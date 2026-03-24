@@ -20,7 +20,7 @@ import ShowTrailerVideo from "./components/usersComponents/MovieGallery/ShowTrai
 import AllMovie from "./pages/users_pages/Movie/AllMovie.jsx";
 import Faq from "./pages/users_pages/faq/faq";
 import MyBooking from "./pages/users_pages/Booking/Booking.jsx";
-import MyBookingMovies from "./pages/users_pages/MovieBooking/movie.jsx";
+import MyBookingMovies from "./pages/users_pages/MovieBooking/Movie.jsx";
 import FoodBeverage from "./pages/users_pages/MovieBooking/foodBeverage.jsx";
 import Payment from "./pages/users_pages/MovieBooking/Payment.jsx";
 import ShowPayment from "./pages/users_pages/ShowBooking/ShowPayment.jsx";
