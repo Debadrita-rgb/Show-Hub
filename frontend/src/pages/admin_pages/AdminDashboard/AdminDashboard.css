@@ -1,0 +1,8 @@
+.company-title-style{
+    margin-left: -17%;
+  }
+  @media (max-width: 320px) {
+    .company-title-style{
+      margin-left: 0;
+    }
+  }

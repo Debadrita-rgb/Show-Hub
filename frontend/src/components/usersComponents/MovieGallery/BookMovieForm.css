@@ -1,0 +1,24 @@
+.seat-grid {
+    display: grid;
+    grid-template-columns: repeat(20, 1fr);
+    gap: 6px;
+    margin-top: 20px;
+  }
+  
+  .seat {
+    padding: 10px;
+    background-color: #e0e0e0;
+    border-radius: 4px;
+    text-align: center;
+    cursor: pointer;
+  }
+  
+  .seat.available:hover {
+    background-color: #b2ffb2;
+  }
+  
+  .seat.booked {
+    background-color: #ffb2b2;
+    cursor: not-allowed;
+  }
+  
