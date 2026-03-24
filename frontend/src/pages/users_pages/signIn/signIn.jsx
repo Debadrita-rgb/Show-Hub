@@ -4,7 +4,7 @@ import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "../../../context/AuthContext";
-
+import BASE_URL from "../../../../config";
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 
@@ -34,7 +34,7 @@ export default function SignIn() {
     }
 
     try {
-      const response = await axios.post("http://localhost:5000/user/login", {
+      const response = await axios.post(`${BASE_URL}/user/login`, {
         email,
         password,
       });
@@ -73,7 +73,7 @@ export default function SignIn() {
         try {
           const email = userData.email;
   
-          const res = await axios.post("http://localhost:5000/user/send-otp", {
+          const res = await axios.post(`${BASE_URL}/user/send-otp`, {
             email: userData.email,
             name: userData.name, // ✅ send name
             password: "google_user", // optional

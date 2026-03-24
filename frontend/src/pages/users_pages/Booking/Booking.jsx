@@ -4,6 +4,7 @@ import QRCode from "react-qr-code";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import BASE_URL from "../../../../config";
 
 const Booking = () => {
   const [bookings, setBookings] = useState([]);
@@ -22,7 +23,7 @@ const Booking = () => {
     const fetchBookings = async () => {
       const token = localStorage.getItem("token");
 
-      const res = await fetch("http://localhost:5000/user/my-bookings", {
+      const res = await fetch(`${BASE_URL}/user/my-bookings`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -67,7 +68,7 @@ const Booking = () => {
         return;
       }
 
-      const response = await fetch("http://localhost:5000/user/add-review", {
+      const response = await fetch(`${BASE_URL}/user/add-review`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

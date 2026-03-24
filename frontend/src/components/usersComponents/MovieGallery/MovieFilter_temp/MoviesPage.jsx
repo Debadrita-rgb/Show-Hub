@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import MovieCard from "./MovieCard";
+import BASE_URL from "../../../../../config";
 
 const MoviesPage = () => {
   const [movies, setMovies] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/user/get-movie")
+    fetch(`${BASE_URL}/user/get-movie`)
       .then((res) => res.json())
       .then((data) => {
         console.log("API DATA:", data);

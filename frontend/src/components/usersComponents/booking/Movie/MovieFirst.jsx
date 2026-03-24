@@ -5,7 +5,9 @@ import { Disclosure } from "@headlessui/react";
 import { FaChevronUp } from "react-icons/fa";
 import { useParams } from "react-router-dom";
 import TheatreList from "./TheaterList"
+import BASE_URL from "../../../../../config";
  
+
 const MovieFirst = () => {
   const { id } = useParams();
 
@@ -19,7 +21,7 @@ const MovieFirst = () => {
   }, []);
 
   const getMovie = async () => {
-    const res = await fetch(`http://localhost:5000/user/get-single-movie/${id}`);
+    const res = await fetch(`${BASE_URL}/user/get-single-movie/${id}`);
     const data = await res.json();
     // console.log(data);
     setMovie(data);

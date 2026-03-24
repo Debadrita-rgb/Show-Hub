@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useLocationcity } from "../../../../context/LocationContext";
+import BASE_URL from "../../../../../config";
 
 const TheaterList = ({ date, language, preferredTime, selectedDate }) => {
   const [allTheaters, setAllTheaters] = useState([]);
@@ -21,7 +22,7 @@ const TheaterList = ({ date, language, preferredTime, selectedDate }) => {
     const queryCity = city && city !== "Detecting..." ? city : "";
 
     const res = await fetch(
-      `http://localhost:5000/user/get-moviewise-theater/${id}?date=${formattedDate}&city=${queryCity}`,
+      `${BASE_URL}/user/get-moviewise-theater/${id}?date=${formattedDate}&city=${queryCity}`,
     );
 
     const data = await res.json();
@@ -37,7 +38,7 @@ const TheaterList = ({ date, language, preferredTime, selectedDate }) => {
   }, [city, selectedDate, id]); //
 
   useEffect(() => {
-    fetch(`http://localhost:5000/user/get-single-movie/${id}`)
+    fetch(`${BASE_URL}/user/get-single-movie/${id}`)
       .then((res) => res.json())
       .then((data) => {
         setMovie(data);

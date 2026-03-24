@@ -7,6 +7,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { Link } from "react-router-dom";
+import BASE_URL from "../../../../config";
 
 const SingleMovie = () => {
   const { slug, id } = useParams();
@@ -43,7 +44,7 @@ const SingleMovie = () => {
   };
 
   useEffect(() => {
-    fetch(`http://localhost:5000/user/get-single-movie/${id}`)
+    fetch(`${BASE_URL}/user/get-single-movie/${id}`)
       .then((res) => res.json())
       .then((data) => {
         setMovie(data);
@@ -67,14 +68,14 @@ const SingleMovie = () => {
 
   //Fetch the rating summary
   useEffect(() => {
-    fetch(`http://localhost:5000/user/rating-summary/Movie/${id}`)
+    fetch(`${BASE_URL}/user/rating-summary/Movie/${id}`)
       .then((res) => res.json())
       .then((data) => setRatingSummary(data));
   }, [id]);
 
   //Fetch Reviews
   const fetchReviews = () => {
-    fetch(`http://localhost:5000/user/reviews/Movie/${id}`)
+    fetch(`${BASE_URL}/user/reviews/Movie/${id}`)
       .then((res) => res.json())
       .then((data) => setReviews(data));
   };

@@ -4,6 +4,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { Link } from "react-router-dom";
+import BASE_URL from "../../../../config";
 
 const SingleShow = () => {
   const { id } = useParams();
@@ -40,7 +41,7 @@ const SingleShow = () => {
   };
 
   useEffect(() => {
-    fetch(`http://localhost:5000/user/get-single-show/${id}`)
+    fetch(`${BASE_URL}/user/get-single-show/${id}`)
       .then((res) => res.json())
       .then((data) => setShow(data))
       .catch((err) => console.log(err));
@@ -104,14 +105,14 @@ const SingleShow = () => {
   };
 
   useEffect(() => {
-    fetch(`http://localhost:5000/user/rating-summary/Show/${id}`)
+    fetch(`${BASE_URL}/user/rating-summary/Show/${id}`)
       .then((res) => res.json())
       .then((data) => setRatingSummary(data));
   }, [id]);
 
   //Fetch Reviews
   const fetchReviews = () => {
-    fetch(`http://localhost:5000/user/reviews/Show/${id}`)
+    fetch(`${BASE_URL}/user/reviews/Show/${id}`)
       .then((res) => res.json())
       .then((data) => setReviews(data));
   };

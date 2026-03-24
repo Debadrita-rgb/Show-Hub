@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import BASE_URL from "../../../../config";
 
 
 const ShowTrailerVideo = () => {
@@ -10,7 +11,7 @@ const ShowTrailerVideo = () => {
   const [movie, setMovie] = useState(null);
 
   useEffect(() => {
-    fetch(`http://localhost:5000/user/get-single-movie/${id}`)
+    fetch(`${BASE_URL}/user/get-single-movie/${id}`)
       .then((res) => res.json())
       .then((data) => {
         setMovie(data);

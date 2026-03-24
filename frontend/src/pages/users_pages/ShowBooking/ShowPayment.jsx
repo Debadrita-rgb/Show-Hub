@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
+import BASE_URL from "../../../../config";
 
 const ShowPayment = () => {
   const location = useLocation();
@@ -25,7 +26,7 @@ const navigate = useNavigate();
       const userId = decoded.id;
       // console.log("UserID:", userId);
 
-      const res = await fetch("http://localhost:5000/user/create-show-order", {
+      const res = await fetch(`${BASE_URL}/user/create-show-order`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -55,7 +56,7 @@ const navigate = useNavigate();
         order_id: order.id,
 
         handler: async function (response) {
-          await fetch("http://localhost:5000/user/save-show-booking", {
+          await fetch(`${BASE_URL}/user/save-show-booking`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

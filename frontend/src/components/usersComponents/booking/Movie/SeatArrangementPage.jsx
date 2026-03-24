@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
+import BASE_URL from "../../../../../config";
 
 const SeatArrangementPage = () => {
   const { id } = useParams();
@@ -21,7 +22,7 @@ const SeatArrangementPage = () => {
   }, []);
 
   useEffect(() => {
-    fetch(`http://localhost:5000/user/get-single-movie/${id}`)
+    fetch(`${BASE_URL}/user/get-single-movie/${id}`)
       .then((res) => res.json())
       .then((data) => {
         setMovies(data);
@@ -34,7 +35,7 @@ const SeatArrangementPage = () => {
 
   const getLayout = async () => {
     const res = await fetch(
-      `http://localhost:5000/user/get-theater-layout/${theaterId}`,
+      `${BASE_URL}/user/get-theater-layout/${theaterId}`,
     );
 
     const data = await res.json();
@@ -48,7 +49,7 @@ const SeatArrangementPage = () => {
 
   const getBookedSeats = async () => {
     const res = await fetch(
-      `http://localhost:5000/user/get-booked-seats?movieId=${id}&theaterId=${theaterId}&showDate=${selectedDate}&showTime=${selectedTimeSlot}`,
+      `${BASE_URL}/user/get-booked-seats?movieId=${id}&theaterId=${theaterId}&showDate=${selectedDate}&showTime=${selectedTimeSlot}`,
     );
 
     const data = await res.json();

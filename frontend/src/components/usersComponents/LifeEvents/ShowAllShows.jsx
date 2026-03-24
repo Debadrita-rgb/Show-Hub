@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import FilterSidebar from "./LifeEvents_temp/FilterSidebar";
 import ShowCard from "./LifeEvents_temp/ShowCard";
 import { useParams } from "react-router-dom";
+import BASE_URL from "../../../../config";
 
 const ShowAllShows = () => {
   const { id } = useParams();
@@ -19,9 +20,9 @@ const [showFilters, setShowFilters] = useState(false);
     const fetchData = async () => {
       try {
         const [categoryRes, showsRes] = await Promise.all([
-          fetch(`http://localhost:5000/user/get-maincategory/${categoryId}`),
+          fetch(`${BASE_URL}/user/get-maincategory/${categoryId}`),
           fetch(
-            `http://localhost:5000/user/get-categorized-show/${categoryId}`,
+            `${BASE_URL}/user/get-categorized-show/${categoryId}`,
           ),
         ]);
 

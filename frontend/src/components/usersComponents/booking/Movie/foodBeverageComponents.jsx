@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import BASE_URL from "../../../../../config";
 
 const foodBeverageComponents = () => {
   const location = useLocation();
@@ -28,7 +29,7 @@ const [category, setCategory] = useState("All");
 
   useEffect(() => {
     fetch(
-      `http://localhost:5000/user/get-single-theater/${booking.theaterId}`,
+      `${BASE_URL}/user/get-single-theater/${booking.theaterId}`,
     )
       .then((res) => res.json())
       .then((data) => {

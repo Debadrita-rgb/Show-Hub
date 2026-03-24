@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import BASE_URL from "../../../../config";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -93,7 +94,7 @@ const AddTestimonial = () => {
 
     try {
       const res = await fetch(
-        "http://localhost:5000/voyager/submit-testimonial",
+        `${BASE_URL}/voyager/submit-testimonial`,
         {
           method: "POST",
           headers: {

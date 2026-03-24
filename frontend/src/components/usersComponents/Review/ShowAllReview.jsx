@@ -1,5 +1,6 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import BASE_URL from "../../../../config";
 
 const ShowAllReview = () => {
   const { type, id, slug } = useParams();
@@ -19,13 +20,13 @@ const [show, setShow] = useState(null);
     if (!id || !type) return;
 
     if (type === "Movie") {
-      fetch(`http://localhost:5000/user/get-single-movie/${id}`)
+      fetch(`${BASE_URL}/user/get-single-movie/${id}`)
         .then((res) => res.json())
         .then((data) => setMovie(data));
     }
 
     if (type === "Show") {
-      fetch(`http://localhost:5000/user/get-single-show/${id}`)
+      fetch(`${BASE_URL}/user/get-single-show/${id}`)
         .then((res) => res.json())
         .then((data) => setShow(data));
     }
@@ -46,13 +47,13 @@ const [show, setShow] = useState(null);
   }, [movie, slug, id]);
 
   useEffect(() => {
-    fetch(`http://localhost:5000/user/rating-summary/${type}/${id}`)
+    fetch(`${BASE_URL}/user/rating-summary/${type}/${id}`)
       .then((res) => res.json())
       .then((data) => setRatingSummary(data));
   }, [id]);
 
   const fetchReviews = () => {
-    fetch(`http://localhost:5000/user/reviews/${type}/${id}`)
+    fetch(`${BASE_URL}/user/reviews/${type}/${id}`)
       .then((res) => res.json())
       .then((data) => setReviews(data));
   };

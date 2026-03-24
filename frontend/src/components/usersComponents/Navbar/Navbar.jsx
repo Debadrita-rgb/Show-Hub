@@ -16,6 +16,8 @@ import axios from "axios";
 import { useLocationcity } from "../../../context/LocationContext";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import BASE_URL from "../../../../config";
+
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -160,7 +162,7 @@ export default function Navbar() {
 
   useEffect(() => {
     // Movies
-    fetch("http://localhost:5000/user/get-recommended-movies")
+    fetch(`${BASE_URL}/user/get-recommended-movies`)
       .then((res) => res.json())
       .then((data) => {
         setMovies(data.data);
@@ -169,7 +171,7 @@ export default function Navbar() {
       .catch((err) => console.error(err));
 
     // Shows
-    fetch("http://localhost:5000/user/get-recommended-shows")
+    fetch(`${BASE_URL}/user/get-recommended-shows`)
       .then((res) => res.json())
       .then((data) => {
         setShows(data.data);

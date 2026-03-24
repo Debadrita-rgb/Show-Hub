@@ -4,6 +4,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useLocationcity } from "../../../context/LocationContext.jsx";
+import BASE_URL from "../../../../config.js";
 
 const LifeEvents = () => {
   const [CategorizedShow, setCategorizedShow] = useState([]);
@@ -13,7 +14,7 @@ const LifeEvents = () => {
   useEffect(() => {
     const type = "Show";
 
-    fetch(`http://localhost:5000/admin/get-typewise-category/${type}`)
+    fetch(`${BASE_URL}/admin/get-typewise-category/${type}`)
       .then((res) => {
         if (!res.ok) throw new Error("Network response was not OK");
         return res.json();

@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import FilterSidebar from "./MovieFilter_temp/FilterSidebar";
 import MovieCard from "./MovieFilter_temp/MovieCard";
+import BASE_URL from "../../../../config";
 
 const ShowAllMovieWithFilter = () => {
   const [movies, setMovies] = useState([]);
@@ -19,10 +20,10 @@ const [showFilters, setShowFilters] = useState(false);
                 const type = "Movie";
 
         const [moviesRes, genreRes, languageRes] = await Promise.all([
-          // fetch("http://localhost:5000/user/get-movie"),
-          fetch("http://localhost:5000/user/getMoviesWithRatings"),
-          fetch(`http://localhost:5000/admin/get-typewise-category/${type}`),
-          fetch("http://localhost:5000/user/get-language"),
+          // fetch("${BASE_URL}/user/get-movie"),
+          fetch(`${BASE_URL}/user/getMoviesWithRatings`),
+          fetch(`${BASE_URL}/admin/get-typewise-category/${type}`),
+          fetch(`${BASE_URL}/user/get-language`),
         ]);
 
         const moviesData = await moviesRes.json();

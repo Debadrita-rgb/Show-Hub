@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 
 // Define the MongoDB connection URL
-const mongoURL = process.env.MONGODB_URL_LOCAL // Replace 'mydatabase' with your database name
-// const mongoURL = process.env.MONGODB_URL;
+// const mongoURL = process.env.MONGODB_URL_LOCAL // Replace 'mydatabase' with your database name
+const mongoURL = process.env.REACT_APP_BASE_URL;
 
 // Set up MongoDB connection
 mongoose.connect(mongoURL, {
@@ -18,7 +18,7 @@ const db = mongoose.connection;
 // Define event listeners for database connection
 
 db.on('connected', () => {
-    console.log('Connected to MongoDB server');
+    console.log('Connected to MongoDB server'); 
 });
 
 db.on('error', (err) => {

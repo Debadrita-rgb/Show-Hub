@@ -3,6 +3,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useLocation } from "react-router-dom";
+import BASE_URL from "../../../../config";
 
 const BannerSection = () => {
   const [activeIndex, setActiveIndex] = useState([]);
@@ -15,7 +16,7 @@ const BannerSection = () => {
 
     const pageType1 = path === "/" ? "home" : path.replace("/", "");
 
-    fetch(`http://localhost:5000/user/get-banner/${pageType1}`)
+    fetch(`${BASE_URL}/user/get-banner/${pageType1}`)
       .then((res) => {
         if (!res.ok) throw new Error("Network response was not OK");
         return res.json();

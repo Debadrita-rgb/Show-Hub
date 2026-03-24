@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import BASE_URL from "../../../../config";
 
 const ProfilePage = () => {
 //   const [user, setUser] = useState({});
@@ -10,7 +11,7 @@ useEffect(() => {
   const fetchUser = async () => {
     const token = localStorage.getItem("token");
 
-    const res = await fetch("http://localhost:5000/user/get-user-profile", {
+    const res = await fetch(`${BASE_URL}/user/get-user-profile`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -28,7 +29,7 @@ useEffect(() => {
 const handleSave = async () => {
   const token = localStorage.getItem("token");
 
-  const res = await fetch("http://localhost:5000/user/update-user-profile", {
+  const res = await fetch(`${BASE_URL}/user/update-user-profile`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",

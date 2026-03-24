@@ -4,6 +4,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useLocationcity } from "../../../context/LocationContext.jsx";
+import BASE_URL from "../../../../config.js";
 
 
 const MovieGallery = () => {
@@ -21,8 +22,8 @@ const MovieGallery = () => {
        try {
          const queryCity = city && city !== "Detecting..." ? city : "";
          const url = queryCity
-           ? `http://localhost:5000/user/get-recommended-movies-by-location?city=${queryCity}`
-           : `http://localhost:5000/user/get-recommended-movies-by-location`;
+           ? `${BASE_URL}/user/get-recommended-movies-by-location?city=${queryCity}`
+           : `${BASE_URL}/user/get-recommended-movies-by-location`;
 
          const res = await fetch(url); 
 
