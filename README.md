@@ -1,4 +1,3 @@
-# Show-Hub
 # 🎬 ShowHub – Movie & Event Booking Platform
 
 ShowHub is a full-stack web application that allows users to explore movies, search events, and book tickets seamlessly. It provides a modern UI with responsive design and real-time features.
