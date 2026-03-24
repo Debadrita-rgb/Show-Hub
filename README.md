@@ -58,17 +58,17 @@ cd showhub
 #### Frontend
 
 ```bash
-cd client
+cd frontend
 npm install
-npm start
+npm run dev
 ```
 
 #### Backend
 
 ```bash
-cd server
+cd backend
 npm install
-npm run dev
+nodemon server.js
 ```
 
 ---
