@@ -330,7 +330,7 @@ export default function Navbar() {
           >
             Movies
           </Link>
-          <Link className="hover:text-purple-950 cursor-pointer text-black">
+          {/* <Link className="hover:text-purple-950 cursor-pointer text-black">
             Stream
           </Link>
           <Link className="hover:text-purple-950 cursor-pointer text-black">
@@ -344,7 +344,7 @@ export default function Navbar() {
           </Link>
           <Link className="hover:text-purple-950 cursor-pointer text-black">
             Activities
-          </Link>
+          </Link> */}
         </div>
 
         {/* <div className="flex gap-6 text-gray-600 text-sm">
