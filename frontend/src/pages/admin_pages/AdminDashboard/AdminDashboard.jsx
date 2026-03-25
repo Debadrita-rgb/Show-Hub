@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { FiBriefcase, FiClock, FiMapPin } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import BASE_URL from "../../../../config";
 
 const AdminDashboard = () => {
 
@@ -17,7 +18,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/admin/dashboardData", {
+        const response = await axios.get(`${BASE_URL}/admin/dashboardData`, {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
 
