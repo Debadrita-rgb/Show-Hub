@@ -4,6 +4,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import DynamicForm from "../../../components/commonComponent/CrudComponent/DynamicFormComponent";
+import BASE_URL from "../../../../config";
 
 const EditMovie = () => {
   const navigate = useNavigate();
@@ -31,7 +32,7 @@ const EditMovie = () => {
         const token = localStorage.getItem("token");
 
         const res = await axios.get(
-          "http://localhost:5000/admin/get-category",
+          `${BASE_URL}/admin/get-category`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -54,7 +55,7 @@ const EditMovie = () => {
         const token = localStorage.getItem("token");
 
         const res = await axios.get(
-          "http://localhost:5000/admin/get-language",
+          `${BASE_URL}/admin/get-language`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -75,7 +76,7 @@ const EditMovie = () => {
     const fetchData = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:5000/admin/get-single-movie/${movieId}`,
+          `${BASE_URL}/admin/get-single-movie/${movieId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           },
@@ -154,7 +155,7 @@ const EditMovie = () => {
       };
 
       const res = await axios.put(
-        `http://localhost:5000/admin/update-movie/${movieId}`,
+        `${BASE_URL}/admin/update-movie/${movieId}`,
         updatedData,
         {
           headers: {

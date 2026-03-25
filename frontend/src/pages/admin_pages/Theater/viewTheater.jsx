@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
 import axios from "axios";
+import BASE_URL from "../../../../config";
 
 const ViewTheater = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -13,7 +14,7 @@ const ViewTheater = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    fetch("http://localhost:5000/admin/get-theater", {
+    fetch(`${BASE_URL}/admin/get-theater`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -49,7 +50,7 @@ const ViewTheater = () => {
     const token = localStorage.getItem("token");
     try {
       const res = await fetch(
-        `http://localhost:5000/admin/toggle-theater-status/${id}`,
+        `${BASE_URL}/admin/toggle-theater-status/${id}`,
         {
           method: "PATCH",
           headers: {
@@ -88,7 +89,7 @@ const ViewTheater = () => {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/admin/delete-theater/${id}`,
+        `${BASE_URL}/admin/delete-theater/${id}`,
         {
           method: "DELETE",
           headers: {

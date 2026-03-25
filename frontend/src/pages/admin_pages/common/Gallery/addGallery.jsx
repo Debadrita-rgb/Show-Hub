@@ -4,6 +4,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import DynamicForm from "../../../../components/commonComponent/CrudComponent/DynamicFormComponent";
+import BASE_URL from "../../../../../config";
 
 const addGallery = () => {
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ const addGallery = () => {
   const handleFormSubmit = async (data) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.post("http://localhost:5000/admin/add-gallery", data, {
+      await axios.post(`${BASE_URL}/admin/add-gallery`, data, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

@@ -4,6 +4,7 @@ import DynamicForm from "../../../components/commonComponent/CrudComponent/Dynam
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import BASE_URL from "../../../../config";
 
 const AddMovie = () => {
   const location = useLocation();
@@ -28,7 +29,7 @@ const AddMovie = () => {
         const type = "Movie";
 
         const res = await axios.get(
-          `http://localhost:5000/admin/get-typewise-category/${type}`,
+          `${BASE_URL}/admin/get-typewise-category/${type}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -51,7 +52,7 @@ const AddMovie = () => {
         const token = localStorage.getItem("token");
 
         const res = await axios.get(
-          "http://localhost:5000/admin/get-language",
+          `${BASE_URL}/admin/get-language`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -132,7 +133,7 @@ const AddMovie = () => {
         crew,
       };
       // console.log(dataToSend);
-      await axios.post("http://localhost:5000/admin/add-movie", dataToSend, {
+      await axios.post(`${BASE_URL}/admin/add-movie`, dataToSend, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

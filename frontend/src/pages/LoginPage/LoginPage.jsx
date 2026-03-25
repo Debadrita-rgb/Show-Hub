@@ -9,6 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import logo from "../../assets/admin_login_logo.png";
 import admin_image from "../../assets/admin_image.png"
+import BASE_URL from "../../../config";
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
@@ -30,7 +31,7 @@ const AdminLogin = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/common/login", {
+      const response = await fetch(`${BASE_URL}/common/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -38,12 +39,12 @@ const AdminLogin = () => {
 
       const data = await response.json();
 
-      // ✅ Check if request is successful
+      // Check if request is successful
       if (!response.ok) {
         throw new Error(data.message || "Login failed");
       }
 
-      // ✅ Only runs if login is successful
+      // Only runs if login is successful
       toast.success("🎉 Login successful!", {
         autoClose: 3000,
         pauseOnFocusLoss: false,
@@ -56,7 +57,7 @@ const AdminLogin = () => {
         if (userRole === "admin") navigate("/admin/dashboard");
       }, 1000);
     } catch (error) {
-      // ✅ Show backend error message
+      // Show backend error message
       const errorMessage = error.message || "Login failed";
       toast.error(errorMessage);
       setErrors({ server: errorMessage });

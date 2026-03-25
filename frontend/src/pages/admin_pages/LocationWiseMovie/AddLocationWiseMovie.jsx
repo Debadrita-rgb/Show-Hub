@@ -3,6 +3,7 @@ import axios from "axios";
 import dayjs from "dayjs";
 import { toast, ToastContainer } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import BASE_URL from "../../../../config";
 
 const AddLocationWiseMovie = () => {
   const navigate = useNavigate();
@@ -40,7 +41,7 @@ const AddLocationWiseMovie = () => {
     const token = localStorage.getItem("token");
 
     axios
-      .get("http://localhost:5000/admin/get-movie", {
+      .get(`${BASE_URL}/admin/get-movie`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -82,7 +83,7 @@ const AddLocationWiseMovie = () => {
     const token = localStorage.getItem("token");
 
     axios
-      .get("http://localhost:5000/admin/get-theater", {
+      .get(`${BASE_URL}/admin/get-theater`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -316,7 +317,7 @@ const AddLocationWiseMovie = () => {
       };
 
       const res = await axios.post(
-        "http://localhost:5000/admin/add-locationwise-movie",
+        `${BASE_URL}/admin/add-locationwise-movie`,
         payload,
         {
           headers: {

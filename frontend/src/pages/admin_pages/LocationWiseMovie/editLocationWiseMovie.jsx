@@ -3,6 +3,7 @@ import axios from "axios";
 import dayjs from "dayjs";
 import { toast, ToastContainer } from "react-toastify";
 import { useNavigate, useParams } from "react-router-dom";
+import BASE_URL from "../../../../config";
 
 const EditLocationWiseMovie = () => {
   const { id } = useParams();
@@ -33,7 +34,7 @@ const EditLocationWiseMovie = () => {
     const token = localStorage.getItem("token");
 
     axios
-      .get("http://localhost:5000/admin/get-movie", {
+      .get(`${BASE_URL}/admin/get-movie`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
@@ -52,7 +53,7 @@ const EditLocationWiseMovie = () => {
     const token = localStorage.getItem("token");
 
     axios
-      .get("http://localhost:5000/admin/get-theater", {
+      .get(`${BASE_URL}/admin/get-theater`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
@@ -72,7 +73,7 @@ const EditLocationWiseMovie = () => {
 
       try {
         const res = await axios.get(
-          `http://localhost:5000/admin/get-single-locationwise-movie/${id}`,
+          `${BASE_URL}/admin/get-single-locationwise-movie/${id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           },
@@ -249,7 +250,7 @@ const handleRemoveLanguage = (lang) => {
       const token = localStorage.getItem("token");
 
       await axios.put(
-        `http://localhost:5000/admin/update-locationwise-movie/${id}`,
+        `${BASE_URL}/admin/update-locationwise-movie/${id}`,
         { ...formData, shows },
         {
           headers: { Authorization: `Bearer ${token}` },

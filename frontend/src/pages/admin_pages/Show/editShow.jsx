@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import { useNavigate, useParams } from "react-router-dom";
+import BASE_URL from "../../../../config";
 
 const EditShow = () => {
   const { id } = useParams();
@@ -40,11 +41,11 @@ const EditShow = () => {
     const fetchData = async () => {
       try {
         const catRes = await axios.get(
-          "http://localhost:5000/admin/get-typewise-category/Show",
+          `${BASE_URL}/admin/get-typewise-category/Show`,
         );
 
         const langRes = await axios.get(
-          "http://localhost:5000/admin/get-language",
+          `${BASE_URL}/admin/get-language`,
           { headers: { Authorization: `Bearer ${token}` } },
         );
 
@@ -127,7 +128,7 @@ const EditShow = () => {
         const token = localStorage.getItem("token");
 
         const res = await axios.get(
-          `http://localhost:5000/admin/get-single-show/${id}`,
+          `${BASE_URL}/admin/get-single-show/${id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           },
@@ -200,7 +201,7 @@ const EditShow = () => {
       [name]: type === "checkbox" ? checked : value,
     });
 
-    // ✅ CATEGORY CHANGE LOGIC
+    //  CATEGORY CHANGE LOGIC
     if (name === "category") {
       const selectedCategory = categories.find((cat) => cat._id === value);
 
@@ -251,7 +252,7 @@ const EditShow = () => {
       };
 
       await axios.put(
-        `http://localhost:5000/admin/update-show/${id}`,
+        `${BASE_URL}/admin/update-show/${id}`,
         payload,
         {
           headers: { Authorization: `Bearer ${token}` },

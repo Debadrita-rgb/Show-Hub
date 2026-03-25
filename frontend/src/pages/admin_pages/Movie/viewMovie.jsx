@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
 import axios from "axios";
+import BASE_URL from "../../../../config";
 
 const ViewMovie = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -14,7 +15,7 @@ const ViewMovie = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    fetch("http://localhost:5000/admin/get-movie", {
+    fetch(`${BASE_URL}/admin/get-movie`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -45,7 +46,7 @@ const ViewMovie = () => {
     const token = localStorage.getItem("token");
     try {
       const res = await fetch(
-        `http://localhost:5000/admin/toggle-movie-status/${id}`,
+        `${BASE_URL}/admin/toggle-movie-status/${id}`,
         {
           method: "PATCH",
           headers: {
@@ -74,7 +75,7 @@ const ViewMovie = () => {
     const token = localStorage.getItem("token");
     try {
       const res = await fetch(
-        `http://localhost:5000/admin/toggle-movie-recommended/${id}`,
+        `${BASE_URL}/admin/toggle-movie-recommended/${id}`,
         {
           method: "PATCH",
           headers: {
@@ -115,7 +116,7 @@ const ViewMovie = () => {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/admin/delete-movie/${id}`,
+        `${BASE_URL}/admin/delete-movie/${id}`,
         {
           method: "DELETE",
           headers: {

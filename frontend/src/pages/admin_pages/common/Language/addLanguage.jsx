@@ -4,6 +4,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import DynamicForm from "../../../../components/commonComponent/CrudComponent/DynamicFormComponent";
+import BASE_URL from "../../../../../config";
 
 const AddLanguage = () => {
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ const AddLanguage = () => {
       type: "Movie",
     };
     try {
-      const res = await fetch("http://localhost:5000/admin/add-language", {
+      const res = await fetch(`${BASE_URL}/admin/add-language`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

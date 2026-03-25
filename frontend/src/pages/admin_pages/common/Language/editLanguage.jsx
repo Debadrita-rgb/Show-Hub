@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import DynamicForm from "../../../../components/commonComponent/CrudComponent/DynamicFormComponent";
+import BASE_URL from "../../../../../config";
 
 const EditLanguage = () => {
   const { id } = useParams();
@@ -11,7 +12,7 @@ const EditLanguage = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    fetch(`http://localhost:5000/admin/get-single-language/${id}`, {
+    fetch(`${BASE_URL}/admin/get-single-language/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
@@ -27,7 +28,7 @@ const EditLanguage = () => {
     };
     try {
       const res = await fetch(
-        `http://localhost:5000/admin/update-language/${id}`,
+        `${BASE_URL}/admin/update-language/${id}`,
         {
           method: "PUT",
           headers: {

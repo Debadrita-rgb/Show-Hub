@@ -3,6 +3,7 @@ import TableComponent from "../../../../components/commonComponent/CrudComponent
 import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import BASE_URL from "../../../../../config";
 
 const contact = () => {
   const [contactItems, setContactItems] = useState([]);
@@ -11,7 +12,7 @@ const contact = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    fetch("http://localhost:5000/admin/get-fullcontact-details", {
+    fetch(`${BASE_URL}/admin/get-fullcontact-details`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

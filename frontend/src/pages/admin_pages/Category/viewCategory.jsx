@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
 import axios from "axios";
+import BASE_URL from "../../../../config";
 
 const ViewCategory = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -13,7 +14,7 @@ const ViewCategory = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    fetch("http://localhost:5000/admin/get-category", {
+    fetch(`${BASE_URL}/admin/get-category`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -45,7 +46,7 @@ const ViewCategory = () => {
     const token = localStorage.getItem("token");
     try {
       const res = await fetch(
-        `http://localhost:5000/admin/toggle-category-status/${id}`,
+        `${BASE_URL}/admin/toggle-category-status/${id}`,
         {
           method: "PATCH",
           headers: {
@@ -84,7 +85,7 @@ const ViewCategory = () => {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/admin/delete-category/${id}`,
+        `${BASE_URL}/admin/delete-category/${id}`,
         {
           method: "DELETE",
           headers: {

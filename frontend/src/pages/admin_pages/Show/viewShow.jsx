@@ -3,6 +3,7 @@ import TableComponent from "../../../components/commonComponent/CrudComponent/Ta
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
+import BASE_URL from "../../../../config";
 
 const viewShow = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -11,7 +12,7 @@ const viewShow = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    fetch("http://localhost:5000/admin/get-show", {
+    fetch(`${BASE_URL}/admin/get-show`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -43,7 +44,7 @@ const viewShow = () => {
     const token = localStorage.getItem("token");
     try {
       const res = await fetch(
-        `http://localhost:5000/admin/toggle-show-status/${id}`,
+        `${BASE_URL}/admin/toggle-show-status/${id}`,
         {
           method: "PATCH",
           headers: {
@@ -82,7 +83,7 @@ const viewShow = () => {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/admin/delete-show/${id}`,
+        `${BASE_URL}/admin/delete-show/${id}`,
         {
           method: "DELETE",
           headers: {
@@ -105,7 +106,7 @@ const viewShow = () => {
       const token = localStorage.getItem("token");
       try {
         const res = await fetch(
-          `http://localhost:5000/admin/toggle-show-recommended/${id}`,
+          `${BASE_URL}/admin/toggle-show-recommended/${id}`,
           {
             method: "PATCH",
             headers: {

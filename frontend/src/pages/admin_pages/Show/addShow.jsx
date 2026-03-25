@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import { useLocation, useNavigate } from "react-router-dom";
+import BASE_URL from "../../../../config";
 
 const AddShow = () => {
   const navigate = useNavigate();
@@ -46,7 +47,7 @@ const AddShow = () => {
         const token = localStorage.getItem("token");
 
         const res = await axios.get(
-          "http://localhost:5000/admin/get-typewise-category/Show",
+          `${BASE_URL}/admin/get-typewise-category/Show`,
           {
             headers: { Authorization: `Bearer ${token}` },
           },
@@ -69,7 +70,7 @@ const AddShow = () => {
         const token = localStorage.getItem("token");
 
         const res = await axios.get(
-          "http://localhost:5000/admin/get-language",
+          `${BASE_URL}/admin/get-language`,
           {
             headers: { Authorization: `Bearer ${token}` },
           },
@@ -214,7 +215,7 @@ const handleChange = (e) => {
         artists,
       };
 
-      await axios.post("http://localhost:5000/admin/add-show", payload, {
+      await axios.post(`${BASE_URL}/admin/add-show`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

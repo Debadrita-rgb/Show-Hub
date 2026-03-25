@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
 import axios from "axios";
 import dayjs from "dayjs";
+import BASE_URL from "../../../../config";
 
 const ViewdLocationWiseMovie = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -15,7 +16,7 @@ const ViewdLocationWiseMovie = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    fetch("http://localhost:5000/admin/get-locationwise-movie", {
+    fetch(`${BASE_URL}/admin/get-locationwise-movie`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

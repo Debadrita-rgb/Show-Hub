@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
 import axios from "axios";
+import BASE_URL from "../../../../../config";
 
 const ViewBanner = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -13,7 +14,7 @@ const ViewBanner = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    fetch("http://localhost:5000/admin/get-banner", {
+    fetch(`${BASE_URL}/admin/get-banner`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

@@ -4,6 +4,8 @@ import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
+import BASE_URL from "../../../../config";
+
 const AddTheater = () => {
   const navigate = useNavigate();
 
@@ -120,7 +122,7 @@ const foodCategories = ["Popcorn", "Snacks", "Combos", "Beverages"];
         foodItems: isPreMeal ? foodItems : [],
       };
       // console.log(payload);
-      await axios.post("http://localhost:5000/admin/add-theater", payload, {
+      await axios.post(`${BASE_URL}/admin/add-theater`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
+import BASE_URL from "../../../../config";
 
 const AddCategory = () => {
   const navigate = useNavigate();
@@ -55,7 +56,7 @@ const AddCategory = () => {
     };
 
     try {
-      const res = await fetch("http://localhost:5000/admin/add-type-category", {
+      const res = await fetch(`${BASE_URL}/admin/add-type-category`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

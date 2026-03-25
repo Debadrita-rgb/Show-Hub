@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
 import axios from "axios";
+import BASE_URL from "../../../../../config";
 
 const ViewLanguage = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -13,7 +14,7 @@ const ViewLanguage = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    fetch("http://localhost:5000/admin/get-language", {
+    fetch(`${BASE_URL}/admin/get-language`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -45,7 +46,7 @@ const ViewLanguage = () => {
     const token = localStorage.getItem("token");
     try {
       const res = await fetch(
-        `http://localhost:5000/admin/toggle-Language-status/${id}`,
+        `${BASE_URL}/admin/toggle-Language-status/${id}`,
         {
           method: "PATCH",
           headers: {
@@ -84,7 +85,7 @@ const ViewLanguage = () => {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/admin/delete-language/${id}`,
+        `${BASE_URL}/admin/delete-language/${id}`,
         {
           method: "DELETE",
           headers: {

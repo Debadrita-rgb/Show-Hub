@@ -3,6 +3,7 @@ import TableComponent from "../../../../components/commonComponent/CrudComponent
 import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import BASE_URL from "../../../../../config";
 
 const feedback = () => {
   const [feedbackItems, setFeedbackItems] = useState([]);
@@ -11,7 +12,7 @@ const feedback = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    fetch("http://localhost:5000/admin/get-fullfeedback-details", {
+    fetch(`${BASE_URL}/admin/get-fullfeedback-details`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

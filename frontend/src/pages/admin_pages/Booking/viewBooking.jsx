@@ -7,6 +7,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Disclosure } from "@headlessui/react";
 import { FaChevronUp } from "react-icons/fa";
+import BASE_URL from "../../../../config";
 
 const ViewBooking = () => {
   const [selectedDate, setSelectedDate] = useState(null);
@@ -16,7 +17,7 @@ const ViewBooking = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    fetch("http://localhost:5000/admin/get-booked-details", {
+    fetch(`${BASE_URL}/admin/get-booked-details`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

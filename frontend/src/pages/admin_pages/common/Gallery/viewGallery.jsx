@@ -3,6 +3,7 @@ import TableComponent from "../../../../components/commonComponent/CrudComponent
 import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import BASE_URL from "../../../../../config";
 
 const viewGallery = () => {
   const [galleryItems, setGalleryItems] = useState([]);
@@ -11,7 +12,7 @@ const viewGallery = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    fetch("http://localhost:5000/admin/get-gallery", {
+    fetch(`${BASE_URL}/admin/get-gallery`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -42,7 +43,7 @@ const viewGallery = () => {
     const token = localStorage.getItem("token");
     try {
       const res = await fetch(
-        `http://localhost:5000/admin/toggle-gallery-status/${id}`,
+        `${BASE_URL}/admin/toggle-gallery-status/${id}`,
         {
           method: "PATCH",
           headers: {
@@ -82,7 +83,7 @@ const viewGallery = () => {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/admin/delete-gallery-item/${id}`,
+        `${BASE_URL}/admin/delete-gallery-item/${id}`,
         {
           method: "DELETE",
           headers: {

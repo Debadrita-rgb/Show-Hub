@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import BASE_URL from "../../../../config";
 
 const EditCategory = () => {
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ const EditCategory = () => {
             const token = localStorage.getItem("token");
 
         const res = await fetch(
-          `http://localhost:5000/admin/get-single-category/${id}`,
+          `${BASE_URL}/admin/get-single-category/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -90,7 +91,7 @@ const EditCategory = () => {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/admin/update-typewise-category/${id}`,
+        `${BASE_URL}/admin/update-typewise-category/${id}`,
         {
           method: "PUT",
           headers: {

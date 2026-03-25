@@ -3,6 +3,7 @@ import DynamicForm from "../../../components/commonComponent/CrudComponent/Dynam
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import { useNavigate, useParams } from "react-router-dom";
+import BASE_URL from "../../../../config";
 
 const EditTheater = () => {
   const { id } = useParams();
@@ -30,7 +31,7 @@ const foodCategories = ["Popcorn", "Snacks", "Combos", "Beverages"];
               const token = localStorage.getItem("token");
 
         const res = await axios.get(
-          `http://localhost:5000/admin/get-single-theater/${id}`,{
+          `${BASE_URL}/admin/get-single-theater/${id}`,{
                     headers: { Authorization: `Bearer ${token}` },
 
           }
@@ -167,7 +168,7 @@ const handleSubmit = async (e) => {
     };
 
     await axios.put(
-      `http://localhost:5000/admin/update-theater/${id}`,
+      `${BASE_URL}/admin/update-theater/${id}`,
       payload,
       {
         headers: { Authorization: `Bearer ${token}` },

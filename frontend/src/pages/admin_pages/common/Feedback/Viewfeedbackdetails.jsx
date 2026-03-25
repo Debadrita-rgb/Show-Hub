@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import DynamicForm from "../../../../components/commonComponent/CrudComponent/DynamicFormComponent";
+import BASE_URL from "../../../../../config";
 
 const fields = [
   { name: "name", label: "Name", type: "text" },
@@ -17,7 +18,7 @@ const Viewfeedbackdetails = () => {
   useEffect(() => {
     if (!conatctId) return;
 
-    fetch(`http://localhost:5000/admin/get-single-contact/${conatctId}`, {
+    fetch(`${BASE_URL}/admin/get-single-contact/${conatctId}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
