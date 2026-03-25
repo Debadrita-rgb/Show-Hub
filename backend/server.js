@@ -18,6 +18,11 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
 
+app.use((req, res, next) => {
+  res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+  next();
+});
+
 // Routes
 const adminRoutes = require('./routes/adminRoutes');
 const userRoutes = require("./routes/userRoutes");
