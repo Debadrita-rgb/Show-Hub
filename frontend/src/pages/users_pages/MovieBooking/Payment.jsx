@@ -16,7 +16,7 @@ const navigate = useNavigate();
   const foodTotal =
     booking.foodItems?.reduce((sum, item) => sum + item.price * item.qty, 0) ||
     0;
-
+ 
   const subtotal = ticketPrice + foodTotal;
 
   const convenienceFee = subtotal * 0.18;
@@ -193,7 +193,7 @@ const navigate = useNavigate();
           <div className="border-t mt-3 pt-3 flex justify-between font-bold text-lg">
             <span>Amount Payable</span>
 
-            <span>₹{finalAmount}</span>
+            <span>₹{Number(finalAmount).toFixed(2)}</span>
           </div>
         </div>
 
