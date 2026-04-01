@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -113,7 +113,7 @@ const App = () => {
     <div className="min-h-screen bg-transparent">
       {/* <ToastContainer position="top-right" autoClose={2000} /> */}
 
-      <BrowserRouter>
+      <HashRouter>
         <Routes>
           {/* User */}
           <Route element={<UserLayout />}>
@@ -246,7 +246,7 @@ const App = () => {
           {/* Redirect unknown routes */}
           <Route path="*" element={<LoginPage />} />
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
     </div>
   );
 };
