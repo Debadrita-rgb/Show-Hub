@@ -10,7 +10,7 @@ import {
 import logo from "../../../assets/logo.png";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
-import "./Navbar.css";
+// import "./Navbar.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useLocationcity } from "../../../context/LocationContext";
@@ -115,6 +115,8 @@ export default function Navbar() {
           data.address.town ||
           data.address.village ||
           data.address.state;
+
+// console.log("detectedCity", detectedCity);
 
         setCity(detectedCity);
         setIsLocationOpen(false);

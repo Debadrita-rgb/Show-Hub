@@ -22,6 +22,10 @@ const navigate = useNavigate();
   const handlePayment = async () => {
     try {
       const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/signin");
+        return;
+      }
       const decoded = jwtDecode(token);
       const userId = decoded.id;
       // console.log("UserID:", userId);
@@ -66,13 +70,13 @@ const navigate = useNavigate();
               details: booking,
               paymentId: response.razorpay_payment_id,
               paymentStatus: "Success",
-              totalAmount: finalAmount,
+              totalAmount: Number(finalAmount.toFixed(2)),
               userId: userId,
-              convenienceFee: convenienceFee,
+              convenienceFee: Number(convenienceFee.toFixed(2)),
               type: "Show",
-              cgst: cgst,
-              sgst: sgst,
-              Price: showPrice,
+              cgst: Number(cgst.toFixed(2)),
+              sgst: Number(sgst.toFixed(2)),
+              Price: Number(showPrice.toFixed(2)),
             }),
           });
 

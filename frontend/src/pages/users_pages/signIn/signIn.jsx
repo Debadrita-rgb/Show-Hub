@@ -69,24 +69,24 @@ export default function SignIn() {
     }
   };
 
-      const handleGoogleLogin = async (userData) => {
-        try {
-          const email = userData.email;
-  
-          const res = await axios.post(`${BASE_URL}/user/send-otp`, {
-            email: userData.email,
-            name: userData.name, // ✅ send name
-            password: "google_user", // optional
-          });
-  
-          toast.success("OTP sent to your email!");
-  
-          // navigate to OTP page
-          navigate("/verify-otp", { state: { email } });
-        } catch (err) {
-          toast.error("Failed to send OTP");
-        }
-      };
+  const handleGoogleLogin = async (userData) => {
+    try {
+      const email = userData.email;
+
+      const res = await axios.post(`${BASE_URL}/user/send-otp`, {
+        email: userData.email,
+        name: userData.name, // ✅ send name
+        password: "google_user", // optional
+      });
+
+      toast.success("OTP sent to your email!");
+
+      // navigate to OTP page
+      navigate("/verify-otp", { state: { email } });
+    } catch (err) {
+      toast.error("Failed to send OTP");
+    }
+  };
 
   return (
     <>

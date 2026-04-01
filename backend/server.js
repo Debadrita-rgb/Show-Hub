@@ -10,7 +10,11 @@ const cors = require("cors");
 
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://show-hub-frontend.onrender.com"],
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:5173",
+      "https://show-hub-frontend.onrender.com",
+    ],
     credentials: true,
   }),
 );

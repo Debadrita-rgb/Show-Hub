@@ -6,7 +6,7 @@ import BASE_URL from "../../../../config";
 const Payment = () => {
   const location = useLocation();
   const { state } = useLocation();
-const navigate = useNavigate();
+  const navigate = useNavigate();
   const booking = location.state;
   // console.log("Booking Data:", state);
   const [showFeeDetails, setShowFeeDetails] = useState(false);
@@ -16,7 +16,7 @@ const navigate = useNavigate();
   const foodTotal =
     booking.foodItems?.reduce((sum, item) => sum + item.price * item.qty, 0) ||
     0;
- 
+
   const subtotal = ticketPrice + foodTotal;
 
   const convenienceFee = subtotal * 0.18;
@@ -29,9 +29,14 @@ const navigate = useNavigate();
   const handlePayment = async () => {
     try {
       const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/signin");
+        return;
+      }
       const decoded = jwtDecode(token);
       const userId = decoded.id;
       // console.log("UserID:", userId);
+      const roundedAmount = Number(finalAmount.toFixed(2));;
 
       const res = await fetch(`${BASE_URL}/user/create-order`, {
         method: "POST",
@@ -39,7 +44,7 @@ const navigate = useNavigate();
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ amount: finalAmount }),
+        body: JSON.stringify({ amount: roundedAmount }),
       });
 
       const order = await res.json();
@@ -71,22 +76,18 @@ const navigate = useNavigate();
             },
             body: JSON.stringify({
               ...booking,
-              // seats: booking.selectedSeats,
-              // foodItems: booking.cart,
               paymentId: response.razorpay_payment_id,
               paymentStatus: "Success",
-              totalAmount: finalAmount,
+              totalAmount: Number(finalAmount.toFixed(2)),
               userId: userId,
-              convenienceFee: convenienceFee,
+              convenienceFee: Number(convenienceFee.toFixed(2)),
               type: "Movie",
-              cgst: cgst,
-              sgst: sgst,
-              ticketPrice: ticketPrice,
-              foodTotal: foodTotal,
+              cgst: Number(cgst.toFixed(2)),
+              sgst: Number(sgst.toFixed(2)),
+              ticketPrice: Number(ticketPrice.toFixed(2)),
+              foodTotal: Number(foodTotal.toFixed(2)),
             }),
           });
-
-
 
           alert("Payment Successful 🎉");
           navigate("/user-bookings");
