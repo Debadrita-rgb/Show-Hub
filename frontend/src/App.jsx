@@ -11,6 +11,10 @@ import { useEffect } from "react";
 import { useAuth } from "./context/AuthContext";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
+//import Auth Handler
+import AuthHandler from "./context/AuthHandler.jsx";
+
 // Layout
 import UserLayout from "./pages/users_pages/layouts/UsersLayout.jsx";
 
@@ -110,23 +114,9 @@ import UserFeedback from "./pages/users_pages/Feedback/Feedback.jsx";
 import LoginPage from "./pages/LoginPage/LoginPage";
 
 const App = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    const publicRoutes = ["/verify-booking"];
-
-    const isPublicRoute = publicRoutes.some((route) =>
-      location.pathname.startsWith(route),
-    );
-
-    if (!token && !isPublicRoute) {
-      navigate("/signin");
-    }
-  }, [location, navigate]);
-  
+  // const { role } = useAuth();
+  // const role = localStorage.getItem("role");
+  // const isAuthenticated = !!role;
   const { loading, isAuthenticated, role } = useAuth();
   if (loading) return <div>Loading...</div>;
 
@@ -136,138 +126,146 @@ const App = () => {
       {/* <ToastContainer position="top-right" autoClose={2000} /> */}
 
       <BrowserRouter>
-        <Routes>
-          {/* User */}
-          <Route element={<UserLayout />}>
-            <Route path="/" element={<UserHomePage />} />
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/verify-otp" element={<VerifyOtp />} />
-            <Route path="/signin" element={<SignIn />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/testimonial" element={<UserTestimonial />} />
-            <Route path="/feedback" element={<UserFeedback />} />
-            <Route path="/faq" element={<Faq />} />
-            <Route path="/user-profile" element={<MyProfile />} />
-            <Route
-              path="movie/:slug/:id/book-movie"
-              element={<MyBookingMovies />}
-            />
-            {/* <Route
+        <AuthHandler>
+          <Routes>
+            {/* User */}
+            <Route element={<UserLayout />}>
+              <Route path="/" element={<UserHomePage />} />
+              <Route path="/signup" element={<SignUp />} />
+              <Route path="/verify-otp" element={<VerifyOtp />} />
+              <Route path="/signin" element={<SignIn />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/testimonial" element={<UserTestimonial />} />
+              <Route path="/feedback" element={<UserFeedback />} />
+              <Route path="/faq" element={<Faq />} />
+              <Route path="/user-profile" element={<MyProfile />} />
+              <Route
+                path="movie/:slug/:id/book-movie"
+                element={<MyBookingMovies />}
+              />
+              {/* <Route
               path="services/facilities/movies/book-movie/:movieId"
               element={<BookMovieForm />}
             /> */}
-            <Route
-              path="/movie/:slug/:id/book-movie/seat-arrangement"
-              element={<SeatArrangementPage />}
-            />
-            <Route path="movie/:slug/:id" element={<SingleMovie />} />
-            <Route path="single-show/:id" element={<SingleShow />} />
-
-            <Route path="/food-beverage" element={<FoodBeverage />} />
-            <Route path="/payment" element={<Payment />} />
-            <Route path="/show-payment" element={<ShowPayment />} />
-
-            <Route
-              path="/:type/:slug/:id/user-reviews"
-              element={<ShowAllReview />}
-            />
-            <Route
-              path="/movie/:slug/:id/videos"
-              element={<ShowTrailerVideo />}
-            />
-            <Route path="/show-all-movies" element={<AllMovie />} />
-            <Route path="/shows/:slug/:id" element={<AllShows />} />
-            <Route path="/user-bookings" element={<MyBooking />} />
-            <Route path="/verify-booking/:id" element={<VerifyBooking />} />
-          </Route>
-
-          {/* Common Login Page */}
-          <Route path="/backend/login" element={<LoginPage />} />
-
-          {/* Admin Routes */}
-          {isAuthenticated && role === "admin" && (
-            <Route path="/admin" element={<AdminLayout />}>
-              <Route path="dashboard" element={<AdminDashboard />} />
-              {/* <Route path="facilities" element={<Facilities />} /> */}
-              {/*  Movie  */}
-              <Route path="viewMovie" element={<ViewMovie />} />
-              <Route path="addMovie" element={<AdminaddMovie />} />
-              <Route path="editMovie/:id" element={<AdmineditMovie />} />
-              {/* User */}
-              <Route path="view-all-user" element={<AdminUser />} />
-              <Route path="add-user" element={<AdminAddUser />} />
-              <Route path="edit-user/:id" element={<AdmineditUser />} />
-              {/* Gallery */}
-              <Route path="view-gallery" element={<AdminviewGallery />} />
-              <Route path="add-gallery" element={<AdminaddGallery />} />
-
-              {/* Category */}
-              <Route path="view-all-category" element={<AdminCategory />} />
-              <Route path="add-category" element={<AdminAddCategory />} />
-              <Route path="edit-category/:id" element={<AdmineditCategory />} />
-
-              {/* LocationWise Movie */}
               <Route
-                path="view-all-movie-selection"
-                element={<AdminViewdLocationWiseMovie />}
+                path="/movie/:slug/:id/book-movie/seat-arrangement"
+                element={<SeatArrangementPage />}
+              />
+              <Route path="movie/:slug/:id" element={<SingleMovie />} />
+              <Route path="single-show/:id" element={<SingleShow />} />
+
+              <Route path="/food-beverage" element={<FoodBeverage />} />
+              <Route path="/payment" element={<Payment />} />
+              <Route path="/show-payment" element={<ShowPayment />} />
+
+              <Route
+                path="/:type/:slug/:id/user-reviews"
+                element={<ShowAllReview />}
               />
               <Route
-                path="add-movie-selection"
-                element={<AdminAddLocationWiseMovie />}
+                path="/movie/:slug/:id/videos"
+                element={<ShowTrailerVideo />}
               />
-              <Route
-                path="edit-movie-selection/:id"
-                element={<AdmineditLocationWiseMovie />}
-              />
-
-              {/* Language */}
-              <Route path="view-all-language" element={<AdminLanguage />} />
-              <Route path="add-language" element={<AdminAddLanguage />} />
-              <Route path="edit-language/:id" element={<AdmineditLanguage />} />
-
-              {/* Banner */}
-              <Route path="view-all-banner" element={<AdminBanner />} />
-              <Route path="add-banner" element={<AdminAddBanner />} />
-              <Route path="edit-banner/:id" element={<AdmineditBanner />} />
-
-              {/* Theater */}
-              <Route path="view-all-theater" element={<AdminTheater />} />
-              <Route path="add-theater" element={<AdminAddTheater />} />
-              <Route path="edit-theater/:id" element={<AdmineditTheater />} />
-
-              {/* Show */}
-              <Route path="view-all-shows" element={<AdminShow />} />
-              <Route path="add-show" element={<AdminAddShow />} />
-              <Route path="edit-show/:id" element={<AdminEditShow />} />
-
-              {/* Booking  */}
-              <Route path="view-all-booking" element={<AdminviewBooking />} />
-
-              {/* AdminContact */}
-              <Route path="view-contact" element={<AdminContact />} />
-              <Route
-                path="view-contact-details/:id"
-                element={<AdminViewContactDetails />}
-              />
-              {/* AdminFeedback */}
-              <Route path="view-feedback" element={<AdminFeedback />} />
-              <Route
-                path="view-feedback-details/:id"
-                element={<AdminViewFeedbackDetails />}
-              />
-              {/* AdminTestimonial */}
-              <Route path="view-testimonial" element={<AdminTestimonial />} />
-              <Route
-                path="view-testimonial-details/:id"
-                element={<AdminViewTestimonialDetails />}
-              />
+              <Route path="/show-all-movies" element={<AllMovie />} />
+              <Route path="/shows/:slug/:id" element={<AllShows />} />
+              <Route path="/user-bookings" element={<MyBooking />} />
+              <Route path="/verify-booking/:id" element={<VerifyBooking />} />
             </Route>
-          )}
 
-          {/* Redirect unknown routes */}
-          <Route path="*" element={<LoginPage />} />
-        </Routes>
+            {/* Common Login Page */}
+            <Route path="/backend/login" element={<LoginPage />} />
+
+            {/* Admin Routes */}
+            {isAuthenticated && role === "admin" && (
+              <Route path="/admin" element={<AdminLayout />}>
+                <Route path="dashboard" element={<AdminDashboard />} />
+                {/* <Route path="facilities" element={<Facilities />} /> */}
+                {/*  Movie  */}
+                <Route path="viewMovie" element={<ViewMovie />} />
+                <Route path="addMovie" element={<AdminaddMovie />} />
+                <Route path="editMovie/:id" element={<AdmineditMovie />} />
+                {/* User */}
+                <Route path="view-all-user" element={<AdminUser />} />
+                <Route path="add-user" element={<AdminAddUser />} />
+                <Route path="edit-user/:id" element={<AdmineditUser />} />
+                {/* Gallery */}
+                <Route path="view-gallery" element={<AdminviewGallery />} />
+                <Route path="add-gallery" element={<AdminaddGallery />} />
+
+                {/* Category */}
+                <Route path="view-all-category" element={<AdminCategory />} />
+                <Route path="add-category" element={<AdminAddCategory />} />
+                <Route
+                  path="edit-category/:id"
+                  element={<AdmineditCategory />}
+                />
+
+                {/* LocationWise Movie */}
+                <Route
+                  path="view-all-movie-selection"
+                  element={<AdminViewdLocationWiseMovie />}
+                />
+                <Route
+                  path="add-movie-selection"
+                  element={<AdminAddLocationWiseMovie />}
+                />
+                <Route
+                  path="edit-movie-selection/:id"
+                  element={<AdmineditLocationWiseMovie />}
+                />
+
+                {/* Language */}
+                <Route path="view-all-language" element={<AdminLanguage />} />
+                <Route path="add-language" element={<AdminAddLanguage />} />
+                <Route
+                  path="edit-language/:id"
+                  element={<AdmineditLanguage />}
+                />
+
+                {/* Banner */}
+                <Route path="view-all-banner" element={<AdminBanner />} />
+                <Route path="add-banner" element={<AdminAddBanner />} />
+                <Route path="edit-banner/:id" element={<AdmineditBanner />} />
+
+                {/* Theater */}
+                <Route path="view-all-theater" element={<AdminTheater />} />
+                <Route path="add-theater" element={<AdminAddTheater />} />
+                <Route path="edit-theater/:id" element={<AdmineditTheater />} />
+
+                {/* Show */}
+                <Route path="view-all-shows" element={<AdminShow />} />
+                <Route path="add-show" element={<AdminAddShow />} />
+                <Route path="edit-show/:id" element={<AdminEditShow />} />
+
+                {/* Booking  */}
+                <Route path="view-all-booking" element={<AdminviewBooking />} />
+
+                {/* AdminContact */}
+                <Route path="view-contact" element={<AdminContact />} />
+                <Route
+                  path="view-contact-details/:id"
+                  element={<AdminViewContactDetails />}
+                />
+                {/* AdminFeedback */}
+                <Route path="view-feedback" element={<AdminFeedback />} />
+                <Route
+                  path="view-feedback-details/:id"
+                  element={<AdminViewFeedbackDetails />}
+                />
+                {/* AdminTestimonial */}
+                <Route path="view-testimonial" element={<AdminTestimonial />} />
+                <Route
+                  path="view-testimonial-details/:id"
+                  element={<AdminViewTestimonialDetails />}
+                />
+              </Route>
+            )}
+
+            {/* Redirect unknown routes */}
+            <Route path="*" element={<LoginPage />} />
+          </Routes>
+        </AuthHandler>
       </BrowserRouter>
     </div>
   );
