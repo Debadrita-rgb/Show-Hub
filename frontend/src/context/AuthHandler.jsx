@@ -8,17 +8,10 @@ export default function AuthHandler({ children }) {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    const publicRoutes = [
-      "/verify-booking",
-      "/signin",
-      "/signup",
-      "/verify-otp",
-    ];
-
-    const fullPath = location.pathname + location.hash;
+    const publicRoutes = ["/verify-booking", "/signin", "/signup", "/verify-otp"];
 
     const isPublicRoute = publicRoutes.some((route) =>
-      fullPath.includes(route),
+      location.pathname.startsWith(route),
     );
 
     if (!token && !isPublicRoute) {

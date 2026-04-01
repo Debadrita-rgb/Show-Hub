@@ -406,7 +406,7 @@ const Booking = () => {
                 //       : selectedBooking.details?.showTitle,
                 //   paymentId: selectedBooking.paymentId,
                 // })}
-                value={`${window.location.origin}/#/verify-booking/${selectedBooking._id}`}
+                value={`${window.location.origin}/verify-booking/${selectedBooking._id}`}
                 size={160}
               />
 
