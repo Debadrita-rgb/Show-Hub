@@ -17,7 +17,7 @@ export default function VerifyBooking() {
   if (!booking) return <p>Loading...</p>;
 
   return (
-    <div className="flex items-center justify-center h-screen overflow-hidden px-4">
+    <section className="px-6 md:px-16 py-15 flex items-center justify-center">
       <div className="bg-white shadow-2xl rounded-3xl p-6 text-center w-full max-w-sm">
         <h2 className="text-xl sm:text-2xl font-bold mb-4 text-green-600">
           ✅ Booking Verified
@@ -43,6 +43,6 @@ export default function VerifyBooking() {
           Show this screen at entry gate
         </p>
       </div>
-    </div>
+    </section>
   );
 }

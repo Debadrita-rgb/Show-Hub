@@ -274,7 +274,7 @@ export default function Navbar() {
                 >
                   Hi{" "}
                   {userName
-                    ? `${userName.slice(0, 10)}${userName.length > 10 ? "..." : ""}`
+                    ? `${userName.slice(0, 4)}${userName.length > 4 ? "..." : ""}`
                     : "Guest"}
                 </button>
 
