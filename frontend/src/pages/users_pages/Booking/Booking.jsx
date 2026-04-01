@@ -10,7 +10,7 @@ const Booking = () => {
   const [bookings, setBookings] = useState([]);
   const [selectedBooking, setSelectedBooking] = useState(null);
   // console.log("selectedBooking", selectedBooking);
-  console.log("bookings", bookings);
+  // console.log("bookings", bookings);
   const [ratingBooking, setRatingBooking] = useState(null);
   const [showRateModal, setShowRateModal] = useState(false);
   const navigate = useNavigate();
@@ -397,15 +397,16 @@ const Booking = () => {
             {/* QR CODE */}
             <div className="flex flex-col items-center p-6">
               <QRCode
-                value={JSON.stringify({
-                  bookingId: selectedBooking._id,
-                  type: selectedBooking.type,
-                  title:
-                    selectedBooking.type === "Movie"
-                      ? selectedBooking.movieTitle
-                      : selectedBooking.details?.showTitle,
-                  paymentId: selectedBooking.paymentId,
-                })}
+                // value={JSON.stringify({
+                //   bookingId: selectedBooking._id,
+                //   type: selectedBooking.type,
+                //   title:
+                //     selectedBooking.type === "Movie"
+                //       ? selectedBooking.movieTitle
+                //       : selectedBooking.details?.showTitle,
+                //   paymentId: selectedBooking.paymentId,
+                // })}
+                value={`${window.location.origin}/verify-booking/${selectedBooking._id}`}
                 size={160}
               />
 

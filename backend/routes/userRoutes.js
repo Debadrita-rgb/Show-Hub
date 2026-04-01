@@ -54,10 +54,39 @@ router.post("/send-otp", async (req, res) => {
     });
 
     await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+      from: `"ShowHub" <${process.env.EMAIL_USER}>`,
       to: email,
-      subject: "Your OTP Code",
-      html: `<h2>Your OTP is: ${otp}</h2>`,
+      subject: "Your Verification Code",
+      html: `
+  <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+    
+    <div style="max-width: 500px; margin: auto; background: #ffffff; border-radius: 10px; padding: 30px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+      
+<div style="text-align:center;">
+    <img src="https://show-hub-frontend.onrender.com/assets/logo-CWqOHdnZ.png" width="80" />
+  </div>      
+    <div style="border: 1px solid #eee; padding: 20px; border-radius: 8px; background: #fafafa;">
+    <p>Hello <b>${name || "User"}</b>,</p>
+  <p style="margin-bottom: 10px;">Your one-time verification code:</p>
+  <div style="font-size: 36px; font-weight: bold;">${otp}</div>
+</div>
+
+      <p style="font-size: 14px; color: #777;">
+        This code will expire in <b>5 minutes</b>.
+      </p>
+
+      <p style="font-size: 12px; color: #aaa; margin-top: 20px;">
+        If you didn’t request this, you can safely ignore this email.
+      </p>
+
+    </div>
+
+    <p style="text-align:center; font-size:12px; color:#aaa; margin-top:20px;">
+      © ${new Date().getFullYear()} ShowHub. All rights reserved.
+    </p>
+
+  </div>
+  `,
     });
 
     res.json({ message: "OTP sent successfully" });
@@ -308,6 +337,7 @@ generateCRUDRoutes("review", Review);
 generateCRUDRoutes("category", Category);
 generateCRUDRoutes("theater", Theater);
 generateCRUDRoutes("show", Show);
+generateCRUDRoutes("booking", Booking)
 
 //Get profile details
 router.get("/get-user-profile", jwtAuthMiddleware, async (req, res) => {

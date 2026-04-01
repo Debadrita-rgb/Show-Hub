@@ -20,6 +20,7 @@ import ShowTrailerVideo from "./components/usersComponents/MovieGallery/ShowTrai
 import AllMovie from "./pages/users_pages/Movie/AllMovie.jsx";
 import Faq from "./pages/users_pages/faq/faq";
 import MyBooking from "./pages/users_pages/Booking/Booking.jsx";
+import VerifyBooking from "./pages/users_pages/Booking/VerifyBooking.jsx";
 import MyBookingMovies from "./pages/users_pages/MovieBooking/Movie.jsx";
 import FoodBeverage from "./pages/users_pages/MovieBooking/foodBeverage.jsx";
 import Payment from "./pages/users_pages/MovieBooking/Payment.jsx";
@@ -156,6 +157,7 @@ const App = () => {
             <Route path="/show-all-movies" element={<AllMovie />} />
             <Route path="/shows/:slug/:id" element={<AllShows />} />
             <Route path="/user-bookings" element={<MyBooking />} />
+            <Route path="/verify-booking/:id" element={<VerifyBooking />} />
           </Route>
 
           {/* Common Login Page */}
