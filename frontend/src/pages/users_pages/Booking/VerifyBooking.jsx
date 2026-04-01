@@ -17,17 +17,30 @@ export default function VerifyBooking() {
   if (!booking) return <p>Loading...</p>;
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="bg-white shadow-xl rounded-2xl p-6 text-center">
-        <h2 className="text-xl font-bold mb-4">🎟 Booking Verified</h2>
-        <p>
-          <b>Title:</b> {booking.movieTitle}
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-100 to-gray-200">
+      <div className="bg-white shadow-2xl rounded-3xl p-8 text-center w-[320px]">
+        <h2 className="text-2xl font-bold mb-4 text-green-600">
+          ✅ Booking Verified
+        </h2>
+
+        <p className="mb-2">
+          <span className="font-semibold">🎬 Title:</span>{" "}
+          {booking.type === "Movie"
+            ? booking.movieTitle
+            : booking.details?.showTitle}
         </p>
-        <p>
-          <b>Type:</b> {booking.type}
+
+        <p className="mb-2">
+          <span className="font-semibold">📌 Type:</span> {booking.type}
         </p>
-        <p>
-          <b>Payment ID:</b> {booking.paymentId}
+
+        <p className="mb-2 text-sm text-gray-600">
+          <span className="font-semibold">💳 Payment ID:</span>{" "}
+          {booking.paymentId}
+        </p>
+
+        <p className="text-xs text-gray-400 mt-4">
+          Show this screen at entry gate
         </p>
       </div>
     </div>
