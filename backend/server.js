@@ -8,6 +8,12 @@ app.use(bodyParser.json());
 
 const cors = require("cors");
 
+app.use((req, res, next) => {
+  res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+  res.setHeader("Cross-Origin-Embedder-Policy", "unsafe-none");
+  next();
+});
+
 app.use(
   cors({
     origin: [
@@ -18,12 +24,6 @@ app.use(
     credentials: true,
   }),
 );
-
-app.use((req, res, next) => {
-  res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
-  res.setHeader("Cross-Origin-Embedder-Policy", "unsafe-none");
-  next();
-});
 
 app.use(express.json());
 
