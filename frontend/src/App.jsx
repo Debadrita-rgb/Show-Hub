@@ -1,5 +1,13 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
+import { useEffect } from "react";
 import { useAuth } from "./context/AuthContext";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -102,9 +110,23 @@ import UserFeedback from "./pages/users_pages/Feedback/Feedback.jsx";
 import LoginPage from "./pages/LoginPage/LoginPage";
 
 const App = () => {
-  // const { role } = useAuth();
-  // const role = localStorage.getItem("role");
-  // const isAuthenticated = !!role;
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    const publicRoutes = ["/verify-booking"];
+
+    const isPublicRoute = publicRoutes.some((route) =>
+      location.pathname.startsWith(route),
+    );
+
+    if (!token && !isPublicRoute) {
+      navigate("/signin");
+    }
+  }, [location, navigate]);
+  
   const { loading, isAuthenticated, role } = useAuth();
   if (loading) return <div>Loading...</div>;
 
