@@ -45,7 +45,7 @@ router.post("/send-otp", async (req, res) => {
     };
     
 await resend.emails.send({
-  from: "ShowHub <debadritapaul76@gmail.com>",
+  from: "ShowHub <onboarding@resend.dev>",
   to: email,
   subject: "ShowHub Login: Here's the 6-digit verification code you requested",
   html: `
