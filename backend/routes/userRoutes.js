@@ -25,15 +25,14 @@ const Show = require("../models/Show");
 const razorpay = require("../api/razorpay");
 
 
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
 
-const otpStore = {};
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 //Google signup
 
 router.post("/send-otp", async (req, res) => {
   try {
-    console.log("BODY:", req.body);
     const { email, name, password } = req.body;
 
     const otp = Math.floor(100000 + Math.random() * 900000);
@@ -44,30 +43,12 @@ router.post("/send-otp", async (req, res) => {
       password,
       expiresAt: Date.now() + 5 * 60 * 1000,
     };
-
     
-console.log("EMAIL:", process.env.EMAIL_USER);
-console.log("PASS:", process.env.EMAIL_PASS ? "EXISTS" : "MISSING");
-
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false, 
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  tls: {
-    rejectUnauthorized: false,
-  },
-});
-    
-
-    await transporter.sendMail({
-      from: `"ShowHub" <${process.env.EMAIL_USER}>`,
-      to: email,
-      subject: "Your Verification Code",
-      html: `
+await resend.emails.send({
+  from: "ShowHub <onboarding@resend.dev>",
+  to: email,
+  subject: "ShowHub Login: Here's the 6-digit verification code you requested",
+  html: `
   <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
     
     <div style="max-width: 500px; margin: auto; background: #ffffff; border-radius: 10px; padding: 30px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
@@ -97,7 +78,7 @@ const transporter = nodemailer.createTransport({
 
   </div>
   `,
-    });
+});
 
     res.json({ message: "OTP sent successfully" });
   } catch (error) {
