@@ -33,10 +33,10 @@ const otpStore = {};
 
 router.post("/send-otp", async (req, res) => {
   try {
+    console.log("BODY:", req.body);
     const { email, name, password } = req.body;
 
     const otp = Math.floor(100000 + Math.random() * 900000);
-
     //   Store everything
     otpStore[email] = {
       otp,
@@ -45,6 +45,10 @@ router.post("/send-otp", async (req, res) => {
       expiresAt: Date.now() + 5 * 60 * 1000,
     };
 
+    
+console.log("EMAIL:", process.env.EMAIL_USER);
+console.log("PASS:", process.env.EMAIL_PASS ? "EXISTS" : "MISSING");
+
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -52,6 +56,7 @@ router.post("/send-otp", async (req, res) => {
         pass: process.env.EMAIL_PASS,
       },
     });
+    
 
     await transporter.sendMail({
       from: `"ShowHub" <${process.env.EMAIL_USER}>`,
