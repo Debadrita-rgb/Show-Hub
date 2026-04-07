@@ -46,12 +46,20 @@ router.post("/send-otp", async (req, res) => {
     };
 
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
       },
+      connectionTimeout: 10000, // increase timeout
+      greetingTimeout: 10000,
+      socketTimeout: 15000,
     });
+
+    await transporter.verify();
+    console.log("SMTP server is ready");
 
     await transporter.sendMail({
       from: `"ShowHub" <${process.env.EMAIL_USER}>`,
