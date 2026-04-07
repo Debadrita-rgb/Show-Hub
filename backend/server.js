@@ -8,17 +8,17 @@ app.use(bodyParser.json());
 
 const cors = require("cors");
 
-app.use((req, res, next) => {
-  res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
-  res.setHeader("Cross-Origin-Embedder-Policy", "unsafe-none");
-  res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
-  next();
-});
+// app.use((req, res, next) => {
+//   res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+//   res.setHeader("Cross-Origin-Embedder-Policy", "unsafe-none");
+//   res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+//   next();
+// });
 
 app.use(
   cors({
     origin: [
-      "http://localhost:3000",
+      // "http://localhost:3000",
       "http://localhost:5173",
       "https://show-hub-frontend.onrender.com",
     ],
