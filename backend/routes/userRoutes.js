@@ -37,26 +37,23 @@ router.post("/send-otp", async (req, res) => {
     const otp = Math.floor(100000 + Math.random() * 900000);
 
     const client = SibApiV3Sdk.ApiClient.instance;
-    const apiKey = client.authentications["api-key"];
-    apiKey.apiKey = process.env.BREVO_API_KEY;
+    client.authentications["api-key"].apiKey = process.env.BREVO_API_KEY;
 
-    const tranEmailApi = new SibApiV3Sdk.TransactionalEmailsApi();
+    const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 
-    await tranEmailApi.sendTransacEmail({
-      sender: { email: "your_verified_email@gmail.com", name: "ShowHub" },
+    await apiInstance.sendTransacEmail({
+      sender: {
+        email: "debadritapaul76@gmail.com",
+        name: "ShowHub",
+      },
       to: [{ email }],
-      subject: "Your OTP Code",
-      htmlContent: `
-        <h2>OTP Verification</h2>
-        <p>Your OTP is:</p>
-        <h1>${otp}</h1>
-        <p>This OTP is valid for 5 minutes.</p>
-      `,
+      subject: "OTP Verification",
+      htmlContent: `<h1>${otp}</h1>`,
     });
 
-    res.json({ success: true }); // don't send OTP in response
-  } catch (error) {
-    console.error("Brevo error:", error);
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err.response?.text || err.message);
     res.status(500).json({ success: false });
   }
 })
