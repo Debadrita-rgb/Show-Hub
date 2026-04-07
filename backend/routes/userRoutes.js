@@ -28,7 +28,7 @@ const razorpay = require("../api/razorpay");
 const { Resend } = require("resend");
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-
+const otpStore = {};
 //Google signup
 
 router.post("/send-otp", async (req, res) => {
