@@ -25,84 +25,114 @@ const Show = require("../models/Show");
 const razorpay = require("../api/razorpay");
 
 
-const nodemailer = require("nodemailer");
+const SibApiV3Sdk = require("sib-api-v3-sdk");
 
 const otpStore = {};
 
 //Google signup
-
 router.post("/send-otp", async (req, res) => {
   try {
-    const { email, name, password } = req.body;
+    const { email } = req.body;
 
     const otp = Math.floor(100000 + Math.random() * 900000);
 
-    //   Store everything
-    otpStore[email] = {
-      otp,
-      name,
-      password,
-      expiresAt: Date.now() + 5 * 60 * 1000,
-    };
+    const client = SibApiV3Sdk.ApiClient.instance;
+    const apiKey = client.authentications["api-key"];
+    apiKey.apiKey = process.env.BREVO_API_KEY;
 
-    const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false,
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-      connectionTimeout: 10000, // increase timeout
-      greetingTimeout: 10000,
-      socketTimeout: 15000,
+    const tranEmailApi = new SibApiV3Sdk.TransactionalEmailsApi();
+
+    await tranEmailApi.sendTransacEmail({
+      sender: { email: "your_verified_email@gmail.com", name: "ShowHub" },
+      to: [{ email }],
+      subject: "Your OTP Code",
+      htmlContent: `
+        <h2>OTP Verification</h2>
+        <p>Your OTP is:</p>
+        <h1>${otp}</h1>
+        <p>This OTP is valid for 5 minutes.</p>
+      `,
     });
 
-    await transporter.verify();
-    console.log("SMTP server is ready");
-
-    await transporter.sendMail({
-      from: `"ShowHub" <${process.env.EMAIL_USER}>`,
-      to: email,
-      subject: "Your Verification Code",
-      html: `
-  <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
-    
-    <div style="max-width: 500px; margin: auto; background: #ffffff; border-radius: 10px; padding: 30px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-      
-<div style="text-align:center;">
-    <img src="https://show-hub-frontend.onrender.com/assets/admin_login_logo-CDHIE2pX.png" width="80" />
-  </div>      
-    <div style="border: 1px solid #eee; padding: 20px; border-radius: 8px; background: #fafafa;">
-    <p>Hello <b>${name || "User"}</b>,</p>
-  <p style="margin-bottom: 10px;">Your one-time verification code:</p>
-  <div style="font-size: 36px; font-weight: bold;">${otp}</div>
-</div>
-
-      <p style="font-size: 14px; color: #777;">
-        This code will expire in <b>5 minutes</b>.
-      </p>
-
-      <p style="font-size: 12px; color: #aaa; margin-top: 20px;">
-        If you didn’t request this, you can safely ignore this email.
-      </p>
-
-    </div>
-
-    <p style="text-align:center; font-size:12px; color:#aaa; margin-top:20px;">
-      © ${new Date().getFullYear()} ShowHub. All rights reserved.
-    </p>
-
-  </div>
-  `,
-    });
-
-    res.json({ message: "OTP sent successfully" });
+    res.json({ success: true }); // don't send OTP in response
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Failed to send OTP" });
+    console.error("Brevo error:", error);
+    res.status(500).json({ success: false });
   }
-});
+})
+
+// router.post("/send-otp", async (req, res) => {
+//   try {
+//     const { email, name, password } = req.body;
+
+//     const otp = Math.floor(100000 + Math.random() * 900000);
+
+//     //   Store everything
+//     otpStore[email] = {
+//       otp,
+//       name,
+//       password,
+//       expiresAt: Date.now() + 5 * 60 * 1000,
+//     };
+
+//     const transporter = nodemailer.createTransport({
+//       host: "smtp.gmail.com",
+//       port: 587,
+//       secure: false,
+//       auth: {
+//         user: process.env.EMAIL_USER,
+//         pass: process.env.EMAIL_PASS,
+//       },
+//       connectionTimeout: 10000, // increase timeout
+//       greetingTimeout: 10000,
+//       socketTimeout: 15000,
+//     });
+
+//     await transporter.verify();
+//     console.log("SMTP server is ready");
+
+//     await transporter.sendMail({
+//       from: `"ShowHub" <${process.env.EMAIL_USER}>`,
+//       to: email,
+//       subject: "Your Verification Code",
+//       html: `
+//   <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+    
+//     <div style="max-width: 500px; margin: auto; background: #ffffff; border-radius: 10px; padding: 30px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+      
+// <div style="text-align:center;">
+//     <img src="https://show-hub-frontend.onrender.com/assets/admin_login_logo-CDHIE2pX.png" width="80" />
+//   </div>      
+//     <div style="border: 1px solid #eee; padding: 20px; border-radius: 8px; background: #fafafa;">
+//     <p>Hello <b>${name || "User"}</b>,</p>
+//   <p style="margin-bottom: 10px;">Your one-time verification code:</p>
+//   <div style="font-size: 36px; font-weight: bold;">${otp}</div>
+// </div>
+
+//       <p style="font-size: 14px; color: #777;">
+//         This code will expire in <b>5 minutes</b>.
+//       </p>
+
+//       <p style="font-size: 12px; color: #aaa; margin-top: 20px;">
+//         If you didn’t request this, you can safely ignore this email.
+//       </p>
+
+//     </div>
+
+//     <p style="text-align:center; font-size:12px; color:#aaa; margin-top:20px;">
+//       © ${new Date().getFullYear()} ShowHub. All rights reserved.
+//     </p>
+
+//   </div>
+//   `,
+//     });
+
+//     res.json({ message: "OTP sent successfully" });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: "Failed to send OTP" });
+//   }
+// });
 
 
 router.post("/verify-otp", async (req, res) => {
