@@ -43,7 +43,7 @@ router.post("/send-otp", async (req, res) => {
 
     await apiInstance.sendTransacEmail({
       sender: {
-        email: "debadritapaul76@gmail.com",
+        email: process.env.EMAIL_USER,
         name: "ShowHub",
       },
       to: [{ email }],
