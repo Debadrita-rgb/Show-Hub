@@ -42,14 +42,17 @@ router.post("/send-otp", async (req, res) => {
     };
 const msg = {
   to: email,
-  from: "debadritapaul76@gmail.com",
+  from: {
+    email: process.env.EMAIL_USER,
+    name: "ShowHub"
+  },
   subject: "Showhub Login: Here's the 6-digit verification code you requested",
   html: `<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
 
       <div style="max-width: 500px; margin: auto; background: #ffffff; border-radius: 10px; padding: 30px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
 
   <div style="text-align:center;">
-      <img src="https: show-hub-frontend.onrender.com/assets/admin_login_logo-CDHIE2pX.png" width="80" />
+      <img src="https://show-hub-frontend.onrender.com/assets/admin_login_logo-CDHIE2pX.png" width="80" />
     </div>
       <div style="border: 1px solid #eee; padding: 20px; border-radius: 8px; background: #fafafa;">
       <p>Hello <b>${name || "User"}</b>,</p>
