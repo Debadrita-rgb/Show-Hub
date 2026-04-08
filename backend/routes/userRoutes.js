@@ -42,7 +42,7 @@ router.post("/send-otp", async (req, res) => {
     };
 const msg = {
   to: email,
-  from: process.env.EMAIL_USER,
+  from: "debadritapaul76@gmail.com",
   subject: "OTP Verification",
   html: `<h1>${otp}</h1><p>Valid for 5 minutes</p>`,
 };
@@ -51,8 +51,7 @@ await sgMail.send(msg);
 
 res.json({ success: true });
   } catch (error) {
-    console.error("EmailJS error:", error);
-  }
+console.error("SendGrid error:", error.response?.body || error.message);  }
 });
 
 // router.post("/send-otp", async (req, res) => {
