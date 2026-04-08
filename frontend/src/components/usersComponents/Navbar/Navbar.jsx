@@ -18,7 +18,6 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import BASE_URL from "../../../../config";
 
-
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState("Guest");
@@ -107,16 +106,20 @@ export default function Navbar() {
         );
 
         const data = await response.json();
-
+        // console.log("data", data);
+        
         const detectedCity =
           data.address.city ||
-          data.address.county?.replace(" City", "") ||
+          data.address.county?.replace(
+            / City Subdistrict| Subdistrict| City/g,
+            "",
+          ) ||
           data.address.state_district?.replace(" District", "") ||
           data.address.town ||
           data.address.village ||
           data.address.state;
 
-console.log("detectedCity", detectedCity);
+        // console.log("detectedCity", detectedCity);
 
         setCity(detectedCity);
         setIsLocationOpen(false);
