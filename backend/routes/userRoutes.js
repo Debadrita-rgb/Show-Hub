@@ -24,7 +24,8 @@ const Theater = require("../models/Theater");
 const Show = require("../models/Show");
 const razorpay = require("../api/razorpay");
 
-const emailjs = require("emailjs-com");
+const sgMail = require("@sendgrid/mail");
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const otpStore = {};
 
@@ -39,21 +40,16 @@ router.post("/send-otp", async (req, res) => {
       password,
       expiresAt: Date.now() + 5 * 60 * 1000,
     };
-    
-    const templateParams = {
-      to_email: email,
-      name: name,
-      otp: otp,
-    };
+const msg = {
+  to: email,
+  from: process.env.EMAIL_USER,
+  subject: "OTP Verification",
+  html: `<h1>${otp}</h1><p>Valid for 5 minutes</p>`,
+};
 
-    await emailjs.send(
-      process.env.SERVICE_ID,
-      process.env.TEMPLATE_ID,
-      templateParams,
-      process.env.PUBLIC_KEY,
-    );
+await sgMail.send(msg);
 
-    console.log("OTP sent");
+res.json({ success: true });
   } catch (error) {
     console.error("EmailJS error:", error);
   }
