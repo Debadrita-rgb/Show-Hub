@@ -79,6 +79,10 @@ const SeatArrangementPage = () => {
       alert("Please select seats");
       return;
     }
+    if (selectedSeats.length !== seatCount) {
+      alert(`Please select exactly ${seatCount} seats`);
+      return;
+    }
 
     const seatDetails = selectedSeats.map((seat) => {
       const catIndex = seat.split("-")[0];
@@ -221,7 +225,7 @@ const SeatArrangementPage = () => {
           </div>
         </div>
       </div>
-      {selectedSeats.length > 0 && (
+      {selectedSeats.length === seatCount && (
         <div className="fixed bottom-0 left-0 w-full bg-white shadow-lg border-t p-4">
           <div className="max-w-5xl mx-auto flex justify-between items-center">
             {/* Seat Info */}
