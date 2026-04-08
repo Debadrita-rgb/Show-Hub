@@ -544,7 +544,7 @@ const AddLocationWiseMovie = () => {
 
             {/* Remove Button (only from 2nd row) */}
             <div className="md:col-span-2">
-              {index > 0 && (
+              {shows.length > 1 && (
                 <button
                   type="button"
                   onClick={() => removeShow(index)}

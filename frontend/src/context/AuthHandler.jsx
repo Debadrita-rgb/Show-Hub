@@ -15,7 +15,7 @@ export default function AuthHandler({ children }) {
     );
 
     if (!token && !isPublicRoute) {
-      navigate("/signin");
+      navigate("/");
     }
   }, [location, navigate]);
 
