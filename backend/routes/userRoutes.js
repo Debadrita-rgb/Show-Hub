@@ -24,39 +24,40 @@ const Theater = require("../models/Theater");
 const Show = require("../models/Show");
 const razorpay = require("../api/razorpay");
 
-
-const SibApiV3Sdk = require("sib-api-v3-sdk");
+const emailjs = require("emailjs-com");
 
 const otpStore = {};
 
 //Google signup
 router.post("/send-otp", async (req, res) => {
   try {
-    const { email } = req.body;
-
+    const { email, name, password } = req.body;
     const otp = Math.floor(100000 + Math.random() * 900000);
+    otpStore[email] = {
+      otp,
+      name,
+      password,
+      expiresAt: Date.now() + 5 * 60 * 1000,
+    };
+    
+    const templateParams = {
+      to_email: email,
+      name: name,
+      otp: otp,
+    };
 
-    const client = SibApiV3Sdk.ApiClient.instance;
-    client.authentications["api-key"].apiKey = process.env.BREVO_API_KEY;
+    await emailjs.send(
+      process.env.SERVICE_ID,
+      process.env.TEMPLATE_ID,
+      templateParams,
+      process.env.PUBLIC_KEY,
+    );
 
-    const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
-
-    await apiInstance.sendTransacEmail({
-      sender: {
-        email: process.env.EMAIL_USER,
-        name: "ShowHub",
-      },
-      to: [{ email }],
-      subject: "OTP Verification",
-      htmlContent: `<h1>${otp}</h1>`,
-    });
-
-    res.json({ success: true });
-  } catch (err) {
-    console.error(err.response?.text || err.message);
-    res.status(500).json({ success: false });
+    console.log("OTP sent");
+  } catch (error) {
+    console.error("EmailJS error:", error);
   }
-})
+});
 
 // router.post("/send-otp", async (req, res) => {
 //   try {
@@ -94,12 +95,12 @@ router.post("/send-otp", async (req, res) => {
 //       subject: "Your Verification Code",
 //       html: `
 //   <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
-    
+
 //     <div style="max-width: 500px; margin: auto; background: #ffffff; border-radius: 10px; padding: 30px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-      
+
 // <div style="text-align:center;">
 //     <img src="https://show-hub-frontend.onrender.com/assets/admin_login_logo-CDHIE2pX.png" width="80" />
-//   </div>      
+//   </div>
 //     <div style="border: 1px solid #eee; padding: 20px; border-radius: 8px; background: #fafafa;">
 //     <p>Hello <b>${name || "User"}</b>,</p>
 //   <p style="margin-bottom: 10px;">Your one-time verification code:</p>
@@ -130,7 +131,6 @@ router.post("/send-otp", async (req, res) => {
 //     res.status(500).json({ message: "Failed to send OTP" });
 //   }
 // });
-
 
 router.post("/verify-otp", async (req, res) => {
   try {
@@ -372,7 +372,7 @@ generateCRUDRoutes("review", Review);
 generateCRUDRoutes("category", Category);
 generateCRUDRoutes("theater", Theater);
 generateCRUDRoutes("show", Show);
-generateCRUDRoutes("booking", Booking)
+generateCRUDRoutes("booking", Booking);
 
 //Get profile details
 router.get("/get-user-profile", jwtAuthMiddleware, async (req, res) => {
@@ -484,8 +484,6 @@ router.get("/get-moviewise-theater/:id", async (req, res) => {
     //   endDate: { $gte: startOfDay },
     // }).populate("theater");
 
-    
-
     // console.log("data", data);
 
     const formatted = data.map((item) => ({
@@ -580,7 +578,7 @@ router.get("/get-recommended-movies", async (req, res) => {
       isActive: true,
     })
       .sort({ createdAt: -1 })
-      .limit(5);;
+      .limit(5);
     res.json({ data: recommendedmovies });
   } catch (err) {
     console.error("Error fetching ordered orders:", err);
@@ -645,15 +643,15 @@ router.get("/get-recommended-movies-by-location", async (req, res) => {
       return res.status(404).json({ message: `No movies showing in ${city}` });
     }
 
-const uniqueMoviesMap = new Map();
-movies.forEach((movie) => {
-  uniqueMoviesMap.set(movie._id.toString(), movie);
-});
+    const uniqueMoviesMap = new Map();
+    movies.forEach((movie) => {
+      uniqueMoviesMap.set(movie._id.toString(), movie);
+    });
 
-const uniqueMovies = Array.from(uniqueMoviesMap.values());
+    const uniqueMovies = Array.from(uniqueMoviesMap.values());
 
-return res.json({ data: uniqueMovies });    
-// return res.json({ data: movies });
+    return res.json({ data: uniqueMovies });
+    // return res.json({ data: movies });
   } catch (err) {
     console.error("Error fetching movies:", err);
     return res.status(500).json({ message: "Server error" });
