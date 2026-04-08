@@ -8,14 +8,14 @@ export default function AuthHandler({ children }) {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    const publicRoutes = ["/verify-booking", "/signin", "/signup", "/verify-otp", "/admin"];
+    const privateRoutes = ["/profile", "/my-bookings"];
 
-    const isPublicRoute = publicRoutes.some((route) =>
+    const isPrivateRoute = privateRoutes.some((route) =>
       location.pathname.startsWith(route),
     );
 
-    if (!token && !isPublicRoute) {
-      navigate("/");
+    if (!token && isPrivateRoute) {
+      navigate("/", { replace: true });
     }
   }, [location, navigate]);
 
