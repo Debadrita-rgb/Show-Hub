@@ -116,7 +116,7 @@ export default function Navbar() {
           data.address.village ||
           data.address.state;
 
-// console.log("detectedCity", detectedCity);
+console.log("detectedCity", detectedCity);
 
         setCity(detectedCity);
         setIsLocationOpen(false);
@@ -332,31 +332,7 @@ export default function Navbar() {
           >
             Movies
           </Link>
-          {/* <Link className="hover:text-purple-950 cursor-pointer text-black">
-            Stream
-          </Link>
-          <Link className="hover:text-purple-950 cursor-pointer text-black">
-            Events
-          </Link>
-          <Link className="hover:text-purple-950 cursor-pointer text-black">
-            Plays
-          </Link>
-          <Link className="hover:text-purple-950 cursor-pointer text-black">
-            Sports
-          </Link>
-          <Link className="hover:text-purple-950 cursor-pointer text-black">
-            Activities
-          </Link> */}
         </div>
-
-        {/* <div className="flex gap-6 text-gray-600 text-sm">
-          <Link className="hover:text-purple-950 cursor-pointer">
-            ListYourShow
-          </Link>
-          <Link className="hover:text-purple-950 cursor-pointer">Corporates</Link>
-          <Link className="hover:text-purple-950 cursor-pointer">Offers</Link>
-          <Link className="hover:text-purple-950 cursor-pointer">Gift Cards</Link>
-        </div> */}
       </div>
 
       {/* MOBILE SEARCH */}
