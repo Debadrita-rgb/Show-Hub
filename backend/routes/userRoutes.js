@@ -23,6 +23,10 @@ const LocationWiseMovie = require("../models/LocationWIseMovieSelection");
 const Theater = require("../models/Theater");
 const Show = require("../models/Show");
 const razorpay = require("../api/razorpay");
+const formatDate = require("../utils/dateHelper");
+
+const fs = require("fs");
+const generateInvoice = require("../utils/invoiceService");
 
 const sgMail = require("@sendgrid/mail");
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
@@ -40,14 +44,15 @@ router.post("/send-otp", async (req, res) => {
       password,
       expiresAt: Date.now() + 5 * 60 * 1000,
     };
-const msg = {
-  to: email,
-  from: {
-    email: process.env.EMAIL_USER,
-    name: "ShowHub"
-  },
-  subject: "Showhub Login: Here's the 6-digit verification code you requested",
-  html: `<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+    const msg = {
+      to: email,
+      from: {
+        email: process.env.EMAIL_USER,
+        name: "ShowHub",
+      },
+      subject:
+        "Showhub Login: Here's the 6-digit verification code you requested",
+      html: `<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
 
       <div style="max-width: 500px; margin: auto; background: #ffffff; border-radius: 10px; padding: 30px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
 
@@ -76,15 +81,15 @@ const msg = {
 
     </div>
     `,
-};
+    };
 
-await sgMail.send(msg);
+    await sgMail.send(msg);
 
-res.json({ success: true });
+    res.json({ success: true });
   } catch (error) {
-console.error("SendGrid error:", error.response?.body || error.message);  }
+    console.error("SendGrid error:", error.response?.body || error.message);
+  }
 });
-
 
 router.post("/verify-otp", async (req, res) => {
   try {
@@ -470,37 +475,6 @@ router.get("/get-theater-layout/:theaterId", async (req, res) => {
   }
 });
 
-// const getMoviesWithRatings = async (req, res) => {
-//   try {
-//     const movies = await Movie.aggregate([
-//       {
-//         $lookup: {
-//           from: "reviews", // review collection name
-//           localField: "_id",
-//           foreignField: "movieId",
-//           as: "reviews",
-//         },
-//       },
-//       {
-//         $addFields: {
-//           totalVotes: { $size: "$reviews" },
-//           averageRating: { $avg: "$reviews.rating" },
-//         },
-//       },
-//       {
-//         $project: {
-//           reviews: 0, // remove full reviews array
-//         },
-//       },
-//     ]);
-
-//     res.json(movies);
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });
-//   }
-// };
-
-//Get Banner Image
 router.get("/get-banner/:type", async (req, res) => {
   try {
     const { type } = req.params;
@@ -611,46 +585,6 @@ router.get("/get-recommended-movies-by-location", async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 });
-
-//fetch bookings of the logged-in user.
-// router.get("/my-bookings", jwtAuthMiddleware, async (req, res) => {
-//   try {
-//     const userId = req.user.id;
-
-//     const bookings = await Booking.find({ userId }).sort({ createdAt: -1 });
-
-//     const result = [];
-
-//     for (let booking of bookings) {
-//       let itemDetails = null;
-//       let theaterDetails = null;
-
-//       if (booking.type === "Movie") {
-//         itemDetails = await Movie.findById(booking.movieId);
-//       }
-
-//       if (booking.theaterId) {
-//         theaterDetails = await Theater.findById(booking.theaterId);
-//       }
-
-//       result.push({
-//         ...booking._doc,
-//         movie: itemDetails,
-//         theater: theaterDetails,
-//       });
-//     }
-
-//     res.json({
-//       bookings: result,
-//     });
-//   } catch (error) {
-//     console.log("BOOKING FETCH ERROR:", error);
-
-//     res.status(500).json({
-//       message: error.message,
-//     });
-//   }
-// });
 
 router.get("/my-bookings", jwtAuthMiddleware, async (req, res) => {
   try {
@@ -944,56 +878,104 @@ router.post("/save-booking", jwtAuthMiddleware, async (req, res) => {
   try {
     // console.log(req.body);
     const booking = new Booking(req.body);
+    console.log("booking", booking);
+    // await booking.save();
 
-    await booking.save();
+    const user = await User.findById(req.user.id);
+    const theater = await User.findById(booking.theaterId);
+    const theaterName = theater.theater_name;
+    const location = theater.location_name;
 
-const user = await User.findById(req.user.id);
-        // Get user from DB
-        // const user = await User.findById(userId);
-
-        if (!user) {
-          return res.status(404).json({ message: "User not found" });
-        }
-const email = user.email;
-const name = user.name;
- const msg = {
-   to: email,
-   from: {
-     email: process.env.EMAIL_USER,
-     name: "ShowHub",
-   },
-   subject: "🎬 Booking Confirmed - ShowHub",
-   html: `
-      <div style="font-family: Arial; padding:20px; background:#f4f4f4;">
-        <div style="max-width:600px; margin:auto; background:white; padding:20px; border-radius:8px;">
-          
-          <h2>Hello ${name},</h2>
-          <p>Your booking is confirmed 🎉</p>
-
-          <hr/>
-
-          <p><strong>🎥 Movie:</strong> ${booking.movieTitle}</p>
-          <p><strong>🏢 Theater:</strong> ${booking.theaterName}</p>
-          <p><strong>📍 Location:</strong> ${booking.location}</p>
-          <p><strong>📅 Date:</strong> ${booking.selectedDate}</p>
-          <p><strong>⏰ Time:</strong> ${booking.selectedTimeSlot}</p>
-          <p><strong>💺 Seats:</strong> ${booking.seats?.join(", ")}</p>
-
-          <hr/>
-
-          <p><strong>💰 Total Paid:</strong> ₹${booking.totalAmount}</p>
-          <p><strong>🧾 Payment ID:</strong> ${booking.paymentId}</p>
-
-          <br/>
-
-          <p>Enjoy your movie 🍿</p>
-          <p>— Team ShowHub</p>
-        </div>
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const email = user.email;
+    const name = user.name;
+    const formattedSeats = booking.seats
+      ?.map((seat) => `${seat.seatId} (${seat.category})`)
+      .join(", ");
+    const formattedDate = formatDate(booking.showDate);
+    const formattedTime = new Date(booking.showDate).toLocaleTimeString(
+      "en-IN",
+      { hour: "numeric", minute: "2-digit", hour12: true },
+    );
+    const msg = {
+      to: email,
+      from: {
+        email: process.env.EMAIL_USER,
+        name: "ShowHub",
+      },
+      subject: "🎬 Booking Confirmed - ShowHub",
+      html: `
+  <div style="font-family: Arial; background:#f4f4f4; padding:20px;">
+    <div style="max-width:700px; margin:auto; background:white; border-radius:10px; overflow:hidden;">
+      
+      <!-- HEADER -->
+      <div style="background:#1f2a44; color:white; padding:20px;">
+      <div style="text-align:left;">
+      <img src="https://show-hub-frontend.onrender.com/assets/admin_login_logo-CDHIE2pX.png" width="80" />
+    </div>
+        <h2>M-Ticket</h2>
+        <p>Booking ID: ${booking.bookingId || booking._id}</p>
+        <h3>Hey ${name}, your booking is confirmed! 🎉</h3>
       </div>
-      `,
- };
- 
- await sgMail.send(msg);
+
+      <!-- BODY -->
+      <div style="padding:20px;">
+        <p><strong>🎥 Movie:</strong> ${booking.movieTitle}</p>
+        <p><strong>🏢 Theater:</strong> ${theaterName}</p>
+        <p><strong>📍 Location:</strong> ${location}</p>
+        <p><strong>📅 Date:</strong> ${formattedDate}</p>
+        <p><strong>⏰ Time:</strong> ${formattedTime}</p>
+        <p><strong>💺 Seats:</strong> ${formattedSeats}</p>
+
+        <hr/>
+
+        <!-- PRICE BREAKDOWN -->
+        <h3>Payment Details</h3>
+        <p>Total Amount Paid: ₹${booking.totalAmount}</p>
+        <p>Ticket Price: ₹${booking.ticketPrice}</p>
+        <p>Convenience Fee: ₹${booking.convenienceFee}</p>
+        <p>Paid using: Online Payment</p>
+
+        <hr/>
+
+        <!-- INFO SECTION -->
+        <p><strong>🎟 Contactless Entry:</strong></p>
+        <p>Safe and contactless entry through M-Ticket scanning! No more box office queue!</p>
+
+        <h4>How to use M-Ticket:</h4>
+        <ul>
+          <li>Log in to ShowHub from app or browser</li>
+          <li>Go to "Your Orders"</li>
+          <li>Show QR code at entry</li>
+        </ul>
+
+        <br/>
+
+        <a href="https://show-hub-frontend.onrender.com/user-bookings"
+          style="display:block; text-align:center; padding:12px; background:#e74c3c; color:white; text-decoration:none; border-radius:6px;">
+          View Tickets
+        </a>
+      </div>
+
+    </div>
+  </div>
+  `,
+    };
+const filePath = await generateInvoice(booking, user);
+
+const attachment = fs.readFileSync(filePath).toString("base64");
+
+msg.attachments = [
+  {
+    content: attachment,
+    filename: "invoice.pdf",
+    type: "application/pdf",
+    disposition: "attachment",
+  },
+];
+    await sgMail.send(msg);
 
     res.json({
       message: "Booking saved successfully",
