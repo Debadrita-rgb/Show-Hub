@@ -85,78 +85,6 @@ res.json({ success: true });
 console.error("SendGrid error:", error.response?.body || error.message);  }
 });
 
-// router.post("/send-otp", async (req, res) => {
-//   try {
-//     const { email, name, password } = req.body;
-
-//     const otp = Math.floor(100000 + Math.random() * 900000);
-
-//     //   Store everything
-//     otpStore[email] = {
-//       otp,
-//       name,
-//       password,
-//       expiresAt: Date.now() + 5 * 60 * 1000,
-//     };
-
-//     const transporter = nodemailer.createTransport({
-//       host: "smtp.gmail.com",
-//       port: 587,
-//       secure: false,
-//       auth: {
-//         user: process.env.EMAIL_USER,
-//         pass: process.env.EMAIL_PASS,
-//       },
-//       connectionTimeout: 10000, // increase timeout
-//       greetingTimeout: 10000,
-//       socketTimeout: 15000,
-//     });
-
-//     await transporter.verify();
-//     console.log("SMTP server is ready");
-
-//     await transporter.sendMail({
-//       from: `"ShowHub" <${process.env.EMAIL_USER}>`,
-//       to: email,
-//       subject: "Your Verification Code",
-//       html: `
-//   <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
-
-//     <div style="max-width: 500px; margin: auto; background: #ffffff; border-radius: 10px; padding: 30px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-
-// <div style="text-align:center;">
-//     <img src="https://show-hub-frontend.onrender.com/assets/admin_login_logo-CDHIE2pX.png" width="80" />
-//   </div>
-//     <div style="border: 1px solid #eee; padding: 20px; border-radius: 8px; background: #fafafa;">
-//     <p>Hello <b>${name || "User"}</b>,</p>
-//   <p style="margin-bottom: 10px;">Your one-time verification code:</p>
-//   <div style="font-size: 36px; font-weight: bold;">${otp}</div>
-// </div>
-
-//       <p style="font-size: 14px; color: #777;">
-//         This code will expire in <b>5 minutes</b>.
-//       </p>
-
-//       <p style="font-size: 12px; color: #aaa; margin-top: 20px;">
-//         If you didn’t request this, you can safely ignore this email.
-//       </p>
-
-//     </div>
-
-//     <p style="text-align:center; font-size:12px; color:#aaa; margin-top:20px;">
-//       © ${new Date().getFullYear()} ShowHub. All rights reserved.
-//     </p>
-
-//   </div>
-//   `,
-//     });
-
-//     res.json({ message: "OTP sent successfully" });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: "Failed to send OTP" });
-//   }
-// });
 
 router.post("/verify-otp", async (req, res) => {
   try {
@@ -1018,6 +946,54 @@ router.post("/save-booking", jwtAuthMiddleware, async (req, res) => {
     const booking = new Booking(req.body);
 
     await booking.save();
+
+const user = await User.findById(req.user.id);
+        // Get user from DB
+        // const user = await User.findById(userId);
+
+        if (!user) {
+          return res.status(404).json({ message: "User not found" });
+        }
+const email = user.email;
+const name = user.name;
+ const msg = {
+   to: email,
+   from: {
+     email: process.env.EMAIL_USER,
+     name: "ShowHub",
+   },
+   subject: "🎬 Booking Confirmed - ShowHub",
+   html: `
+      <div style="font-family: Arial; padding:20px; background:#f4f4f4;">
+        <div style="max-width:600px; margin:auto; background:white; padding:20px; border-radius:8px;">
+          
+          <h2>Hello ${name},</h2>
+          <p>Your booking is confirmed 🎉</p>
+
+          <hr/>
+
+          <p><strong>🎥 Movie:</strong> ${booking.movieTitle}</p>
+          <p><strong>🏢 Theater:</strong> ${booking.theaterName}</p>
+          <p><strong>📍 Location:</strong> ${booking.location}</p>
+          <p><strong>📅 Date:</strong> ${booking.selectedDate}</p>
+          <p><strong>⏰ Time:</strong> ${booking.selectedTimeSlot}</p>
+          <p><strong>💺 Seats:</strong> ${booking.seats?.join(", ")}</p>
+
+          <hr/>
+
+          <p><strong>💰 Total Paid:</strong> ₹${booking.totalAmount}</p>
+          <p><strong>🧾 Payment ID:</strong> ${booking.paymentId}</p>
+
+          <br/>
+
+          <p>Enjoy your movie 🍿</p>
+          <p>— Team ShowHub</p>
+        </div>
+      </div>
+      `,
+ };
+ 
+ await sgMail.send(msg);
 
     res.json({
       message: "Booking saved successfully",

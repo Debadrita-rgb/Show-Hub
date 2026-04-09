@@ -16,6 +16,7 @@ const Booking = () => {
   const navigate = useNavigate();
   const [rating, setRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
+  const [movie, setMovies] = useState({});
 
   const [filterType, setFilterType] = useState("All");
 
@@ -123,6 +124,68 @@ const Booking = () => {
 
     return today > bookingDate;
   };
+
+//     useEffect(() => {
+//       fetch(
+//         `${BASE_URL}/user/get-single-movie/${selectedBooking.movie?.movieId}`,
+//       )
+//         .then((res) => res.json())
+//         .then((data) => {
+//           setMovies(data);
+//         });
+//     }, []);
+// console.log("movie", movie)
+const openGoogleCalender = (booking) => {
+  let title = "";
+  let startDateTime;
+  let endDateTime;
+  let location = "";
+  let details = "Booked via ShowHub 🎬";
+
+  if (booking.type === "Movie") {
+    title = booking.movieTitle;
+
+    // Extract only YYYY-MM-DD
+    const datePart = booking.showDate.split("T")[0];
+
+    const start = new Date(`${datePart}T${booking.showTime}`);
+    startDateTime = start;
+
+    const duration = booking.movie?.totalTiming; // fallback
+    endDateTime = new Date(start.getTime() + duration * 60000);
+
+location = `${booking.theaterName || "Cinema Hall"}, ${booking.theater?.location_name || ""}`;
+  } else {
+    title = booking.details?.showTitle;
+
+    const start = new Date(
+      `${booking.details?.date}T${booking.details?.startTime}`,
+    );
+
+    startDateTime = start;
+
+    const duration = Number(booking.details?.duration || 60);
+    endDateTime = new Date(start.getTime() + duration * 60000);
+
+location = `${booking.theaterName || "Event Venue"}, ${booking.details?.locationName || ""}`;
+  }
+
+  const formatDate = (date) => {
+    if (isNaN(date)) return ""; //safety check
+    return date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+  };
+
+  const startStr = formatDate(startDateTime);
+  const endStr = formatDate(endDateTime);
+
+  const url = `https://calendar.google.com/calendar/u/0/r/eventedit?text=${encodeURIComponent(
+    title,
+  )}&dates=${startStr}/${endStr}&details=${encodeURIComponent(
+    details,
+  )}&location=${encodeURIComponent(location)}&ctz=Asia/Kolkata`;
+
+  window.open(url, "_blank");
+};
 
   return (
     <section className="px-4 sm:px-6 md:px-16 py-12">
@@ -245,6 +308,13 @@ const Booking = () => {
                 className="border border-purple-600 px-3 sm:px-4 py-2 rounded text-sm hover:bg-purple-200 hover:text-black sm:mb-2"
               >
                 View Booking Info
+              </button>
+
+              <button
+                onClick={() => openGoogleCalender(booking)}
+                className="border border-purple-600 px-3 sm:px-4 py-2 rounded text-sm hover:bg-purple-200 hover:text-black sm:mb-2"
+              >
+                Save Date Google Calender
               </button>
 
               {canRateBooking(booking) && (
