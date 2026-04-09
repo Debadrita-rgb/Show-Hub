@@ -964,22 +964,26 @@ router.post("/save-booking", jwtAuthMiddleware, async (req, res) => {
   `,
     };
 
-const pdfBuffer = await generateInvoice(booking, user);
+// const pdfBuffer = await generateInvoice(booking, user);
 
-msg.attachments = [
-  {
-    content: pdfBuffer.toString("base64"),
-    filename: "invoice.pdf",
-    type: "application/pdf",
-    disposition: "attachment",
-  },
-];
-    await sgMail.send(msg);
+// msg.attachments = [
+//   {
+//     content: pdfBuffer.toString("base64"),
+//     filename: "invoice.pdf",
+//     type: "application/pdf",
+//     disposition: "attachment",
+//   },
+// ];
+    sgMail
+      .send(msg)
+      .then(() => console.log("Email sent"))
+      .catch((err) => console.log("Email error:", err));
 
     res.json({
       message: "Booking saved successfully",
       booking,
     });
+    
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
