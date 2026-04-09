@@ -31,13 +31,8 @@ const generateInvoice = (booking, user) => {
     doc.text(`Email: ${user.email}`, leftX, y + 90);
 
     // RIGHT SIDE
-    doc.text("Invoice issued by", rightX, y);
-    doc.text("BigTree Entertainment Pvt. Ltd.", rightX, y + 15);
-
-    doc.text("Invoice issued on behalf of", rightX, y + 45);
-    doc.text("Biswa Kalyan Rath_Maharashtra", rightX, y + 60);
-    doc.text("PAN: BJYPB8723M", rightX, y + 75);
-    doc.text("GSTIN: 27BJYPB8723M1ZF", rightX, y + 90);
+    doc.text("Invoice issued by", "Showhub", rightX, y);
+    doc.text(`${booking.movieTitle}`, rightX, y + 60);
 
     // ================= TABLE =================
     let tableY = 220;
@@ -54,7 +49,7 @@ const generateInvoice = (booking, user) => {
 
     // ROW
     doc.text(
-      `${booking.movieTitle}\n${booking.selectedDate}\n${booking.seats
+      `${booking.movieTitle}\n${booking.showDate}\n${booking.seats
       ?.map((seat) => `${seat.seatId} (${seat.category})`)
       .join(", ")}`,
       leftX,

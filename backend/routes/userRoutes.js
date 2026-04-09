@@ -883,9 +883,11 @@ router.post("/save-booking", jwtAuthMiddleware, async (req, res) => {
 
     const user = await User.findById(req.user.id);
     const theater = await Theater.findById(booking.theaterId);
+        const movie = await Movie.findById(booking.movieId);
+
     const theaterName = theater.theater_name;
     const location = theater.location_name;
-
+const movieImage = movie.movieimage; 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -907,73 +909,130 @@ router.post("/save-booking", jwtAuthMiddleware, async (req, res) => {
       },
       subject: "🎬 Booking Confirmed - ShowHub",
       html: `
-  <div style="font-family: Arial; background:#f4f4f4; padding:20px;">
-    <div style="max-width:700px; margin:auto; background:white; border-radius:10px; overflow:hidden;">
-      
-      <!-- HEADER -->
-      <div style="background:#1f2a44; color:white; padding:20px;">
-      <div style="text-align:left;">
-      <img src="https://show-hub-frontend.onrender.com/assets/admin_login_logo-CDHIE2pX.png" width="80" />
-    </div>
-        <h2>M-Ticket</h2>
-        <p>Booking ID: ${booking.bookingId || booking._id}</p>
-        <h3>Hey ${name}, your booking is confirmed! 🎉</h3>
+<div style="font-family: Arial, sans-serif; background:#f2f2f2; padding:20px;">
+  <div style="max-width:700px; margin:auto; background:#ffffff; border-radius:10px; overflow:hidden;">
+
+    <!-- HEADER -->
+    <div style="background:#1f2a44; color:white; padding:20px;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <img src="https://show-hub-frontend.onrender.com/assets/admin_login_logo-CDHIE2pX.png" width="90"/>
+        <span style="font-size:12px;">BOOKING ID: ${booking.bookingId || booking._id}</span>
       </div>
 
-      <!-- BODY -->
-      <div style="padding:20px;">
-        <p><strong>🎥 Movie:</strong> ${booking.movieTitle}</p>
-        <p><strong>🏢 Theater:</strong> ${theaterName}</p>
-        <p><strong>📍 Location:</strong> ${location}</p>
-        <p><strong>📅 Date:</strong> ${formattedDate}</p>
-        <p><strong>⏰ Time:</strong> ${formattedTime}</p>
-        <p><strong>💺 Seats:</strong> ${formattedSeats}</p>
+      <h2 style="margin-top:15px;">M-Ticket</h2>
+      <h3 style="margin:5px 0;">Hey ${name}, your booking is confirmed! 🎉</h3>
+      <p style="font-size:13px;">View tickets in your profile on the app / mobile web.</p>
+    </div>
 
-        <hr/>
+    <!-- MOVIE CARD -->
+    <div style="padding:20px; border-bottom:1px dashed #ccc;">
 
-        <!-- PRICE BREAKDOWN -->
-        <h3>Payment Details</h3>
-        <p>Total Amount Paid: ₹${booking.totalAmount}</p>
-        <p>Ticket Price: ₹${booking.ticketPrice}</p>
-        <p>Convenience Fee: ₹${booking.convenienceFee}</p>
-        <p>Paid using: Online Payment</p>
+      <div style="display:flex; gap:15px;">
+        
+        <!-- MOVIE IMAGE -->
+        <img 
+          src="${movieImage || "https://via.placeholder.com/120x160"}" 
+          style="width:120px; height:160px; object-fit:cover; border-radius:6px;"
+        />
 
-        <hr/>
+        <!-- DETAILS -->
+        <div style="flex:1;">
+          <h3 style="margin:0;">${booking.movieTitle}</h3>
 
-        <!-- INFO SECTION -->
-        <p><strong>🎟 Contactless Entry:</strong></p>
-        <p>Safe and contactless entry through M-Ticket scanning! No more box office queue!</p>
+          <p style="margin:5px 0; color:#666;">
+            ${theaterName}<br/>
+            ${location}
+          </p>
 
-        <h4>How to use M-Ticket:</h4>
-        <ul>
-          <li>Log in to ShowHub from app or browser</li>
-          <li>Go to "Your Orders"</li>
-          <li>Show QR code at entry</li>
-        </ul>
+          <p style="margin:5px 0;">
+            <strong>Date & Time:</strong><br/>
+            ${formattedDate} | ${formattedTime}
+          </p>
 
-        <br/>
+          <p style="margin:5px 0;">
+            <strong>Seats:</strong> ${formattedSeats}
+          </p>
+        </div>
 
-        <a href="https://show-hub-frontend.onrender.com/user-bookings"
-          style="display:block; text-align:center; padding:12px; background:#e74c3c; color:white; text-decoration:none; border-radius:6px;">
-          View Tickets
-        </a>
+      </div>
+
+      <!-- CATEGORY / PRICE -->
+      <div style="display:flex; justify-content:space-between; margin-top:15px;">
+        <div>
+          <p style="margin:0; font-size:12px; color:#777;">Category</p>
+          <strong>${booking.seats?.[0]?.category || "N/A"}</strong>
+        </div>
+
+        <div>
+          <p style="margin:0; font-size:12px; color:#777;">Quantity</p>
+          <strong>${booking.seats?.length || 1}</strong>
+        </div>
+
+        <div>
+          <p style="margin:0; font-size:12px; color:#777;">Price</p>
+          <strong>₹${booking.ticketPrice}</strong>
+        </div>
       </div>
 
     </div>
+
+    <!-- BUTTON -->
+    <div style="padding:20px; text-align:center;">
+      <a 
+        href="https://show-hub-frontend.onrender.com/verify-booking/${booking.bookingId || booking._id}"
+        style="display:inline-block; padding:12px 25px; background:#e74c3c; color:white; text-decoration:none; border-radius:6px; font-weight:bold;"
+      >
+        View Tickets
+      </a>
+    </div>
+
+    <!-- PAYMENT DETAILS -->
+    <div style="padding:20px; border-top:1px solid #eee;">
+      <h3>Total amount paid <span style="float:right;">₹${booking.totalAmount}</span></h3>
+
+      <p style="color:#777;">Ticket price <span style="float:right;">₹${booking.ticketPrice}</span></p>
+      <p style="color:#777;">Convenience Fee <span style="float:right;">₹${booking.convenienceFee}</span></p>
+      <p style="color:#777;">Paid using <span style="float:right;">Online</span></p>
+    </div>
+
+    <!-- HOW TO USE -->
+    <div style="padding:20px;">
+      <h4>How to use M-Ticket:</h4>
+      <ol style="color:#555;">
+        <li>Log in to ShowHub from app or mobile browser.</li>
+        <li>Go to "Your Orders".</li>
+        <li>Show QR code at entry.</li>
+      </ol>
+    </div>
+
+    <!-- FOOTER -->
+    <div style="padding:20px; text-align:center; border-top:1px solid #eee;">
+    <a 
+  href="https://show-hub-frontend.onrender.com/verify-booking/${booking.bookingId}"
+  style=style="color:#e74c3c; border:1px solid #e74c3c; padding:10px 15px; border-radius:5px; text-decoration:none;"
+>
+  View Tickets
+</a>
+      <a href="#" style="color:#e74c3c; border:1px solid #e74c3c; padding:10px 15px; border-radius:5px; text-decoration:none;">
+        Need help? Contact Support
+      </a>
+    </div>
+
   </div>
-  `,
+</div>
+`,
     };
 
-// const pdfBuffer = await generateInvoice(booking, user);
+const pdfBuffer = await generateInvoice(booking, user);
 
-// msg.attachments = [
-//   {
-//     content: pdfBuffer.toString("base64"),
-//     filename: "invoice.pdf",
-//     type: "application/pdf",
-//     disposition: "attachment",
-//   },
-// ];
+msg.attachments = [
+  {
+    content: pdfBuffer.toString("base64"),
+    filename: "invoice.pdf",
+    type: "application/pdf",
+    disposition: "attachment",
+  },
+];
     sgMail
       .send(msg)
       .then(() => console.log("Email sent"))
