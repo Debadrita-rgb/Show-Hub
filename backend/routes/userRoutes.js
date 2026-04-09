@@ -878,11 +878,11 @@ router.post("/save-booking", jwtAuthMiddleware, async (req, res) => {
   try {
     // console.log(req.body);
     const booking = new Booking(req.body);
-    console.log("booking", booking);
-    // await booking.save();
+    // console.log("booking", booking);
+    await booking.save();
 
     const user = await User.findById(req.user.id);
-    const theater = await User.findById(booking.theaterId);
+    const theater = await Theater.findById(booking.theaterId);
     const theaterName = theater.theater_name;
     const location = theater.location_name;
 
@@ -963,13 +963,12 @@ router.post("/save-booking", jwtAuthMiddleware, async (req, res) => {
   </div>
   `,
     };
-const filePath = await generateInvoice(booking, user);
 
-const attachment = fs.readFileSync(filePath).toString("base64");
+const pdfBuffer = await generateInvoice(booking, user);
 
 msg.attachments = [
   {
-    content: attachment,
+    content: pdfBuffer.toString("base64"),
     filename: "invoice.pdf",
     type: "application/pdf",
     disposition: "attachment",
