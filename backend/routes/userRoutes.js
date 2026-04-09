@@ -876,10 +876,10 @@ router.post("/create-order", jwtAuthMiddleware, async (req, res) => {
 
   router.post("/save-booking", jwtAuthMiddleware, async (req, res) => {
     try {
-      // console.log(req.body);
+      console.log(req.body);
       const booking = new Booking(req.body);
-      // console.log("booking", booking);
-      await booking.save();
+      console.log("booking", booking);
+      // await booking.save();
 
   const user = await User.findById(req.user.id);
   const theater = await Theater.findById(booking.theaterId);
@@ -906,6 +906,37 @@ router.post("/create-order", jwtAuthMiddleware, async (req, res) => {
         "en-IN",
         { hour: "numeric", minute: "2-digit", hour12: true },
       );
+
+const seatsHTML = booking.seats
+  ?.map(
+    (seat) => `
+    <div style="display:flex; justify-content:space-between; font-size:13px; margin:2px 0;">
+      <span>${seat.seatId} (${seat.category})</span>
+      <span>₹${seat.price}</span>
+    </div>
+  `,
+  )
+  .join("");
+
+const foodHTML =
+  booking.foodItems && booking.foodItems.length > 0
+    ? `
+    <div style="margin-top:15px;">
+      <h4 style="margin-bottom:5px;">🍿 Food & Beverages</h4>
+      ${booking.foodItems
+        .map(
+          (item) => `
+          <div style="display:flex; justify-content:space-between; font-size:13px;">
+            <span>${item.name} x${item.quantity}</span>
+            <span>₹${item.total}</span>
+          </div>
+        `,
+        )
+        .join("")}
+    </div>
+  `
+    : "";
+
       const msg = {
         to: email,
         from: {
@@ -914,125 +945,141 @@ router.post("/create-order", jwtAuthMiddleware, async (req, res) => {
         },
         subject: "🎬 Booking Confirmed - ShowHub",
         html: `
-  <div style="font-family: Arial, sans-serif; background:#f2f2f2; padding:20px;">
-    <div style="max-width:700px; margin:auto; background:#ffffff; border-radius:10px; overflow:hidden;">
+<div style="font-family: Arial, sans-serif; background:#f2f2f2; padding:20px;">
+  <div style="max-width:700px; margin:auto; background:#ffffff; border-radius:10px; overflow:hidden;">
 
-      <!-- HEADER -->
-      <div style="background:#1f2a44; color:white; padding:20px;">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <img src="https://show-hub-frontend.onrender.com/assets/admin_login_logo-CDHIE2pX.png" width="90"/>
-          <span style="font-size:12px;">BOOKING ID: ${booking.bookingId || booking._id}</span>
+    <!-- HEADER -->
+    <div style="background:#1f2a44; color:white; padding:20px;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <img src="https://show-hub-frontend.onrender.com/assets/admin_login_logo-CDHIE2pX.png" width="80"/>
+        <span style="font-size:12px;">BOOKING ID: ${booking.bookingId || booking._id}</span>
+      </div>
+
+      <h2 style="margin-top:15px;">M-Ticket</h2>
+      <h3 style="margin:5px 0;">Hey ${name}, your booking is confirmed! 🎉</h3>
+      <p style="font-size:13px;">View tickets in your profile on the app / mobile web.</p>
+    </div>
+
+    <!-- MOVIE CARD -->
+    <div style="padding:20px; border-bottom:1px dashed #ccc;">
+
+      <div style="display:flex; gap:15px;">
+        
+        <!-- MOVIE IMAGE -->
+        <img 
+          src="${movieImage || "https://via.placeholder.com/120x160"}" 
+          style="width:120px; height:160px; object-fit:cover; border-radius:6px;"
+        />
+
+        <!-- DETAILS -->
+        <div style="flex:1;">
+          <h3 style="margin:0;">${booking.movieTitle}</h3>
+
+          <p style="margin:5px 0; color:#666;">
+            ${theaterName}<br/>
+            ${location}
+          </p>
+
+          <p style="margin:5px 0;">
+            <strong>Date & Time:</strong><br/>
+            ${formattedDate} | ${formattedTime}
+          </p>
+
+          <p style="margin:5px 0;">
+            <strong>Hall:</strong> ${booking.hallName || ""}
+          </p>
+        </div>
+      </div>
+
+      <!-- SEATS LIST -->
+      <div style="margin-top:15px;">
+        <h4 style="margin-bottom:5px;">💺 Seats</h4>
+        ${seatsHTML}
+      </div>
+
+      ${foodHTML}
+
+      <!-- SUMMARY -->
+      <div style="display:flex; justify-content:space-between; margin-top:15px;">
+        <div>
+          <p style="margin:0; font-size:12px; color:#777;">Total Tickets</p>
+          <strong>${booking.seats?.length || 1}</strong>
         </div>
 
-        <h2 style="margin-top:15px;">M-Ticket</h2>
-        <h3 style="margin:5px 0;">Hey ${name}, your booking is confirmed! 🎉</h3>
-        <p style="font-size:13px;">View tickets in your profile on the app / mobile web.</p>
-      </div>
-
-      <!-- MOVIE CARD -->
-      <div style="padding:20px; border-bottom:1px dashed #ccc;">
-
-        <div style="display:flex; gap:15px;">
-          
-          <!-- MOVIE IMAGE -->
-          <img 
-            src="${movieImage || "https://via.placeholder.com/120x160"}" 
-            style="width:120px; height:160px; object-fit:cover; border-radius:6px;"
-          />
-
-          <!-- DETAILS -->
-          <div style="flex:1;">
-            <h3 style="margin:0;">${booking.movieTitle}</h3>
-
-            <p style="margin:5px 0; color:#666;">
-              ${theaterName}<br/>
-              ${location}
-            </p>
-
-            <p style="margin:5px 0;">
-              <strong>Date & Time:</strong><br/>
-              ${formattedDate} | ${formattedTime}
-            </p>
-
-            <p style="margin:5px 0;">
-              <strong>Seats:</strong> ${formattedSeats}
-            </p>
-          </div>
-
+        <div>
+          <p style="margin:0; font-size:12px; color:#777;">Ticket Price</p>
+          <strong>₹${booking.ticketPrice}</strong>
         </div>
-
-        <!-- CATEGORY / PRICE -->
-        <div style="display:flex; justify-content:space-between; margin-top:15px;">
-          <div>
-            <p style="margin:0; font-size:12px; color:#777;">Category</p>
-            <strong>${booking.seats?.[0]?.category || "N/A"}</strong>
-          </div>
-
-          <div>
-            <p style="margin:0; font-size:12px; color:#777;">Quantity</p>
-            <strong>${booking.seats?.length || 1}</strong>
-          </div>
-
-          <div>
-            <p style="margin:0; font-size:12px; color:#777;">Price</p>
-            <strong>₹${booking.ticketPrice}</strong>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- BUTTON -->
-      <div style="padding:20px; text-align:center;">
-        <a 
-          href="https://show-hub-frontend.onrender.com/verify-booking/${booking.bookingId || booking._id}"
-          style="display:inline-block; padding:12px 25px; background:#e74c3c; color:white; text-decoration:none; border-radius:6px; font-weight:bold;"
-        >
-          View Tickets
-        </a>
-      </div>
-
-      <!-- PAYMENT DETAILS -->
-      <div style="padding:20px; border-top:1px solid #eee;">
-        <h3>Total amount paid <span style="float:right;">₹${booking.totalAmount}</span></h3>
-
-        <p style="color:#777;">Ticket price <span style="float:right;">₹${booking.ticketPrice}</span></p>
-        <p style="color:#777;">Convenience Fee <span style="float:right;">₹${booking.convenienceFee}</span></p>
-        <p style="color:#777;">Paid using <span style="float:right;">Online</span></p>
-      </div>
-
-      <!-- HOW TO USE -->
-      <div style="padding:20px;">
-        <h4>How to use M-Ticket:</h4>
-        <ol style="color:#555;">
-          <li>Log in to ShowHub from app or mobile browser.</li>
-          <li>Go to "Your Orders".</li>
-          <li>Show QR code at entry.</li>
-        </ol>
-      </div>
-
-      <!-- FOOTER -->
-      <div style="padding:20px; text-align:center; border-top:1px solid #eee;">
-      
-        <a href="#" style="color:#e74c3c; border:1px solid #e74c3c; padding:10px 15px; border-radius:5px; text-decoration:none;">
-          Need help? Contact Support
-        </a>
       </div>
 
     </div>
+
+    <!-- BUTTON -->
+    <div style="padding:20px; text-align:center;">
+      <a 
+        href="https://show-hub-frontend.onrender.com/verify-booking/${booking.bookingId || booking._id}"
+        style="display:inline-block; padding:12px 25px; background:#e74c3c; color:white; text-decoration:none; border-radius:6px; font-weight:bold;"
+      >
+        View Tickets
+      </a>
+    </div>
+
+    <!-- PAYMENT DETAILS -->
+    <div style="padding:20px; border-top:1px solid #eee;">
+      <h3>Total amount paid <span style="float:right;">₹${booking.totalAmount}</span></h3>
+
+      <p style="color:#777;">Ticket price <span style="float:right;">₹${booking.ticketPrice}</span></p>
+
+      ${
+        booking.foodItems && booking.foodItems.length > 0
+          ? `<p style="color:#777;">Food Total <span style="float:right;">₹${booking.foodTotal}</span></p>`
+          : ""
+      }
+
+      <p style="color:#777;">Convenience Fee <span style="float:right;">₹${booking.convenienceFee}</span></p>
+      <p style="color:#777;">Paid using <span style="float:right;">Online</span></p>
+    </div>
+
+    <!-- INFO -->
+    <div style="margin:20px; padding:15px; background:#fff3cd; border-left:4px solid #f1c40f; border-radius:5px;">
+      <strong>Contactless & Fast-track Entry with M-ticket</strong>
+      <p style="margin:5px 0;">
+        Safe and contactless entry through M-Ticket scanning! No more box office queue!
+      </p>
+    </div>
+
+    <!-- HOW TO USE -->
+    <div style="padding:20px;">
+      <h4>How to use M-Ticket:</h4>
+      <ol style="color:#555;">
+        <li>Log in to ShowHub from app or mobile browser.</li>
+        <li>Go to "Your Orders".</li>
+        <li>Show QR code at entry.</li>
+      </ol>
+    </div>
+
+    <!-- FOOTER -->
+    <div style="padding:20px; text-align:center; border-top:1px solid #eee;">
+      <a href="https://show-hub-frontend.onrender.com/contact" style="color:#e74c3c; border:1px solid #e74c3c; padding:10px 15px; border-radius:5px; text-decoration:none;">
+        Need help? Contact Support
+      </a>
+    </div>
+
   </div>
-  `,
+</div>
+`,
       };
 
-      // const pdfBuffer = await generateInvoice(booking, user);
+      const pdfBuffer = await generateInvoice(booking, user);
 
-      // msg.attachments = [
-      //   {
-      //     content: pdfBuffer.toString("base64"),
-      //     filename: "invoice.pdf",
-      //     type: "application/pdf",
-      //     disposition: "attachment",
-      //   },
-      // ];
+      msg.attachments = [
+        {
+          content: pdfBuffer.toString("base64"),
+          filename: "invoice.pdf",
+          type: "application/pdf",
+          disposition: "attachment",
+        },
+      ];
       sgMail
         .send(msg)
         .then(() => console.log("Email sent"))

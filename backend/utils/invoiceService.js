@@ -31,8 +31,11 @@ const generateInvoice = (booking, user) => {
     doc.text(`Email: ${user.email}`, leftX, y + 90);
 
     // RIGHT SIDE
-    doc.text("Invoice issued by", "Showhub", rightX, y);
-    doc.text(`${booking.movieTitle}`, rightX, y + 60);
+doc.text("Invoice issued by", rightX, y);
+doc.text("ShowHub", rightX, y + 15);
+
+doc.text("Invoice issued on behalf of", rightX, y + 40);
+doc.text(booking.movieTitle, rightX, y + 55);
 
     // ================= TABLE =================
     let tableY = 220;
