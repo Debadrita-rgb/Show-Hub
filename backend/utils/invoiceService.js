@@ -1,6 +1,17 @@
 const PDFDocument = require("pdfkit");
-const fs = require("fs");
-const path = require("path");
+
+const formatDateTime = (date) => {
+  const d = new Date(date);
+  return d.toLocaleString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: "Asia/Kolkata",
+  });
+};
 
 const generateInvoice = (booking, user) => {
   return new Promise((resolve, reject) => {
@@ -10,135 +21,146 @@ const generateInvoice = (booking, user) => {
     doc.on("data", buffers.push.bind(buffers));
     doc.on("end", () => resolve(Buffer.concat(buffers)));
 
-    // ================= HEADER =================
-    doc.fontSize(18).text("INVOICE", { align: "center" }).moveDown(1);
-
-    // ================= TWO COLUMN SECTION =================
     const leftX = 40;
-    const rightX = 320;
-    let y = 100;
+    const rightX = 550;
 
-    // LEFT SIDE
+    // ================= LOGO =================
+    try {
+      doc.image(
+        "https://show-hub-frontend.onrender.com/assets/logo-CWqOHdnZ.png",
+        40,
+        30,
+        { width: 80 },
+      );
+    } catch (e) {}
+
+    // ================= HEADER =================
+    doc.fontSize(18).text("INVOICE", 0, 40, { align: "center" });
+
     doc.fontSize(10);
-    doc.text(`Date of issue: ${new Date().toDateString()}`, leftX, y);
-    doc.text(`Booking ID: ${booking._id}`, leftX, y + 30);
+    doc.text(`Date: ${formatDateTime(new Date())}`, leftX, 90);
+    doc.text(`Booking ID: ${booking._id}`, leftX, 105);
 
-    doc.moveDown();
+    doc.text("Customer:", leftX, 130);
+    doc.text(user.name, leftX, 145);
+    doc.text(user.email, leftX, 160);
 
-    doc.text("Customer", leftX, y + 60);
-    doc.text(`Name: ${user.name}`, leftX, y + 75);
-    doc.text(`Email: ${user.email}`, leftX, y + 90);
+    doc.text("Issued By:", 350, 90);
+    doc.text("ShowHub", 350, 105);
 
-    // RIGHT SIDE
-    doc.text("Invoice issued by", rightX, y);
-    doc.text("ShowHub", rightX, y + 15);
+    doc.text("Movie:", 350, 130);
+    doc.text(booking.movieTitle, 350, 145);
 
-    doc.text("Invoice issued on behalf of", rightX, y + 40);
-    doc.text(booking.movieTitle, rightX, y + 55);
+    // ================= TABLE START =================
+    let y = 200;
 
-    // ================= TABLE =================
-    // ================= TABLE =================
-    let tableY = 220;
+    const drawRow = (y, item, qty, price, total) => {
+      doc.rect(leftX, y, 510, 25).stroke();
 
-    doc.moveTo(leftX, tableY).lineTo(550, tableY).stroke();
+      doc.text(item, leftX + 5, y + 5, { width: 300 });
+      doc.text(qty, 350, y + 5);
+      doc.text(price, 400, y + 5);
+      doc.text(total, 470, y + 5);
+    };
 
-    doc.fontSize(10).text("Item Description", leftX, tableY + 5);
-    doc.text("Qty", 350, tableY + 5);
-    doc.text("Price", 400, tableY + 5);
-    doc.text("Total", 470, tableY + 5);
+    // HEADER
+    drawRow(y, "Item Description", "Qty", "Price", "Total");
+    y += 25;
 
-    tableY += 20;
-    doc.moveTo(leftX, tableY).lineTo(550, tableY).stroke();
+    // ================= ITEM DESCRIPTION =================
+    let description = `${booking.movieTitle}\n${formatDateTime(booking.showDate)}\n`;
 
-    // ================= MOVIE INFO =================
-    let descriptionY = tableY + 10;
+    booking.seats.forEach((seat) => {
+      description += `${seat.seatId} (${seat.category}) - ₹${seat.price}\n`;
+    });
 
-    doc.text(`${booking.movieTitle}`, leftX, descriptionY);
-    descriptionY += 15;
+    // ================= CALCULATIONS =================
+    const qty = booking.seats.length;
+    const ticketTotal = booking.ticketPrice;
+    const cgst = booking.cgst || 0;
+    const sgst = booking.sgst || 0;
+    const convenienceFee = booking.convenienceFee || 0;
 
-    doc.text(`${booking.showDate}`, leftX, descriptionY);
-    descriptionY += 15;
+    const totalBeforeTax = ticketTotal;
+    const taxAmount = cgst + sgst;
+    const grandTotal = totalBeforeTax + taxAmount + convenienceFee;
 
-    // ================= SEATS SECTION =================
-    if (booking.seats && booking.seats.length > 0) {
-      descriptionY += 10;
-      doc.font("Helvetica-Bold").text("Seats", leftX, descriptionY);
-      doc.font("Helvetica");
+    drawRow(y, description, qty, `₹${ticketTotal}`, `₹${totalBeforeTax}`);
 
-      descriptionY += 15;
-
-      booking.seats.forEach((seat) => {
-        doc.text(
-          `${seat.seatId} (${seat.category}) - ₹${seat.price}`,
-          leftX,
-          descriptionY,
-        );
-        descriptionY += 15;
-      });
-    }
-
-    // ================= FOOD SECTION (CONDITIONAL) =================
-    if (booking.foodItems && booking.foodItems.length > 0) {
-      descriptionY += 15;
-
-      doc.font("Helvetica-Bold").text("Food & Beverages", leftX, descriptionY);
-      doc.font("Helvetica");
-
-      descriptionY += 15;
-
-      booking.foodItems.forEach((item) => {
-        doc.text(
-          `${item.name} x${item.quantity} - ₹${item.price}`,
-          leftX,
-          descriptionY,
-        );
-        descriptionY += 15;
-      });
-    }
-
-    // ================= PRICE SUMMARY =================
-    descriptionY += 20;
-
-    doc.text(`Total Tickets: ${booking.seats.length}`, leftX, descriptionY);
-    descriptionY += 15;
-
-    doc.text(`Ticket Price: ₹${booking.ticketPrice}`, leftX, descriptionY);
-
-    // ================= RIGHT SIDE VALUES =================
-    doc.text("1", 350, tableY + 10);
-    doc.text(`₹${booking.ticketPrice}`, 400, tableY + 10);
-    doc.text(`₹${booking.ticketPrice}`, 470, tableY + 10);
-
-    // ================= LINE =================
-    tableY = descriptionY + 10;
-    doc.moveTo(leftX, tableY).lineTo(550, tableY).stroke();
+    y += 80;
 
     // ================= TAX =================
-    doc.moveDown();
+    doc.text(`CGST (9%): ₹${cgst}`, rightX - 150, y);
+    y += 15;
+    doc.text(`SGST (9%): ₹${sgst}`, rightX - 150, y);
+    y += 15;
+    doc.text(`Convenience Fee: ₹${convenienceFee}`, rightX - 150, y);
 
-    doc.text(`CGST (9%): ₹${booking.cgst}`, { align: "right" });
-    doc.text(`SGST (9%): ₹${booking.sgst}`, { align: "right" });
+    y += 30;
 
-    // ================= TOTAL =================
-    doc.moveDown();
+    // ================= FOOD TABLE =================
+    if (booking.foodItems && booking.foodItems.length > 0) {
+      doc.font("Helvetica-Bold").text("Food & Beverages", leftX, y);
+      doc.font("Helvetica");
+      y += 20;
 
-    doc
-      .fontSize(12)
-      .text(`Grand Total: ₹${booking.totalAmount}`, { align: "right" });
+      drawRow(y, "Item", "Qty", "Price", "Total");
+      y += 25;
+
+      let foodTotal = 0;
+
+      booking.foodItems.forEach((item) => {
+        foodTotal += item.total;
+
+        drawRow(
+          y,
+          item.name,
+          item.quantity,
+          `₹${item.price}`,
+          `₹${item.total}`,
+        );
+
+        y += 25;
+      });
+
+      y += 10;
+      doc.text(`Food Total: ₹${foodTotal}`, rightX - 150, y);
+      y += 30;
+
+      // add to grand total
+      grandTotal += foodTotal;
+    }
+
+    // ================= FINAL SUMMARY =================
+    doc.moveTo(leftX, y).lineTo(rightX, y).stroke();
+    y += 10;
+
+    doc.font("Helvetica-Bold");
+
+    doc.text(`Net Amount: ₹${totalBeforeTax}`, leftX, y);
+    doc.text(`Tax Amount: ₹${taxAmount}`, 250, y);
+    doc.text(`Grand Total: ₹${grandTotal}`, 400, y);
+
+    doc.font("Helvetica");
 
     // ================= FOOTER =================
-    doc.moveDown();
+    y += 40;
 
     doc
       .fontSize(9)
       .text(
-        "Note: Convenience fee pertains to services by BigTree Entertainment Pvt. Ltd.",
-        { align: "left" },
+        "Note: Convenience fee pertains to services provided by ShowHub.",
+        leftX,
+        y,
       );
 
-    doc.text(`Transaction ID: ${booking.paymentId} | Payment Mode: UPI`, {
-      align: "left",
-    });
+    y += 15;
+
+    doc.text(
+      `Transaction ID: ${booking.paymentId} | Payment Mode: UPI`,
+      leftX,
+      y,
+    );
 
     doc.end();
   });

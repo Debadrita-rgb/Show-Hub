@@ -975,7 +975,7 @@ router.post("/create-order", jwtAuthMiddleware, async (req, res) => {
   padding:20px;
 ">
   <div style="display:flex; justify-content:space-between; align-items:center;">
-    <img src="https://show-hub-frontend.onrender.com/assets/logo-CWqOHdnZ.png" width="80"/>
+    <img src="https://show-hub-frontend.onrender.com/assets/admin_login_logo-CDHIE2pX.png" width="80"/>
     <span style="font-size:12px;">BOOKING ID: ${booking.bookingId || booking._id}</span>
   </div>
 
