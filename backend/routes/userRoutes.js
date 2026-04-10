@@ -921,21 +921,43 @@ const seatsHTML = booking.seats
 const foodHTML =
   booking.foodItems && booking.foodItems.length > 0
     ? `
-    <div style="margin-top:15px;">
-      <h4 style="margin-bottom:5px;">🍿 Food & Beverages</h4>
+<div style="margin-top:20px; background:#fafafa; padding:10px; border-radius:6px;">
+      <h4 style="margin-bottom:10px;">🍿 Food & Beverages</h4>
+
       ${booking.foodItems
         .map(
           (item) => `
-          <div style="display:flex; justify-content:space-between; font-size:13px;">
+          <div style="
+            display:flex; 
+            justify-content:space-between; 
+            font-size:13px; 
+            margin-bottom:8px;
+          ">
             <span>${item.name} x${item.quantity}</span>
             <span>₹${item.total}</span>
           </div>
         `,
         )
         .join("")}
+
+      <!-- Divider -->
+      <div style="border-top:1px dashed #ccc; margin:10px 0;"></div>
+
+      <!-- Food Total -->
+      <div style="
+        display:flex; 
+        justify-content:space-between; 
+        font-weight:bold;
+      ">
+        <span>Food Total</span>
+        <span>₹${foodTotal}</span>
+      </div>
     </div>
   `
     : "";
+
+    const foodTotal =
+      booking.foodItems?.reduce((sum, item) => sum + item.total, 0) || 0;
 
       const msg = {
         to: email,
@@ -949,14 +971,19 @@ const foodHTML =
   <div style="max-width:700px; margin:auto; background:#ffffff; border-radius:10px; overflow:hidden;">
 
     <!-- HEADER -->
-    <div style="background:#1f2a44; color:white; padding:20px;">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <img src="https://show-hub-frontend.onrender.com/assets/admin_login_logo-CDHIE2pX.png" width="80"/>
-        <span style="font-size:12px;">BOOKING ID: ${booking.bookingId || booking._id}</span>
-      </div>
+    <div style="
+  background: linear-gradient(135deg, #000000, #4c1d95, #000000);
+  color:white;
+  padding:20px;
+">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <img src="https://show-hub-frontend.onrender.com/assets/logo-CWqOHdnZ.png" width="80"/>
+    <span style="font-size:12px;">BOOKING ID: ${booking.bookingId || booking._id}</span>
+  </div>
 
-      <h2 style="margin-top:15px;">M-Ticket</h2>
-      <h3 style="margin:5px 0;">Hey ${name}, your booking is confirmed! 🎉</h3>
+  <h2 style="margin-top:15px;">M-Ticket</h2>
+  <h3 style="margin:5px 0;">Hey ${name}, your booking is confirmed! 🎉</h3>
+
       <p style="font-size:13px;">View tickets in your profile on the app / mobile web.</p>
     </div>
 
@@ -972,7 +999,7 @@ const foodHTML =
         />
 
         <!-- DETAILS -->
-        <div style="flex:1;">
+        <div style="flex:1; margin-left:3px">
           <h3 style="margin:0;">${booking.movieTitle}</h3>
 
           <p style="margin:5px 0; color:#666;">
@@ -1032,7 +1059,10 @@ const foodHTML =
 
       ${
         booking.foodItems && booking.foodItems.length > 0
-          ? `<p style="color:#777;">Food Total <span style="float:right;">₹${booking.foodTotal}</span></p>`
+          ? `<p style="color:#777;">
+         Food Total 
+         <span style="float:right;">₹${foodTotal}</span>
+       </p>`
           : ""
       }
 

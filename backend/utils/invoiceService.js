@@ -21,7 +21,6 @@ const generateInvoice = (booking, user) => {
     // LEFT SIDE
     doc.fontSize(10);
     doc.text(`Date of issue: ${new Date().toDateString()}`, leftX, y);
-    doc.text(`Place of supply: Maharashtra`, leftX, y + 15);
     doc.text(`Booking ID: ${booking._id}`, leftX, y + 30);
 
     doc.moveDown();
@@ -31,12 +30,13 @@ const generateInvoice = (booking, user) => {
     doc.text(`Email: ${user.email}`, leftX, y + 90);
 
     // RIGHT SIDE
-doc.text("Invoice issued by", rightX, y);
-doc.text("ShowHub", rightX, y + 15);
+    doc.text("Invoice issued by", rightX, y);
+    doc.text("ShowHub", rightX, y + 15);
 
-doc.text("Invoice issued on behalf of", rightX, y + 40);
-doc.text(booking.movieTitle, rightX, y + 55);
+    doc.text("Invoice issued on behalf of", rightX, y + 40);
+    doc.text(booking.movieTitle, rightX, y + 55);
 
+    // ================= TABLE =================
     // ================= TABLE =================
     let tableY = 220;
 
@@ -50,20 +50,67 @@ doc.text(booking.movieTitle, rightX, y + 55);
     tableY += 20;
     doc.moveTo(leftX, tableY).lineTo(550, tableY).stroke();
 
-    // ROW
-    doc.text(
-      `${booking.movieTitle}\n${booking.showDate}\n${booking.seats
-      ?.map((seat) => `${seat.seatId} (${seat.category})`)
-      .join(", ")}`,
-      leftX,
-      tableY + 5,
-    );
+    // ================= MOVIE INFO =================
+    let descriptionY = tableY + 10;
 
-    doc.text("1", 350, tableY + 5);
-    doc.text(`₹${booking.ticketPrice}`, 400, tableY + 5);
-    doc.text(`₹${booking.ticketPrice}`, 470, tableY + 5);
+    doc.text(`${booking.movieTitle}`, leftX, descriptionY);
+    descriptionY += 15;
 
-    tableY += 60;
+    doc.text(`${booking.showDate}`, leftX, descriptionY);
+    descriptionY += 15;
+
+    // ================= SEATS SECTION =================
+    if (booking.seats && booking.seats.length > 0) {
+      descriptionY += 10;
+      doc.font("Helvetica-Bold").text("Seats", leftX, descriptionY);
+      doc.font("Helvetica");
+
+      descriptionY += 15;
+
+      booking.seats.forEach((seat) => {
+        doc.text(
+          `${seat.seatId} (${seat.category}) - ₹${seat.price}`,
+          leftX,
+          descriptionY,
+        );
+        descriptionY += 15;
+      });
+    }
+
+    // ================= FOOD SECTION (CONDITIONAL) =================
+    if (booking.foodItems && booking.foodItems.length > 0) {
+      descriptionY += 15;
+
+      doc.font("Helvetica-Bold").text("Food & Beverages", leftX, descriptionY);
+      doc.font("Helvetica");
+
+      descriptionY += 15;
+
+      booking.foodItems.forEach((item) => {
+        doc.text(
+          `${item.name} x${item.quantity} - ₹${item.price}`,
+          leftX,
+          descriptionY,
+        );
+        descriptionY += 15;
+      });
+    }
+
+    // ================= PRICE SUMMARY =================
+    descriptionY += 20;
+
+    doc.text(`Total Tickets: ${booking.seats.length}`, leftX, descriptionY);
+    descriptionY += 15;
+
+    doc.text(`Ticket Price: ₹${booking.ticketPrice}`, leftX, descriptionY);
+
+    // ================= RIGHT SIDE VALUES =================
+    doc.text("1", 350, tableY + 10);
+    doc.text(`₹${booking.ticketPrice}`, 400, tableY + 10);
+    doc.text(`₹${booking.ticketPrice}`, 470, tableY + 10);
+
+    // ================= LINE =================
+    tableY = descriptionY + 10;
     doc.moveTo(leftX, tableY).lineTo(550, tableY).stroke();
 
     // ================= TAX =================
