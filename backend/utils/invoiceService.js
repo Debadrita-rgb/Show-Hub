@@ -83,7 +83,7 @@ const generateInvoice = (booking, user) => {
 
     const totalBeforeTax = ticketTotal;
     const taxAmount = cgst + sgst;
-    const grandTotal = totalBeforeTax + taxAmount + convenienceFee;
+    let grandTotal = totalBeforeTax + taxAmount + convenienceFee;
 
     drawRow(y, description, qty, `₹${ticketTotal}`, `₹${totalBeforeTax}`);
 
