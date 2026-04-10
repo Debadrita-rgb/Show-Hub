@@ -881,21 +881,22 @@ router.post("/create-order", jwtAuthMiddleware, async (req, res) => {
       console.log("booking", booking);
       // await booking.save();
 
-  const user = await User.findById(req.user.id);
-  const theater = await Theater.findById(booking.theaterId);
-  const movie = await Movie.findById(booking.movieId);
+      const user = await User.findById(req.user.id);
+      const theater = await Theater.findById(booking.theaterId);
+      const movie = await Movie.findById(booking.movieId);
 
-  if (!user) return res.status(404).json({ message: "User not found" });
-  if (!theater) return res.status(404).json({ message: "Theater not found" });
-  if (!movie) return res.status(404).json({ message: "Movie not found" });
+      if (!user) return res.status(404).json({ message: "User not found" });
+      if (!theater)
+        return res.status(404).json({ message: "Theater not found" });
+      if (!movie) return res.status(404).json({ message: "Movie not found" });
 
-  const theaterName = theater.theater_name;
-  const location = theater.location_name;
-  const movieImage = movie?.movieimage || "";
+      const theaterName = theater.theater_name;
+      const location = theater.location_name;
+      const movieImage = movie?.movieimage || "";
 
-  if (!booking.showDate) {
-    throw new Error("showDate missing");
-  }
+      if (!booking.showDate) {
+        throw new Error("showDate missing");
+      }
       const email = user.email;
       const name = user.name;
       const formattedSeats = booking.seats
@@ -907,57 +908,54 @@ router.post("/create-order", jwtAuthMiddleware, async (req, res) => {
         { hour: "numeric", minute: "2-digit", hour12: true },
       );
 
-const seatsHTML = booking.seats
-  ?.map(
-    (seat) => `
+      const seatsHTML = booking.seats
+        ?.map(
+          (seat) => `
     <div style="display:flex; justify-content:space-between; font-size:13px; margin:2px 0;">
       <span>${seat.seatId} (${seat.category})</span>
       <span>₹${seat.price}</span>
     </div>
   `,
-  )
-  .join("");
-
-const foodHTML =
-  booking.foodItems && booking.foodItems.length > 0
-    ? `
-<div style="margin-top:20px; background:#fafafa; padding:10px; border-radius:6px;">
-      <h4 style="margin-bottom:10px;">🍿 Food & Beverages</h4>
-
-      ${booking.foodItems
-        .map(
-          (item) => `
-          <div style="
-            display:flex; 
-            justify-content:space-between; 
-            font-size:13px; 
-            margin-bottom:8px;
-          ">
-            <span>${item.name} x${item.quantity}</span>
-            <span>₹${item.total}</span>
-          </div>
-        `,
         )
-        .join("")}
+        .join("");
+      const foodTotal =
+        booking.foodItems?.reduce((sum, item) => sum + item.total, 0) || 0;
 
-      <!-- Divider -->
-      <div style="border-top:1px dashed #ccc; margin:10px 0;"></div>
+      const foodHTML =
+        booking.foodItems && booking.foodItems.length > 0
+          ? `
+<div style="margin-top:20px; background:#fafafa; padding:10px; border-radius:6px;">
+  <h4 style="margin-bottom:10px;">🍿 Food & Beverages</h4>
 
-      <!-- Food Total -->
+  ${booking.foodItems
+    .map(
+      (item) => `
       <div style="
         display:flex; 
         justify-content:space-between; 
-        font-weight:bold;
+        font-size:13px; 
+        margin-bottom:8px;
       ">
-        <span>Food Total</span>
-        <span>₹${foodTotal}</span>
+        <span>${item.name} x${item.quantity}</span>
+        <span>₹${item.total}</span>
       </div>
-    </div>
-  `
-    : "";
+    `,
+    )
+    .join("")}
 
-    const foodTotal =
-      booking.foodItems?.reduce((sum, item) => sum + item.total, 0) || 0;
+  <div style="border-top:1px dashed #ccc; margin:10px 0;"></div>
+
+  <div style="
+    display:flex; 
+    justify-content:space-between; 
+    font-weight:bold;
+  ">
+    <span>Food Total</span>
+    <span>₹${foodTotal}</span>
+  </div>
+</div>
+`
+          : "";
 
       const msg = {
         to: email,
