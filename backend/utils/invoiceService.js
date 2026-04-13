@@ -13,6 +13,13 @@ const formatShowDateTime = (date, time) => {
   return `${formattedDate} ${time}`;
 };
 
+const today = new Date().toLocaleDateString("en-IN", {
+  day: "2-digit",
+  month: "short",
+  year: "numeric",
+  timeZone: "Asia/Kolkata",
+});
+
 const generateInvoice = (booking, user) => {
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({ margin: 40 });
@@ -38,7 +45,7 @@ const generateInvoice = (booking, user) => {
     doc.fontSize(18).text("INVOICE", 0, 40, { align: "center" });
 
     doc.fontSize(10);
-    doc.text(`Date: ${formattedDate(new Date())}`, leftX, 90);
+    doc.text(`Date: ${today}`, leftX, 90);
     doc.text(`Booking ID: ${booking._id}`, leftX, 105);
 
     doc.text("Customer:", leftX, 130);
@@ -54,38 +61,38 @@ const generateInvoice = (booking, user) => {
     // ================= TABLE START =================
     let y = 200;
 
-//     const drawRow = (y, item, qty, price, total) => {
-// const rowHeight = doc.heightOfString(item, { width: 300 }) + 10;
+    //     const drawRow = (y, item, qty, price, total) => {
+    // const rowHeight = doc.heightOfString(item, { width: 300 }) + 10;
 
-// doc.rect(leftX, y, 510, rowHeight).stroke();
+    // doc.rect(leftX, y, 510, rowHeight).stroke();
 
-// doc.text(item, leftX + 5, y + 5, { width: 300 });
-// doc.text(qty, 350, y + 5);
-// doc.text(price, 400, y + 5);
-// doc.text(total, 470, y + 5);
+    // doc.text(item, leftX + 5, y + 5, { width: 300 });
+    // doc.text(qty, 350, y + 5);
+    // doc.text(price, 400, y + 5);
+    // doc.text(total, 470, y + 5);
 
-// y += rowHeight;
+    // y += rowHeight;
 
-// doc.text(item, leftX + 5, y + 5, {
-//   width: 300,
-//   lineGap: 2,
-// });      doc.text(qty, 350, y + 5);
-//       doc.text(price, 400, y + 5);
-//       doc.text(total, 470, y + 5);
-//     };
+    // doc.text(item, leftX + 5, y + 5, {
+    //   width: 300,
+    //   lineGap: 2,
+    // });      doc.text(qty, 350, y + 5);
+    //       doc.text(price, 400, y + 5);
+    //       doc.text(total, 470, y + 5);
+    //     };
 
-const drawRow = (y, item, qty, price, total) => {
-  const rowHeight = doc.heightOfString(item, { width: 300 }) + 10;
+    const drawRow = (y, item, qty, price, total) => {
+      const rowHeight = doc.heightOfString(item, { width: 300 }) + 10;
 
-  doc.rect(leftX, y, 510, rowHeight).stroke();
+      doc.rect(leftX, y, 510, rowHeight).stroke();
 
-  doc.text(item, leftX + 5, y + 5, { width: 300 });
-  doc.text(qty, 350, y + 5);
-  doc.text(price, 400, y + 5);
-  doc.text(total, 470, y + 5);
+      doc.text(item, leftX + 5, y + 5, { width: 300 });
+      doc.text(qty, 350, y + 5);
+      doc.text(price, 400, y + 5);
+      doc.text(total, 470, y + 5);
 
-  return y + rowHeight; // better practice
-};
+      return y + rowHeight; // better practice
+    };
 
     // HEADER
     drawRow(y, "Item Description", "Qty", "Price", "Total");
@@ -119,8 +126,7 @@ const drawRow = (y, item, qty, price, total) => {
     const taxAmount = cgst + sgst;
     let grandTotal = totalBeforeTax + taxAmount;
 
-    drawRow(y, description, qty, `₹${ticketTotal}`, `₹${totalBeforeTax}`);
-
+    y = drawRow(y, description, qty, `₹${ticketTotal}`, `₹${totalBeforeTax}`);
     y += 80;
 
     // ================= TAX =================
