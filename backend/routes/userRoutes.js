@@ -27,8 +27,9 @@ const formatDate = require("../utils/dateHelper");
 
 const fs = require("fs");
 const generateInvoice = require("../utils/invoiceService");
+const sendBookingEmail = require("../services/emailService");
 
-const emailQueue =require("../queue/emailQueue.js");
+// const emailQueue =require("../queue/emailQueue.js");
 
 const sgMail = require("@sendgrid/mail");
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
@@ -1152,7 +1153,7 @@ router.post("/create-order", jwtAuthMiddleware, async (req, res) => {
 router.post("/save-booking", jwtAuthMiddleware, async (req, res) => {
   try {
     const booking = new Booking(req.body);
-    await booking.save();
+    // await booking.save();
 
     const user = await User.findById(req.user.id);
     const theater = await Theater.findById(booking.theaterId);
@@ -1170,9 +1171,10 @@ router.post("/save-booking", jwtAuthMiddleware, async (req, res) => {
     //     backoff: 5000,
     //   },
     // );
-console.log("📩 Adding job to queue...");
-await emailQueue.add({ booking, user, theater, movie });
-console.log("✅ Job added");
+setImmediate(() => {
+  sendBookingEmail(booking, user, theater, movie);
+});
+
 
     res.json({
       message: "Booking saved successfully",
