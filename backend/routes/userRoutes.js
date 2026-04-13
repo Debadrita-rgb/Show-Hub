@@ -872,7 +872,7 @@ console.log("SECRET:", process.env.RAZORPAY_KEY_SECRET);
 
     res.json(order);
   } catch (error) {
-    console.log("RAZORPAY ERROR:", error);
+    console.log("RAZORPAY ERROR:", error); 
 
     res.status(500).json({
       message: error.message,
