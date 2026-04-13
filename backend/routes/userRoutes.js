@@ -865,8 +865,8 @@ router.post("/create-order", jwtAuthMiddleware, async (req, res) => {
       currency: "INR",
     };
 
-console.log("KEY:", process.env.RAZORPAY_KEY_ID);
-console.log("SECRET:", process.env.RAZORPAY_KEY_SECRET);
+// console.log("KEY:", process.env.RAZORPAY_KEY_ID);
+// console.log("SECRET:", process.env.RAZORPAY_KEY_SECRET);
 
     const order = await razorpay.orders.create(options);
 

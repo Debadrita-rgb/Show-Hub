@@ -38,7 +38,7 @@ const generateInvoice = (booking, user) => {
     doc.fontSize(18).text("INVOICE", 0, 40, { align: "center" });
 
     doc.fontSize(10);
-    doc.text(`Date: ${formatDateTime(new Date())}`, leftX, 90);
+    doc.text(`Date: ${formattedDate(new Date())}`, leftX, 90);
     doc.text(`Booking ID: ${booking._id}`, leftX, 105);
 
     doc.text("Customer:", leftX, 130);
