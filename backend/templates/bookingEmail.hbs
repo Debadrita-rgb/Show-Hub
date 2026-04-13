@@ -5,11 +5,17 @@
 <div style="background: linear-gradient(135deg, #000000, #4c1d95); color:white; padding:20px;">
   
   <div style="display:flex; align-items:center; justify-content:space-between;">
-<img 
-  src="https://show-hub-frontend.onrender.com/assets/admin_login_logo-CDHIE2pX.png"
-  width="90"
-  style="display:block;"
-/>        <span style="font-size:13px;">
+    
+    <!-- LEFT: LOGO -->
+    <img 
+      src="https://show-hub-frontend.onrender.com/assets/logo-CWqOHdnZ.png" 
+      width="90"
+        style="display:block;"
+
+    />
+
+    <!-- RIGHT: BOOKING ID -->
+    <span style="font-size:13px;">
       BOOKING ID: <b>{{bookingId}}</b>
     </span>
 
@@ -24,27 +30,14 @@
     <!-- MOVIE -->
     <div style="padding:20px;">
   <div style="display:flex; gap:15px; align-items:center;">
-          {{!-- <div style="display:flex; gap:15px;"> --}}
-
         <img src="{{movieImage}}" style="width:100px; border-radius:6px;" />
 
-        {{!-- <div style="margin-left:3px">
+        <div style="margin-left:3px">
           <h3>{{movieTitle}}</h3>
           <p>{{theaterName}}<br/>{{location}}</p>
 
           <p><b>Date:</b> {{date}} | {{time}}</p>
-        </div> --}}
-        <div>
-      <h3 style="margin:0;">{{movieTitle}}</h3>
-      <p style="color:#666; margin:5px 0;">
-        {{theaterName}}<br/>{{location}}
-      </p>
-
-      <p style="margin:5px 0;">
-        <b>Date & Time:</b><br/>
-        {{date}} | {{time}}
-      </p>
-    </div>
+        </div>
       </div>
 
       <!-- SEATS -->

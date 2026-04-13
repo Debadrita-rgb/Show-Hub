@@ -1156,7 +1156,7 @@ router.post("/create-order", jwtAuthMiddleware, async (req, res) => {
 router.post("/save-booking", jwtAuthMiddleware, async (req, res) => {
   try {
     const booking = new Booking(req.body);
-    // await booking.save();
+    await booking.save();
 
     const user = await User.findById(req.user.id);
     const theater = await Theater.findById(booking.theaterId);

@@ -24,8 +24,8 @@ const sendWithRetry = async (msg, retries = 3) => {
 // Main background function
 const sendBookingEmail = async (booking, user, theater, movie) => {
   try {
-    console.log("📧 Preparing email...");
-console.log("Template function:", buildEmailTemplate);
+//     console.log("📧 Preparing email...");
+// console.log("Template function:", buildEmailTemplate);
 
     const msg = buildEmailTemplate(booking, user, theater, movie);
 
