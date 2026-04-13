@@ -1,6 +1,6 @@
 const emailQueue = require("../queue/emailQueue");
 const sgMail = require("@sendgrid/mail");
-const { buildEmailTemplate } = require("../services/emailTemplate");
+const { buildEmailTemplate } = require("../templates/emailTemplate");
 const generateInvoice = require("../utils/invoiceService");
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
@@ -9,6 +9,8 @@ emailQueue.process(async (job) => {
   const { booking, user, theater, movie } = job.data;
 
   try {
+        console.log("📧 Sending email to:", booking.movieTitle);
+
     //  Build template
     const msg = buildEmailTemplate(booking, user, theater, movie);
 

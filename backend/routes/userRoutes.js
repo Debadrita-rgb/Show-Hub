@@ -1163,13 +1163,16 @@ router.post("/save-booking", jwtAuthMiddleware, async (req, res) => {
     }
 
     //  Push to queue (NON-BLOCKING)
-    await emailQueue.add(
-      { booking, user, theater, movie },
-      {
-        attempts: 3,
-        backoff: 5000,
-      },
-    );
+    // await emailQueue.add(
+    //   { booking, user, theater, movie },
+    //   {
+    //     attempts: 3,
+    //     backoff: 5000,
+    //   },
+    // );
+console.log("📩 Adding job to queue...");
+await emailQueue.add({ booking, user, theater, movie });
+console.log("✅ Job added");
 
     res.json({
       message: "Booking saved successfully",
@@ -1202,7 +1205,7 @@ router.get("/get-booked-seats", async (req, res) => {
 
     // console.log("bookings:", bookings);
 
-    const bookedSeats = bookings.flatMap((b) => b.seats);
+const bookedSeats = bookings.flatMap((b) => b.seats.map((seat) => seat.seatId));
     res.json(bookedSeats);
   } catch (error) {
     res.status(500).json({ message: error.message });
