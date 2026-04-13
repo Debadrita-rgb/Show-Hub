@@ -850,7 +850,7 @@ router.get("/rating-summary/:type/:id", async (req, res) => {
 
 router.post("/create-order", jwtAuthMiddleware, async (req, res) => {
   try {
-    console.log("BODY:", req.body);
+    // console.log("BODY:", req.body);
 
     const { amount } = req.body;
 
@@ -861,9 +861,12 @@ router.post("/create-order", jwtAuthMiddleware, async (req, res) => {
     }
 
     const options = {
-      amount: amount * 100,
+      amount: Math.round(amount * 100),
       currency: "INR",
     };
+
+console.log("KEY:", process.env.RAZORPAY_KEY_ID);
+console.log("SECRET:", process.env.RAZORPAY_KEY_SECRET);
 
     const order = await razorpay.orders.create(options);
 

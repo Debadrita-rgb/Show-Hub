@@ -1,31 +1,59 @@
-{{!-- <div style="font-family: Arial; background:#f2f2f2; padding:20px;">
-  <div style="max-width:700px; margin:auto; background:#fff; border-radius:10px; overflow:hidden;">
+<div style="font-family: Arial, sans-serif; background:#f2f2f2; padding:20px;">
+  <div style="max-width:700px; margin:auto; background:#ffffff; border-radius:10px; overflow:hidden;">
 
     <!-- HEADER -->
-    <div style="background:#4c1d95; color:white; padding:20px;">
+    <div style="background: linear-gradient(135deg, #000000, #4c1d95); color:white; padding:20px;">
+      <div style="display:flex; justify-content:space-between;">
+        <img src="https://show-hub-frontend.onrender.com/assets/admin_login_logo-CDHIE2pX.png" width="80"/>
+        <span>BOOKING ID: {{bookingId}}</span>
+      </div>
+
       <h2>M-Ticket 🎬</h2>
       <p>Hey {{name}}, your booking is confirmed!</p>
-      <p>Booking ID: {{bookingId}}</p>
     </div>
 
     <!-- MOVIE -->
     <div style="padding:20px;">
-      <img src="{{movieImage}}" width="120" style="border-radius:6px;" />
+      <div style="display:flex; gap:15px;">
+        <img src="{{movieImage}}" style="width:120px; border-radius:6px;" />
 
-      <h3>{{movieTitle}}</h3>
-      <p>{{theaterName}}, {{location}}</p>
+        <div>
+          <h3>{{movieTitle}}</h3>
+          <p>{{theaterName}}<br/>{{location}}</p>
 
-      <p><b>Date:</b> {{date}}</p>
-      <p><b>Time:</b> {{time}}</p>
-      <p><b>Seats:</b> {{seats}}</p>
+          <p><b>Date:</b> {{date}} | {{time}}</p>
+        </div>
+      </div>
 
+      <!-- SEATS -->
+      <div style="margin-top:15px;">
+        <h4>💺 Seats</h4>
+        {{{seatsHTML}}}
+      </div>
+
+      <!-- FOOD -->
+      {{{foodHTML}}}
+
+      <!-- SUMMARY -->
+      <div style="margin-top:15px;">
+        <p>Total Tickets: {{seatsCount}}</p>
+        <p>Ticket Price: ₹{{ticketPrice}}</p>
+      </div>
+    </div>
+
+    <!-- TOTAL -->
+    <div style="padding:20px; border-top:1px solid #eee;">
       <h3>Total Paid: ₹{{totalAmount}}</h3>
+      <p>Convenience Fee: ₹{{convenienceFee}}</p>
     </div>
 
     <!-- FOOTER -->
     <div style="padding:20px; text-align:center;">
-      <p>Enjoy your movie 🍿</p>
+      <a href="https://show-hub-frontend.onrender.com"
+        style="background:#e74c3c; color:white; padding:10px 20px; text-decoration:none;">
+        View Ticket
+      </a>
     </div>
 
   </div>
-</div> --}}
+</div>
