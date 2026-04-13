@@ -2,37 +2,22 @@
   <div style="max-width:700px; margin:auto; background:#ffffff; border-radius:10px; overflow:hidden;">
 
     <!-- HEADER -->
-<div style="background: linear-gradient(135deg, #000000, #4c1d95); color:white; padding:20px;">
-  
-  <div style="display:flex; align-items:center; justify-content:space-between;">
-    
-    <!-- LEFT: LOGO -->
-    <img 
-      src="https://show-hub-frontend.onrender.com/assets/logo-CWqOHdnZ.png" 
-      width="90"
-        style="display:block;"
+    <div style="background: linear-gradient(135deg, #000000, #4c1d95); color:white; padding:20px;">
+      <div style="display:flex; justify-content:space-between;">
+        <img src="https://show-hub-frontend.onrender.com/assets/logo-CWqOHdnZ.png" width="80"/>
+        <span>BOOKING ID: {{bookingId}}</span>
+      </div>
 
-    />
-
-    <!-- RIGHT: BOOKING ID -->
-    <span style="font-size:13px;">
-      BOOKING ID: <b>{{bookingId}}</b>
-    </span>
-
-  </div>
-
-  <h2 style="margin-top:15px;">M-Ticket 🎬</h2>
-  <p>Hey {{name}}, your booking is confirmed!</p>
-
-</div>
+      <h2>M-Ticket 🎬</h2>
+      <p>Hey {{name}}, your booking is confirmed!</p>
     </div>
 
     <!-- MOVIE -->
     <div style="padding:20px;">
-  <div style="display:flex; gap:15px; align-items:center;">
-        <img src="{{movieImage}}" style="width:100px; border-radius:6px;" />
+      <div style="display:flex; gap:15px;">
+        <img src="{{movieImage}}" style="width:90px; border-radius:6px;" />
 
-        <div style="margin-left:3px">
+        <div style="margin-left: 2px;">
           <h3>{{movieTitle}}</h3>
           <p>{{theaterName}}<br/>{{location}}</p>
 
@@ -58,25 +43,17 @@
 
     <!-- TOTAL -->
     <div style="padding:20px; border-top:1px solid #eee;">
-              <p>Convenience Fee: ₹{{convenienceFee}}</p>
-
       <h3>Total Paid: ₹{{totalAmount}}</h3>
+      <p>Convenience Fee: ₹{{convenienceFee}}</p>
     </div>
 
     <!-- FOOTER -->
     <div style="padding:20px; text-align:center;">
       <a href="https://show-hub-frontend.onrender.com/verify-booking/{{bookingId}}"
-  style="
-    display:inline-block;
-    background:#e74c3c;
-    color:white;
-    padding:12px 25px;
-    text-decoration:none;
-    border-radius:6px;
-    font-weight:bold;
-  ">
-  View Ticket
-</a>
+
+        style="background:#e74c3c; color:white; padding:10px 20px; text-decoration:none;">
+        View Ticket
+      </a>
     </div>
 
   </div>
