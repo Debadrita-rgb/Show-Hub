@@ -1,5 +1,5 @@
 const sgMail = require("@sendgrid/mail");
-const buildEmailTemplate = require("../templates/emailTemplate");
+const { buildEmailTemplate } = require("../templates/emailTemplate");
 const generateInvoice = require("../utils/invoiceService");
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
@@ -25,6 +25,7 @@ const sendWithRetry = async (msg, retries = 3) => {
 const sendBookingEmail = async (booking, user, theater, movie) => {
   try {
     console.log("📧 Preparing email...");
+console.log("Template function:", buildEmailTemplate);
 
     const msg = buildEmailTemplate(booking, user, theater, movie);
 
