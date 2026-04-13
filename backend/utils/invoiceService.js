@@ -1,16 +1,16 @@
 const PDFDocument = require("pdfkit");
 
-const formatDateTime = (date) => {
+const formatShowDateTime = (date, time) => {
   const d = new Date(date);
-  return d.toLocaleString("en-IN", {
+
+  const formattedDate = d.toLocaleDateString("en-IN", {
     day: "2-digit",
     month: "short",
     year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
     timeZone: "Asia/Kolkata",
   });
+
+  return `${formattedDate} ${time}`;
 };
 
 const generateInvoice = (booking, user) => {
@@ -54,24 +54,58 @@ const generateInvoice = (booking, user) => {
     // ================= TABLE START =================
     let y = 200;
 
-    const drawRow = (y, item, qty, price, total) => {
-      doc.rect(leftX, y, 510, 25).stroke();
+//     const drawRow = (y, item, qty, price, total) => {
+// const rowHeight = doc.heightOfString(item, { width: 300 }) + 10;
 
-      doc.text(item, leftX + 5, y + 5, { width: 300 });
-      doc.text(qty, 350, y + 5);
-      doc.text(price, 400, y + 5);
-      doc.text(total, 470, y + 5);
-    };
+// doc.rect(leftX, y, 510, rowHeight).stroke();
+
+// doc.text(item, leftX + 5, y + 5, { width: 300 });
+// doc.text(qty, 350, y + 5);
+// doc.text(price, 400, y + 5);
+// doc.text(total, 470, y + 5);
+
+// y += rowHeight;
+
+// doc.text(item, leftX + 5, y + 5, {
+//   width: 300,
+//   lineGap: 2,
+// });      doc.text(qty, 350, y + 5);
+//       doc.text(price, 400, y + 5);
+//       doc.text(total, 470, y + 5);
+//     };
+
+const drawRow = (y, item, qty, price, total) => {
+  const rowHeight = doc.heightOfString(item, { width: 300 }) + 10;
+
+  doc.rect(leftX, y, 510, rowHeight).stroke();
+
+  doc.text(item, leftX + 5, y + 5, { width: 300 });
+  doc.text(qty, 350, y + 5);
+  doc.text(price, 400, y + 5);
+  doc.text(total, 470, y + 5);
+
+  return y + rowHeight; // better practice
+};
 
     // HEADER
     drawRow(y, "Item Description", "Qty", "Price", "Total");
     y += 25;
 
     // ================= ITEM DESCRIPTION =================
-    let description = `${booking.movieTitle}\n${formatDateTime(booking.showDate)}\n`;
+    let description = "";
 
-    booking.seats.forEach((seat) => {
-      description += `${seat.seatId} (${seat.category}) - ₹${seat.price}\n`;
+    // 🎬 Movie title
+    description += `${booking.movieTitle}\n`;
+
+    // 📅 Correct date + showTime
+    description += `${formatShowDateTime(
+      booking.showDate,
+      booking.showTime,
+    )}\n\n`;
+
+    // 💺 Seats section
+    booking.seats?.forEach((seat, index) => {
+      description += `${index + 1}. ${seat.seatId} (${seat.category}) - ₹${seat.price}\n`;
     });
 
     // ================= CALCULATIONS =================
@@ -83,7 +117,7 @@ const generateInvoice = (booking, user) => {
 
     const totalBeforeTax = ticketTotal;
     const taxAmount = cgst + sgst;
-    let grandTotal = totalBeforeTax + taxAmount + convenienceFee;
+    let grandTotal = totalBeforeTax + taxAmount;
 
     drawRow(y, description, qty, `₹${ticketTotal}`, `₹${totalBeforeTax}`);
 

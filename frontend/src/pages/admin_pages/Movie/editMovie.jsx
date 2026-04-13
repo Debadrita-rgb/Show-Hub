@@ -25,14 +25,15 @@ const EditMovie = () => {
     { castname: "", castimageURL: "", inmoviecastname: "" },
   ]);
 
-  //Fetch category types
+  //Fetch category types 
   useEffect(() => {
     const fetchCategory = async () => {
       try {
         const token = localStorage.getItem("token");
+        const type = "Movie";
 
         const res = await axios.get(
-          `${BASE_URL}/admin/get-category`,
+          `${BASE_URL}/admin/get-typewise-category/${type}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -92,7 +93,7 @@ const EditMovie = () => {
           movieDescription: data.movieDescription || "",
           category: data.category || [],
           format: data.format || [],
-          trailerlink: data.trailerlink || [],
+          trailerlink: data.trailerlink || "",
           // isRecommended: data.isRecommended ?? false,
         });
         setCasting(
@@ -155,7 +156,7 @@ const EditMovie = () => {
       };
 
       const res = await axios.put(
-        `${BASE_URL}/admin/update-movie/${movieId}`,
+        `${BASE_URL}/admin/update-single-movie/${movieId}`,
         updatedData,
         {
           headers: {
@@ -238,8 +239,12 @@ const EditMovie = () => {
     // },
     {
       name: "trailerlink",
-      label: "Trailer Link",
+      label: "Trailer Link (YouTube only)",
       type: "text",
+      validation: {
+        pattern: /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\//,
+        message: "Enter valid YouTube URL",
+      },
     },
     { name: "movieDescription", label: "Movie Description", type: "tiptap" },
   ];

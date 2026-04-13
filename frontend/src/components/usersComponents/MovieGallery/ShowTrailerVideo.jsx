@@ -34,6 +34,13 @@ const ShowTrailerVideo = () => {
     }, [movie, slug, id]);
   
   if (!movie) return <p className="text-white p-10">Loading...</p>;
+const getEmbedUrl = (url) => {
+  if (!url) return null;
+
+  const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/);
+
+  return match ? `https://www.youtube.com/embed/${match[1]}` : null;
+};
 
   return (
     <div className="min-h-screen text-white px-4 sm:px-10 py-10">
@@ -44,10 +51,11 @@ const ShowTrailerVideo = () => {
       <div className="flex justify-center">
         <div className="w-full max-w-4xl aspect-video">
           <iframe
-            src={movie?.trailerlink}
+            src={getEmbedUrl(movie?.trailerlink)}
             title="Movie Trailer"
             allowFullScreen
             className="w-full h-full rounded-xl"
+            loading="lazy"
           ></iframe>
         </div>
       </div>

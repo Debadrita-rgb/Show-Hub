@@ -7,17 +7,22 @@ const ShowAllMovieWithFilter = () => {
   const [movies, setMovies] = useState([]);
   const [genres, setGenres] = useState([]);
   const [languages, setLanguages] = useState([]);
-const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState({
     language: [],
     genre: [],
     format: [],
   });
 
-  useEffect(() => { 
+  const [currentPage, setCurrentPage] = useState(1);
+  const moviesPerPage = 4;
+const [searchTerm, setSearchTerm] = useState("");
+const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  useEffect(() => {
     const fetchData = async () => {
       try {
-                const type = "Movie";
+        const type = "Movie";
 
         const [moviesRes, genreRes, languageRes] = await Promise.all([
           // fetch("${BASE_URL}/user/get-movie"),
@@ -40,7 +45,7 @@ const [showFilters, setShowFilters] = useState(false);
 
     fetchData();
   }, []);
-// console.log(movies)
+
   // Generate filters dynamically from API movies
   const filters = useMemo(
     () => ({
@@ -90,21 +95,55 @@ const [showFilters, setShowFilters] = useState(false);
         selectedFilters.format.some((f) =>
           normalizedFormats.includes(f.toLowerCase()),
         );
+      // SEARCH LOGIC
+      const matchSearch = movie.title
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase());
 
-      return matchLanguage && matchGenre && matchFormat;
+      return matchLanguage && matchGenre && matchFormat && matchSearch;
     });
-  }, [movies, selectedFilters]);
+  }, [movies, selectedFilters, searchTerm]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedFilters, searchTerm]);
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredMovies.length / moviesPerPage);
+
+  const paginatedMovies = useMemo(() => {
+    const startIndex = (currentPage - 1) * moviesPerPage;
+    return filteredMovies.slice(startIndex, startIndex + moviesPerPage);
+  }, [filteredMovies, currentPage]);
 
 
   return (
     <div className="min-h-screen px-6 md:px-16 py-16">
-      <h1 className="text-3xl md:text-4xl font-bold mb-12">All Movies </h1>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-10 gap-4">
+        {/* Title */}
+        <h1 className="text-3xl md:text-4xl font-bold">All Movies</h1>
+
+        {/* Search */}
+        <div className="relative flex items-center justify-end">
+          <input
+            type="text"
+            placeholder="Search movies..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <span className="absolute left-3 top-2.5 text-gray-400 ">🔍</span>
+        </div>
+      </div>
+      {/* Mobile Filter Button */}
       <button
         onClick={() => setShowFilters(true)}
         className="lg:hidden fixed bottom-4 right-4 bg-blue-600 text-white px-5 py-3 rounded-full shadow-lg"
       >
         ⚙️ Filters
       </button>
+
       <div className="flex flex-col lg:flex-row gap-10">
         {/* Sidebar */}
         <div className="hidden lg:block lg:w-1/4">
@@ -114,18 +153,16 @@ const [showFilters, setShowFilters] = useState(false);
             setSelectedFilters={setSelectedFilters}
           />
         </div>
-        {/* Mobile / Tablet Filter Drawer */}
+
+        {/* Mobile Drawer */}
         {showFilters && (
           <div className="fixed inset-0 z-50 flex">
-            {/* Overlay */}
             <div
               className="absolute inset-0 bg-black/50"
               onClick={() => setShowFilters(false)}
             ></div>
 
-            {/* Drawer */}
             <div className="relative w-3/4 max-w-sm bg-white h-full p-4 overflow-y-auto shadow-lg">
-              {/* Header */}
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold">Filters</h2>
                 <button
@@ -144,10 +181,11 @@ const [showFilters, setShowFilters] = useState(false);
             </div>
           </div>
         )}
-        {/* Movies Grid */}
+
+        {/* Movies */}
         <div className="lg:w-3/4">
           <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8">
-            {filteredMovies.map((movie) => (
+            {paginatedMovies.map((movie) => (
               <MovieCard key={movie._id} movie={movie} />
             ))}
           </div>
@@ -155,9 +193,49 @@ const [showFilters, setShowFilters] = useState(false);
           {filteredMovies.length === 0 && (
             <p className="text-center text-gray-500 mt-20">No movies found.</p>
           )}
+
+          {/* ✅ Pagination UI */}
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-10 gap-2 flex-wrap">
+              {/* Prev */}
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 bg-purple-900 hover:bg-purple-800 text-white rounded disabled:opacity-50"
+              >
+                Prev
+              </button>
+
+              {/* Page Numbers */}
+              {[...Array(totalPages)].map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentPage(index + 1)}
+                  className={`px-4 py-2 rounded ${
+                    currentPage === index + 1
+                      ? "bg-blue-600 text-white"
+                      : "bg-purple-900 hover:bg-purple-800 text-white"
+                  }`}
+                >
+                  {index + 1}
+                </button>
+              ))}
+
+              {/* Next */}
+              <button
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 bg-purple-900 hover:bg-purple-800 text-white rounded disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
-};;
+}
 export default ShowAllMovieWithFilter;

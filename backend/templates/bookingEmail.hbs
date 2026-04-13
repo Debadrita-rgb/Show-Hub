@@ -1,0 +1,31 @@
+<div style="font-family: Arial; background:#f2f2f2; padding:20px;">
+  <div style="max-width:700px; margin:auto; background:#fff; border-radius:10px; overflow:hidden;">
+
+    <!-- HEADER -->
+    <div style="background:#4c1d95; color:white; padding:20px;">
+      <h2>M-Ticket 🎬</h2>
+      <p>Hey {{name}}, your booking is confirmed!</p>
+      <p>Booking ID: {{bookingId}}</p>
+    </div>
+
+    <!-- MOVIE -->
+    <div style="padding:20px;">
+      <img src="{{movieImage}}" width="120" style="border-radius:6px;" />
+
+      <h3>{{movieTitle}}</h3>
+      <p>{{theaterName}}, {{location}}</p>
+
+      <p><b>Date:</b> {{date}}</p>
+      <p><b>Time:</b> {{time}}</p>
+      <p><b>Seats:</b> {{seats}}</p>
+
+      <h3>Total Paid: ₹{{totalAmount}}</h3>
+    </div>
+
+    <!-- FOOTER -->
+    <div style="padding:20px; text-align:center;">
+      <p>Enjoy your movie 🍿</p>
+    </div>
+
+  </div>
+</div>

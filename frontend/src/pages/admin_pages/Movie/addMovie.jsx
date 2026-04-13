@@ -133,7 +133,7 @@ const AddMovie = () => {
         crew,
       };
       // console.log(dataToSend);
-      await axios.post(`${BASE_URL}/admin/add-movie`, dataToSend, {
+      await axios.post(`${BASE_URL}/admin/add-single-movie`, dataToSend, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -210,6 +210,10 @@ const AddMovie = () => {
       name: "trailerlink",
       label: "Trailer Link",
       type: "text",
+      validation: {
+        pattern: /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\//,
+        message: "Enter valid YouTube URL",
+      },
     },
     { name: "movieDescription", label: "Movie Description", type: "tiptap" },
   ];

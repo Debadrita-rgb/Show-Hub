@@ -277,6 +277,63 @@ generateCRUDRoutes("banner", Banner);
 generateCRUDRoutes("show", Show);
 generateCRUDRoutes("language", Language);
 
+const isValidYouTubeURL = (url) => {
+  const regex =
+    /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/(watch\?v=|embed\/|shorts\/)?([a-zA-Z0-9_-]{11})/;
+  return regex.test(url);
+};
+
+//add single movie
+router.post(`/add-single-movie`, jwtAuthMiddleware, async(req, res) =>{
+try {
+  const { trailerlink, ...rest } = req.body;
+
+  // Validate YouTube URL
+  if (trailerlink && !isValidYouTubeURL(trailerlink)) {
+    return res.status(400).json({
+      error: "Only valid YouTube URLs are allowed",
+    });
+  }
+
+  const item = new Movie({
+    ...rest,
+    trailerlink,
+  });
+
+  await item.save();
+
+  res.json({ message: `${path} added`, item });
+} catch (error) {
+  console.error("Server Error:", error);
+  res.status(500).json({
+    error: "Internal server error",
+    details: error.message,
+  });
+}
+
+});
+
+//update single movie
+router.put(`/update-single-movie/:id`, jwtAuthMiddleware, async (req, res) => {
+  try {
+    const { trailerlink } = req.body;
+
+    if (trailerlink && !isValidYouTubeURL(trailerlink)) {
+      return res.status(400).json({
+        error: "Invalid YouTube URL",
+      });
+    }
+
+    const updatedItem = await Movie.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
+
+    res.json(updatedItem);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to update item" });
+  }
+});
+
 //Add show category
 router.post(`/add-type-category`, jwtAuthMiddleware, async (req, res) => {
   try {
