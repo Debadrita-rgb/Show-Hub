@@ -3,12 +3,11 @@ const handlebars = require("handlebars");
 const path = require("path");
 
 const buildEmailTemplate = (booking, user, theater, movie) => {
-  const templatePath = path.join(__dirname, "../templates/bookingEmail.hbs");
-
+const templatePath = path.join(process.cwd(), "templates", "bookingEmail.hbs");
   const source = fs.readFileSync(templatePath, "utf8");
   const template = handlebars.compile(source);
 
-  // ✅ FORMAT DATE TIME
+  // FORMAT DATE TIME
   const d = new Date(booking.showDate);
   const formattedDate = d.toLocaleDateString("en-IN", {
     day: "numeric",
@@ -16,13 +15,7 @@ const buildEmailTemplate = (booking, user, theater, movie) => {
     year: "numeric",
   });
 
-  const formattedTime = d.toLocaleTimeString("en-IN", {
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  });
-
-  // ✅ SEATS HTML
+  // SEATS HTML
   const seatsHTML = booking.seats
     ?.map(
       (seat) => `
@@ -34,7 +27,7 @@ const buildEmailTemplate = (booking, user, theater, movie) => {
     )
     .join("");
 
-  // ✅ FOOD
+  // FOOD
   const foodTotal =
     booking.foodItems?.reduce((sum, item) => sum + item.total, 0) || 0;
 
@@ -62,7 +55,7 @@ const buildEmailTemplate = (booking, user, theater, movie) => {
     `
       : "";
 
-  // ✅ PASS DATA
+  // PASS DATA
   const html = template({
     name: user.name,
     bookingId: booking.bookingId || booking._id,
@@ -70,7 +63,7 @@ const buildEmailTemplate = (booking, user, theater, movie) => {
     theaterName: theater.theater_name,
     location: theater.location_name,
     date: formattedDate,
-    time: formattedTime,
+    time: booking.showTime,
     totalAmount: booking.totalAmount,
     ticketPrice: booking.ticketPrice,
     convenienceFee: booking.convenienceFee,

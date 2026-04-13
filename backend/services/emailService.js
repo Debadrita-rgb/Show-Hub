@@ -4,7 +4,7 @@ const generateInvoice = require("../utils/invoiceService");
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-// 🔁 Retry function
+// Retry function
 const sendWithRetry = async (msg, retries = 3) => {
   try {
     await sgMail.send(msg);
@@ -21,7 +21,7 @@ const sendWithRetry = async (msg, retries = 3) => {
   }
 };
 
-// 🚀 Main background function
+// Main background function
 const sendBookingEmail = async (booking, user, theater, movie) => {
   try {
     console.log("📧 Preparing email...");
