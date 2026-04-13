@@ -31,7 +31,7 @@ const generateInvoice = (booking, user) => {
     const leftX = 40;
     const rightX = 550;
 
-    // ================= LOGO =================
+    //  LOGO 
     try {
       doc.image(
         "https://show-hub-frontend.onrender.com/assets/logo-CWqOHdnZ.png",
@@ -41,7 +41,7 @@ const generateInvoice = (booking, user) => {
       );
     } catch (e) {}
 
-    // ================= HEADER =================
+    //  HEADER 
     doc.fontSize(18).text("INVOICE", 0, 40, { align: "center" });
 
     doc.fontSize(10);
@@ -58,7 +58,7 @@ const generateInvoice = (booking, user) => {
     doc.text("Movie:", 350, 130);
     doc.text(booking.movieTitle, 350, 145);
 
-    // ================= TABLE START =================
+    //  TABLE START 
     let y = 200;
 
     //     const drawRow = (y, item, qty, price, total) => {
@@ -98,7 +98,7 @@ const generateInvoice = (booking, user) => {
     drawRow(y, "Item Description", "Qty", "Price", "Total");
     y += 25;
 
-    // ================= ITEM DESCRIPTION =================
+    //  ITEM DESCRIPTION 
     let description = "";
 
     // 🎬 Movie title
@@ -110,12 +110,12 @@ const generateInvoice = (booking, user) => {
       booking.showTime,
     )}\n\n`;
 
-    // 💺 Seats section
+    // Seats section
     booking.seats?.forEach((seat, index) => {
-      description += `${index + 1}. ${seat.seatId} (${seat.category}) - ₹${seat.price}\n`;
+      description += `${index + 1}. ${seat.seatId} (${seat.category}) - ${seat.price}\n`;
     });
 
-    // ================= CALCULATIONS =================
+    //  CALCULATIONS 
     const qty = booking.seats.length;
     const ticketTotal = booking.ticketPrice;
     const cgst = booking.cgst || 0;
@@ -126,19 +126,19 @@ const generateInvoice = (booking, user) => {
     const taxAmount = cgst + sgst;
     let grandTotal = totalBeforeTax + taxAmount;
 
-    y = drawRow(y, description, qty, `₹${ticketTotal}`, `₹${totalBeforeTax}`);
+    y = drawRow(y, description, qty, `${ticketTotal}`, `${totalBeforeTax}`);
     y += 80;
 
-    // ================= TAX =================
-    doc.text(`CGST (9%): ₹${cgst}`, rightX - 150, y);
+    //  TAX 
+    doc.text(`CGST (9%): ${cgst}`, rightX - 150, y);
     y += 15;
-    doc.text(`SGST (9%): ₹${sgst}`, rightX - 150, y);
+    doc.text(`SGST (9%): ${sgst}`, rightX - 150, y);
     y += 15;
-    doc.text(`Convenience Fee: ₹${convenienceFee}`, rightX - 150, y);
+    doc.text(`Convenience Fee: ${convenienceFee}`, rightX - 150, y);
 
     y += 30;
 
-    // ================= FOOD TABLE =================
+    //  FOOD TABLE 
     if (booking.foodItems && booking.foodItems.length > 0) {
       doc.font("Helvetica-Bold").text("Food & Beverages", leftX, y);
       doc.font("Helvetica");
@@ -156,34 +156,34 @@ const generateInvoice = (booking, user) => {
           y,
           item.name,
           item.quantity,
-          `₹${item.price}`,
-          `₹${item.total}`,
+          `${item.price}`,
+          `${item.total}`,
         );
 
         y += 25;
       });
 
       y += 10;
-      doc.text(`Food Total: ₹${foodTotal}`, rightX - 150, y);
+      doc.text(`Food Total: ${foodTotal}`, rightX - 150, y);
       y += 30;
 
       // add to grand total
       grandTotal += foodTotal;
     }
 
-    // ================= FINAL SUMMARY =================
+    //  FINAL SUMMARY 
     doc.moveTo(leftX, y).lineTo(rightX, y).stroke();
     y += 10;
 
     doc.font("Helvetica-Bold");
 
-    doc.text(`Net Amount: ₹${totalBeforeTax}`, leftX, y);
-    doc.text(`Tax Amount: ₹${taxAmount}`, 250, y);
-    doc.text(`Grand Total: ₹${grandTotal}`, 400, y);
+    doc.text(`Net Amount: ${totalBeforeTax}`, leftX, y);
+    doc.text(`Tax Amount: ${taxAmount}`, 250, y);
+    doc.text(`Grand Total: ${grandTotal}`, 400, y);
 
     doc.font("Helvetica");
 
-    // ================= FOOTER =================
+    //  FOOTER 
     y += 40;
 
     doc
