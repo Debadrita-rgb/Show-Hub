@@ -10,7 +10,6 @@ const jsonwebtoken = require("../middleware/auth")("USER");
 const Booking = require("../models/Booking");
 const User = require("../models/User");
 const Movie = require("../models/Movie");
-// const MovieBooking = require("../models/MovieBooking");
 const Gallery = require("../models/Gallery");
 const Contact = require("../models/Contact");
 const Notification = require("../models/Notification");
@@ -22,14 +21,12 @@ const Category = require("../models/Category");
 const LocationWiseMovie = require("../models/LocationWIseMovieSelection");
 const Theater = require("../models/Theater");
 const Show = require("../models/Show");
+const SeatLock = require("../models/SeatLock");
 const razorpay = require("../api/razorpay");
 const formatDate = require("../utils/dateHelper");
 
-const fs = require("fs");
-const generateInvoice = require("../utils/invoiceService");
-const sendBookingEmail = require("../services/emailService");
-
-// const emailQueue =require("../queue/emailQueue.js");
+const sendBookingEmail = require("../services/emailService.js");
+const sendCancelEmail = require("../services/sendCancelEmail.js");
 
 const sgMail = require("@sendgrid/mail");
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
@@ -113,7 +110,6 @@ router.post("/verify-otp", async (req, res) => {
       return res.status(400).json({ message: "Invalid OTP" });
     }
 
-    //   Check if user already exists
     let user = await User.findOne({ email });
 
     if (!user) {
@@ -122,7 +118,6 @@ router.post("/verify-otp", async (req, res) => {
         10,
       );
 
-      //   Create user
       user = new User({
         name: record.name || "Google User",
         email,
@@ -133,7 +128,6 @@ router.post("/verify-otp", async (req, res) => {
       await user.save();
     }
 
-    //   Generate JWT
     const payload = {
       id: user._id,
       role: user.role,
@@ -253,49 +247,6 @@ router.post("/notifications/mark-read", jwtAuthMiddleware, async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
-
-// const getModelByPath = (path) => {
-//   return serviceModels[path] || null;
-// };
-
-// router.get(`/movieIdcategorized-:path`, async (req, res) => {
-//   try {
-//     const { path } = req.params;
-//     const { category } = req.query;
-//     const Model = getModelByPath(path);
-
-//     if (!Model) {
-//       return res.status(400).json({ error: "Invalid service path." });
-//     }
-
-//     const query = {};
-//     // const query = { isActive: true };
-
-//     if (category) query.category = category;
-//     query.isActive = true;
-
-//     const items = await Model.find(query);
-//     res.json(items);
-//   } catch (error) {
-//     console.error("Server Error:", error);
-//     res.status(500).json({ error: "Failed to fetch items" });
-//   }
-// });
-
-// //get user details by id
-// router.get("/movieIduser-details/:id", jwtAuthMiddleware, async (req, res) => {
-//   try {
-//     const user = await User.findById(req.params.id).select("name email").lean();
-//     if (!user) return res.status(404).json({ error: "User not found" });
-//     res.json({
-//       name: user.name,
-//       email: user.email,
-//     });
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ error: "Server error" });
-//   }
-// });
 
 const generateCRUDRoutes = (path, Model) => {
   router.get(`/get-${path}`, async (req, res) => {
@@ -418,14 +369,9 @@ router.get("/get-moviewise-theater/:id", async (req, res) => {
 
     const selectedDate = new Date(date);
 
-    // Start of selected day
     const startOfDay = new Date(selectedDate.setHours(0, 0, 0, 0));
 
-    // End of selected day
     const endOfDay = new Date(selectedDate.setHours(23, 59, 59, 999));
-
-    // console.log("startOfDay", startOfDay);
-    // console.log("endOfDay", endOfDay);
 
     const query = {
       movie: id,
@@ -439,15 +385,6 @@ router.get("/get-moviewise-theater/:id", async (req, res) => {
 
     const data = await LocationWiseMovie.find(query).populate("theater");
 
-    // const data = await LocationWiseMovie.find({
-    //   movie: id,
-    //   location: city,
-    //   startDate: { $lte: endOfDay },
-    //   endDate: { $gte: startOfDay },
-    // }).populate("theater");
-
-    // console.log("data", data);
-
     const formatted = data.map((item) => ({
       _id: item._id,
       theater: item.theater,
@@ -460,7 +397,6 @@ router.get("/get-moviewise-theater/:id", async (req, res) => {
         endTime: s.endTime,
       })),
     }));
-    // console.log(formatted)
     res.json(formatted);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -524,7 +460,7 @@ router.get("/get-recommended-shows", async (req, res) => {
       isActive: true,
     })
       .sort({ createdAt: -1 })
-      .limit(5); // ✅ only 5 shows
+      .limit(5); //  only 5 shows
 
     res.json({ data: shows });
   } catch (err) {
@@ -539,7 +475,6 @@ router.get("/get-recommended-movies-by-location", async (req, res) => {
     const { city } = req.query;
     const today = new Date();
     if (!city || city === "Detecting...") {
-      // No city provided, return all recommended movies
       const allMovies = await Movie.find({
         isRecommended: true,
         isActive: true,
@@ -547,7 +482,6 @@ router.get("/get-recommended-movies-by-location", async (req, res) => {
       return res.json({ data: allMovies });
     }
 
-    // Check if city exists in LocationWiseMovie
     const locationMovies = await LocationWiseMovie.find({
       location: { $regex: new RegExp(`^${city}$`, "i") },
       endDate: { $gte: today },
@@ -557,20 +491,16 @@ router.get("/get-recommended-movies-by-location", async (req, res) => {
         path: "movie",
         match: { isRecommended: true, isActive: true },
       });
-    // console.log("locationMovies", locationMovies);
 
     if (!locationMovies || locationMovies.length === 0) {
-      // City doesn't exist in location collection
       return res.status(404).json({ message: `No movies showing in ${city}` });
     }
 
-    // Extract movies that exist
     const movies = locationMovies
       .map((lm) => lm.movie)
       .filter((m) => m !== null);
 
     if (movies.length === 0) {
-      // City exists but no recommended/active movies
       return res.status(404).json({ message: `No movies showing in ${city}` });
     }
 
@@ -582,81 +512,9 @@ router.get("/get-recommended-movies-by-location", async (req, res) => {
     const uniqueMovies = Array.from(uniqueMoviesMap.values());
 
     return res.json({ data: uniqueMovies });
-    // return res.json({ data: movies });
   } catch (err) {
     console.error("Error fetching movies:", err);
     return res.status(500).json({ message: "Server error" });
-  }
-});
-
-router.get("/my-bookings", jwtAuthMiddleware, async (req, res) => {
-  try {
-    const userId = req.user.id;
-
-    const bookings = await Booking.find({ userId }).sort({ createdAt: -1 });
-
-    const result = [];
-
-    for (let booking of bookings) {
-      let itemDetails = null;
-      let theaterDetails = null;
-      let showDetails = null;
-
-      // MOVIE BOOKING
-      if (booking.type === "Movie") {
-        itemDetails = await Movie.findById(booking.movieId);
-
-        if (booking.theaterId) {
-          theaterDetails = await Theater.findById(booking.theaterId);
-        }
-      }
-
-      // SHOW BOOKING
-      if (booking.type === "Show") {
-        if (booking.details?.showId) {
-          showDetails = await Show.findById(booking.details.showId);
-        }
-      }
-
-      result.push({
-        ...booking._doc,
-        movie: itemDetails,
-        theater: theaterDetails,
-        show: showDetails,
-      });
-    }
-
-    res.json({
-      bookings: result,
-    });
-  } catch (error) {
-    console.log("BOOKING FETCH ERROR:", error);
-
-    res.status(500).json({
-      message: error.message,
-    });
-  }
-});
-
-//Ticket Verification API
-router.post("/verify-ticket", async (req, res) => {
-  try {
-    const { bookingId } = req.body;
-
-    const booking = await Booking.findById(bookingId);
-
-    if (!booking) {
-      return res.json({ valid: false });
-    }
-
-    res.json({
-      valid: true,
-      movie: booking.movieTitle,
-      seats: booking.seats,
-      showTime: booking.showTime,
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
   }
 });
 
@@ -850,8 +708,6 @@ router.get("/rating-summary/:type/:id", async (req, res) => {
 
 router.post("/create-order", jwtAuthMiddleware, async (req, res) => {
   try {
-    // console.log("BODY:", req.body);
-
     const { amount } = req.body;
 
     if (!amount) {
@@ -865,14 +721,11 @@ router.post("/create-order", jwtAuthMiddleware, async (req, res) => {
       currency: "INR",
     };
 
-// console.log("KEY:", process.env.RAZORPAY_KEY_ID);
-// console.log("SECRET:", process.env.RAZORPAY_KEY_SECRET);
-
     const order = await razorpay.orders.create(options);
 
     res.json(order);
   } catch (error) {
-    console.log("RAZORPAY ERROR:", error); 
+    console.log("RAZORPAY ERROR:", error);
 
     res.status(500).json({
       message: error.message,
@@ -937,9 +790,9 @@ router.post("/create-order", jwtAuthMiddleware, async (req, res) => {
 //     .map(
 //       (item) => `
 //       <div style="
-//         display:flex; 
-//         justify-content:space-between; 
-//         font-size:13px; 
+//         display:flex;
+//         justify-content:space-between;
+//         font-size:13px;
 //         margin-bottom:8px;
 //       ">
 //         <span>${item.name} x${item.quantity}</span>
@@ -952,8 +805,8 @@ router.post("/create-order", jwtAuthMiddleware, async (req, res) => {
 //   <div style="border-top:1px dashed #ccc; margin:10px 0;"></div>
 
 //   <div style="
-//     display:flex; 
-//     justify-content:space-between; 
+//     display:flex;
+//     justify-content:space-between;
 //     font-weight:bold;
 //   ">
 //     <span>Food Total</span>
@@ -995,10 +848,10 @@ router.post("/create-order", jwtAuthMiddleware, async (req, res) => {
 //     <div style="padding:20px; border-bottom:1px dashed #ccc;">
 
 //       <div style="display:flex; gap:15px;">
-        
+
 //         <!-- MOVIE IMAGE -->
-//         <img 
-//           src="${movieImage || "https://via.placeholder.com/120x160"}" 
+//         <img
+//           src="${movieImage || "https://via.placeholder.com/120x160"}"
 //           style="width:120px; height:160px; object-fit:cover; border-radius:6px;"
 //         />
 
@@ -1047,7 +900,7 @@ router.post("/create-order", jwtAuthMiddleware, async (req, res) => {
 
 //     <!-- BUTTON -->
 //     <div style="padding:20px; text-align:center;">
-//       <a 
+//       <a
 //         href="https://show-hub-frontend.onrender.com/verify-booking/${booking.bookingId || booking._id}"
 //         style="display:inline-block; padding:12px 25px; background:#e74c3c; color:white; text-decoration:none; border-radius:6px; font-weight:bold;"
 //       >
@@ -1064,7 +917,7 @@ router.post("/create-order", jwtAuthMiddleware, async (req, res) => {
 //       ${
 //         booking.foodItems && booking.foodItems.length > 0
 //           ? `<p style="color:#777;">
-//          Food Total 
+//          Food Total
 //          <span style="float:right;">₹${foodTotal}</span>
 //        </p>`
 //           : ""
@@ -1122,7 +975,7 @@ router.post("/create-order", jwtAuthMiddleware, async (req, res) => {
 //           movie,
 //         },
 //         {
-//           attempts: 3, // 🔥 retry 3 times
+//           attempts: 3, //  retry 3 times
 //           backoff: 5000, // wait 5 sec between retries
 //         },
 //       );
@@ -1132,9 +985,9 @@ router.post("/create-order", jwtAuthMiddleware, async (req, res) => {
 //       });
 
 //       emailQueue.on("completed", (job) => {
-//         console.log(`✅ Job completed ${job.id}`);
+//         console.log(` Job completed ${job.id}`);
 //       });
-      
+
 //       // sgMail
 //       //   .send(msg)
 //       //   .then(() => console.log("Email sent"))
@@ -1153,11 +1006,199 @@ router.post("/create-order", jwtAuthMiddleware, async (req, res) => {
 //     }
 //   });
 
-router.post("/save-booking", jwtAuthMiddleware, async (req, res) => {
+router.get("/get-booked-seats", async (req, res) => {
+  const { movieId, theaterId, showDate, showTime } = req.query;
+
+  const dateStr = new Date(showDate).toISOString().split("T")[0];
+await SeatLock.updateMany(
+  { expiresAt: { $lt: new Date() }, lockStatus: "Active" },
+  { $set: { lockStatus: "InActive" } },
+);
+
+  const bookings = await Booking.find({
+    movieId,
+    theaterId,
+    showTime,
+    paymentStatus: "Success",
+    bookingStatus: { $in: ["Confirmed", "Partially Cancelled"] },
+    $expr: {
+      $eq: [
+        {
+          $dateToString: {
+            format: "%Y-%m-%d",
+            date: "$showDate",
+            timezone: "Asia/Kolkata",
+          },
+        },
+        dateStr,
+      ],
+    },
+  });
+
+  const lockedSeats = await SeatLock.find({
+    movieId,
+    theaterId,
+    showTime,
+    lockStatus: "Active",
+    expiresAt: { $gt: new Date() },
+    $expr: {
+      $eq: [
+        {
+          $dateToString: {
+            format: "%Y-%m-%d",
+            date: "$showDate",
+            timezone: "Asia/Kolkata",
+          },
+        },
+        dateStr,
+      ],
+    },
+  });
+
+  const bookedSeats = bookings.flatMap((b) =>
+    b.seats.filter((s) => s.status === "Booked").map((s) => s.seatId),
+  );
+  const lockedSeatIds = lockedSeats.flatMap((l) =>
+    l.seats.map((s) => s.seatId),
+  );
+  res.json({
+    bookedSeats,
+    lockedSeats: lockedSeatIds,
+  });
+});
+
+router.post("/lock-seats", async (req, res) => {
   try {
-    const booking = new Booking(req.body);
+    const { movieId, theaterId, showDate, showTime, seats, userId } = req.body;
+
+    const expiresAt = new Date(Date.now() + 2 * 60 * 1000);
+
+    const normalizedDate = new Date(showDate);
+    normalizedDate.setHours(0, 0, 0, 0);
+
+    const existingLocks = await SeatLock.find({
+      movieId,
+      theaterId,
+      showTime,
+      lockStatus: "Active",
+      expiresAt: { $gt: new Date() },
+      "seats.seatId": { $in: seats },
+    });
+
+    if (existingLocks.length > 0) {
+      return res.status(400).json({
+        message: "Some seats already locked",
+      });
+    }
+
+    const newLock = new SeatLock({
+      movieId,
+      theaterId,
+      showDate: normalizedDate,
+      showTime,
+      seats: seats.map((s) => ({ seatId: s })),
+      lockedBy: userId,
+      expiresAt,
+      lockStatus: "Active",
+    });
+
+    await newLock.save();
+
+    res.json({
+      success: true,
+      expiresAt,
+      lockId: newLock._id,
+      lockStatus: "Active",
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+router.post("/release-lock", async (req, res) => {
+  try {
+    let lockId;
+
+    if (typeof req.body === "string") {
+      const parsed = JSON.parse(req.body);
+      lockId = parsed.lockId;
+    } else {
+      lockId = req.body.lockId;
+    }
+
+    if (!lockId) return res.json({ success: true });
+
+    const updatedSeatlock = await SeatLock.findByIdAndUpdate(
+      lockId,
+      { lockStatus: "InActive" },
+      { new: true },
+    );
+    res.json({ success: true, data: updatedSeatlock });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+  router.get(`/get-single-lockedseat/:lockId`, async (req, res) => {
+    try {
+      const { lockId } = req.params;
+      const item = await SeatLock.findById(lockId);
+
+      if (!item) {
+        return res.status(404).json({ error: `${path} not found` });
+      }
+
+      res.status(200).json(item);
+    } catch (error) {
+      console.error("GET single error:", error);
+      res.status(500).json({ error: "Failed to fetch item" });
+    }
+  });
+
+router.post("/confirm-booking", jwtAuthMiddleware, async (req, res) => {
+  try {
+    const { lockId } = req.body;
+
+    const lock = await SeatLock.findById(lockId);
+
+    if (!lock) {
+      return res.status(400).json({
+        message: "Seat lock not found. Please reselect seats.",
+      });
+    }
+
+    if (lock.expiresAt < new Date()) {
+        await SeatLock.updateOne(
+          { _id: lockId },
+          { $set: { lockStatus: "InActive" } },
+        );
+
+      return res.status(400).json({
+        message: "Payment Session expired. Please reselect seats.",
+      });
+    }
+
+    const booking = new Booking({
+      ...req.body,
+      // seats: lock.seats.map((s) => ({
+      //   seatId: s,
+      // })),
+      seats: req.body.seats,
+      paymentStatus: "Success",
+      bookingStatus: "Confirmed",
+    });
+
     await booking.save();
 
+await SeatLock.updateOne(
+  { _id: lockId },
+  {
+    $set: {
+      lockStatus: "InActive",
+      usedForBooking: true,
+    },
+  },
+);
     const user = await User.findById(req.user.id);
     const theater = await Theater.findById(booking.theaterId);
     const movie = await Movie.findById(booking.movieId);
@@ -1166,18 +1207,9 @@ router.post("/save-booking", jwtAuthMiddleware, async (req, res) => {
       return res.status(404).json({ message: "Data not found" });
     }
 
-    //  Push to queue (NON-BLOCKING)
-    // await emailQueue.add(
-    //   { booking, user, theater, movie },
-    //   {
-    //     attempts: 3,
-    //     backoff: 5000,
-    //   },
-    // );
-setImmediate(() => {
-  sendBookingEmail(booking, user, theater, movie);
-});
-
+    setImmediate(() => {
+      sendBookingEmail(booking, user, theater, movie);
+    });
 
     res.json({
       message: "Booking saved successfully",
@@ -1189,56 +1221,152 @@ setImmediate(() => {
   }
 });
 
-router.get("/get-booked-seats", async (req, res) => {
+//Full Booking Cancel
+router.post("/cancel-booking", jwtAuthMiddleware, async (req, res) => {
   try {
-    const { movieId, theaterId, showDate, showTime } = req.query;
+    const { bookingId } = req.body;
 
-    const dateOnly = new Date(showDate).toISOString().split("T")[0];
+    const booking = await Booking.findById(bookingId);
 
-    const bookings = await Booking.find({
-      movieId,
-      theaterId,
-      showTime,
-      paymentStatus: "Success",
-      $expr: {
-        $eq: [
-          { $dateToString: { format: "%Y-%m-%d", date: "$showDate" } },
-          dateOnly,
-        ],
-      },
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    booking.seats = booking.seats.map((seat) => ({
+      ...seat.toObject(),
+      status: "Cancelled",
+    }));
+
+    booking.bookingStatus = "Cancelled";
+
+    const refundAmount = booking.totalAmount - booking.convenienceFee;
+
+    booking.refundAmount = refundAmount;
+    booking.refundStatus = "Completed";
+
+    await booking.save();
+
+    await razorpay.payments.refund(booking.paymentId, {
+      amount: refundAmount * 100,
     });
 
-    // console.log("bookings:", bookings);
+    const user = await User.findById(booking.userId);
 
-const bookedSeats = bookings.flatMap((b) => b.seats.map((seat) => seat.seatId));
-    res.json(bookedSeats);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    setImmediate(() => {
+      sendCancelEmail({
+        user,
+        booking,
+        refundAmount,
+        cancelType: "FULL",
+      });
+    });
+
+    res.json({
+      message: "Full booking cancelled",
+      refundAmount,
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Error cancelling booking" });
   }
 });
 
-router.post("/create-show-order", jwtAuthMiddleware, async (req, res) => {
+// Partial Seat Cancel
+router.post("/cancel-seats", jwtAuthMiddleware, async (req, res) => {
   try {
-    console.log("BODY:", req.body);
+    const { bookingId, seatIds } = req.body;
 
-    const { amount } = req.body;
+    const booking = await Booking.findById(bookingId);
 
-    if (!amount) {
-      return res.status(400).json({
-        message: "Amount is required",
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    let refundAmount = 0;
+
+    booking.seats = booking.seats.map((seat) => {
+      if (seatIds.includes(seat.seatId) && seat.status !== "Cancelled") {
+        refundAmount += seat.price;
+        return { ...seat.toObject(), status: "Cancelled" };
+      }
+      return seat;
+    });
+
+    const activeSeats = booking.seats.filter((s) => s.status === "Booked");
+
+    booking.bookingStatus =
+      activeSeats.length === 0 ? "Cancelled" : "Partially Cancelled";
+
+    booking.refundAmount = (booking.refundAmount || 0) + refundAmount;
+    booking.refundStatus = "Initiated";
+
+    await booking.save();
+
+    await razorpay.payments.refund(booking.paymentId, {
+      amount: refundAmount * 100,
+    });
+
+const user = await User.findById(booking.userId);
+
+await sendCancelEmail({
+  user,
+  booking,
+  refundAmount,
+  cancelType: "PARTIAL",
+  seatIds,
+});
+
+    res.json({
+      message: "Seats cancelled",
+      refundAmount,
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Error cancelling seats" });
+  }
+});
+
+router.get("/my-bookings", jwtAuthMiddleware, async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const bookings = await Booking.find({
+      userId,
+      bookingStatus: { $in: ["Confirmed", "Partially Cancelled", "Cancelled"] },
+    }).sort({ createdAt: -1 });
+
+    const result = [];
+
+    for (let booking of bookings) {
+      let itemDetails = null;
+      let theaterDetails = null;
+      let showDetails = null;
+
+      if (booking.type === "Movie") {
+        itemDetails = await Movie.findById(booking.movieId);
+
+        if (booking.theaterId) {
+          theaterDetails = await Theater.findById(booking.theaterId);
+        }
+      }
+
+      if (booking.type === "Show") {
+        if (booking.details?.showId) {
+          showDetails = await Show.findById(booking.details.showId);
+        }
+      }
+
+      result.push({
+        ...booking._doc,
+        movie: itemDetails,
+        theater: theaterDetails,
+        show: showDetails,
       });
     }
 
-    const options = {
-      amount: amount * 100,
-      currency: "INR",
-    };
-
-    const order = await razorpay.orders.create(options);
-
-    res.json(order);
+    res.json({
+      bookings: result,
+    });
   } catch (error) {
-    console.log("RAZORPAY ERROR:", error);
+    console.log("BOOKING FETCH ERROR:", error);
 
     res.status(500).json({
       message: error.message,
@@ -1246,9 +1374,30 @@ router.post("/create-show-order", jwtAuthMiddleware, async (req, res) => {
   }
 });
 
+//Ticket Verification API
+router.post("/verify-ticket", async (req, res) => {
+  try {
+    const { bookingId } = req.body;
+
+    const booking = await Booking.findById(bookingId);
+
+    if (!booking) {
+      return res.json({ valid: false });
+    }
+
+    res.json({
+      valid: true,
+      movie: booking.movieTitle,
+      seats: booking.seats,
+      showTime: booking.showTime,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 router.post("/save-show-booking", jwtAuthMiddleware, async (req, res) => {
   try {
-    // console.log(req.body);
     const booking = new Booking(req.body);
 
     await booking.save();

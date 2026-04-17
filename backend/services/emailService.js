@@ -1,5 +1,5 @@
 const sgMail = require("@sendgrid/mail");
-const { buildEmailTemplate } = require("../templates/emailTemplate");
+const { buildEmailTemplate } = require("../templates/bookingemailTemplate");
 const generateInvoice = require("../utils/invoiceService");
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);

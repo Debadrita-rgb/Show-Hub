@@ -1,11 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import BASE_URL from "../../../../../config";
+import { jwtDecode } from "jwt-decode";
+import useLockHandler from "../../../../hooks/useLockHandler";
 
 const SeatArrangementPage = () => {
   const { id } = useParams();
   const location = useLocation();
-
+    useLockHandler();
   const { selectedDate, selectedTimeSlot, seatCount, theaterId } =
     location.state || {};
   const [layout, setLayout] = useState([]);
@@ -16,11 +18,25 @@ const SeatArrangementPage = () => {
   const navigate = useNavigate();
   const [isPreMeal, setIsPreMeal] = useState(false);
   const [soldSeats, setSoldSeats] = useState([]);
-
+  const [lockedSeats, setLockedSeats] = useState([]);
   useEffect(() => {
-    getBookedSeats();
+    if (theaterId && selectedDate && selectedTimeSlot) {
+      getBookedSeats();
+    }
+  }, [theaterId, selectedDate, selectedTimeSlot]);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      getBookedSeats();
+    }, 5000); // every 5 sec
+
+    return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    if (location.state?.expired) {
+      alert("⚠️ Your session expired. Please select seats again.");
+    }
+  }, []);
   useEffect(() => {
     fetch(`${BASE_URL}/user/get-single-movie/${id}`)
       .then((res) => res.json())
@@ -33,10 +49,9 @@ const SeatArrangementPage = () => {
     getLayout();
   }, []);
 
+  
   const getLayout = async () => {
-    const res = await fetch(
-      `${BASE_URL}/user/get-theater-layout/${theaterId}`,
-    );
+    const res = await fetch(`${BASE_URL}/user/get-theater-layout/${theaterId}`);
 
     const data = await res.json();
     // console.log(data)
@@ -44,7 +59,10 @@ const SeatArrangementPage = () => {
     setHallName(data.halls[0].hall_name);
     setLayout(data.halls[0].seatCategories);
     setIsPreMeal(data.isPreMeal);
-    getBookedSeats(data.theater_name);
+    if (data.expiresAt) {
+      localStorage.setItem("lockExpiry", data.expiresAt);
+    }
+    // getBookedSeats(data.theater_name);
   };
 
   const getBookedSeats = async () => {
@@ -53,19 +71,30 @@ const SeatArrangementPage = () => {
     );
 
     const data = await res.json();
-    setSoldSeats(data);
+    // setSoldSeats(data);
+    setSoldSeats(data.bookedSeats);
+    setLockedSeats(data.lockedSeats);
   };
 
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-  const toggleSeat = (seatId) => {
-    if (soldSeats.includes(seatId)) return;
+  const toggleSeat = async (seatId) => {
+    if (soldSeats.includes(seatId) || lockedSeats.includes(seatId)) return;
+
+    let updatedSeats;
 
     if (selectedSeats.includes(seatId)) {
-      setSelectedSeats(selectedSeats.filter((s) => s !== seatId));
+      updatedSeats = selectedSeats.filter((s) => s !== seatId);
     } else {
       if (selectedSeats.length >= seatCount) return;
-      setSelectedSeats([...selectedSeats, seatId]);
+      updatedSeats = [...selectedSeats, seatId];
+    }
+
+    setSelectedSeats(updatedSeats);
+    // console.log("Seats sending:", updatedSeats);
+
+    if (updatedSeats.length === seatCount) {
+      await lockSeats(updatedSeats);
     }
   };
 
@@ -74,13 +103,63 @@ const SeatArrangementPage = () => {
     return total + layout[catIndex].price;
   }, 0);
 
-  const handleSubmit = () => {
-    if (selectedSeats.length === 0) {
-      alert("Please select seats");
-      return;
-    }
+    const lockSeats = async (seatsToLock) => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/signin");
+        return;
+      }
+
+      const decoded = jwtDecode(token);
+
+      const res = await fetch(`${BASE_URL}/user/lock-seats`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          movieId: id,
+          theaterId,
+          showDate: selectedDate,
+          showTime: selectedTimeSlot,
+          seats: seatsToLock,
+          userId: decoded.id,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.message);
+        setSelectedSeats([]); // reset
+        return;
+      }
+
+      localStorage.setItem("lockExpiry", data.expiresAt);
+      localStorage.setItem("lockId", data.lockId);
+      localStorage.setItem("lockStatus", data.lockStatus);
+
+    };
+
+  const handleSubmit = async () => {
     if (selectedSeats.length !== seatCount) {
       alert(`Please select exactly ${seatCount} seats`);
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/signin");
+      return;
+    }
+
+    // GET FROM LOCAL STORAGE (already saved during lock)
+    const lockId = localStorage.getItem("lockId");
+    const expiresAt = localStorage.getItem("lockExpiry");
+
+    if (!lockId || !expiresAt) {
+      alert("Session expired. Please select seats again.");
+      navigate(`/movie/${id}/book-movie/seat-arrangement`);
       return;
     }
 
@@ -97,6 +176,7 @@ const SeatArrangementPage = () => {
     const bookingData = {
       movieId: movie?._id,
       movieTitle: movie?.title,
+      slug: movie?.title?.toLowerCase().replace(/\s+/g, "-"),
       theaterName,
       theaterId,
       hallName,
@@ -104,17 +184,27 @@ const SeatArrangementPage = () => {
       showDate: selectedDate,
       showTime: selectedTimeSlot,
       totalPrice,
+      expiresAt,
+      lockId, 
     };
 
-    // console.log("Booking Data:", bookingData);
-
-    // condition based navigation
     if (isPreMeal) {
+      // nextPathRef.current = "/food-beverage"; // ✅ TRACK NEXT PAGE
       navigate("/food-beverage", { state: bookingData });
     } else {
+      // nextPathRef.current = "/payment"; // ✅ TRACK NEXT PAGE
       navigate("/payment", { state: bookingData });
     }
   };
+
+  useEffect(() => {
+    const expiry = localStorage.getItem("lockExpiry");
+
+    if (expiry && new Date(expiry) < new Date()) {
+      localStorage.removeItem("lockId");
+      localStorage.removeItem("lockExpiry");
+    }
+  }, []);
 
   return (
     <div className="min-h-screen flex justify-center px-3 pt-6">
@@ -171,19 +261,29 @@ const SeatArrangementPage = () => {
                             const seatId = `${catIndex}-${rowLetter}-${seatIndex + 1}`;
                             const isSelected = selectedSeats.includes(seatId);
                             const isSold = soldSeats.includes(seatId);
+                            const isLocked = lockedSeats.includes(seatId);
 
                             return (
                               <button
                                 key={seatIndex}
-                                disabled={isSold}
+                                disabled={isSold || isLocked}
+                                title={
+                                  isLocked
+                                    ? "Seat locked"
+                                    : isSold
+                                      ? "Seat booked"
+                                      : ""
+                                }
                                 onClick={() => toggleSeat(seatId)}
-                                className={`w-7 h-7 sm:w-8 sm:h-8 text-[10px] sm:text-xs rounded border
+                                className={`w-7 h-7 sm:w-8 sm:h-8 text-[10px] sm:text-xs rounded border transition-all duration-200
                 ${
                   isSold
                     ? "bg-gray-400 text-white cursor-not-allowed"
-                    : isSelected
-                      ? "bg-purple-600 hover:bg-purple-700 text-white"
-                      : "border-black text-white hover:bg-green-100 hover:text-black"
+                    : isLocked
+                      ? "bg-yellow-400 text-black cursor-not-allowed hover:scale-105"
+                      : isSelected
+                        ? "bg-purple-600 hover:bg-purple-700 text-white"
+                        : "border-black text-white hover:bg-green-100 hover:text-black"
                 }
               `}
                               >

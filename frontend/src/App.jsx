@@ -104,6 +104,7 @@ import AdminViewTestimonialDetails from "./pages/admin_pages/common/Testimonial/
 
 //admin view booking
 import AdminviewBooking from "./pages/admin_pages/Booking/viewBooking.jsx";
+import AdminviewCancelBooking from "./pages/admin_pages/Booking/viewCancelBooking.jsx";
 
 //user testimonial
 import UserTestimonial from "./pages/users_pages/Testimonial/Testimonial.jsx";
@@ -192,7 +193,6 @@ const App = () => {
                 {/* Gallery */}
                 <Route path="view-gallery" element={<AdminviewGallery />} />
                 <Route path="add-gallery" element={<AdminaddGallery />} />
-
                 {/* Category */}
                 <Route path="view-all-category" element={<AdminCategory />} />
                 <Route path="add-category" element={<AdminAddCategory />} />
@@ -200,7 +200,6 @@ const App = () => {
                   path="edit-category/:id"
                   element={<AdmineditCategory />}
                 />
-
                 {/* LocationWise Movie */}
                 <Route
                   path="view-all-movie-selection"
@@ -214,7 +213,6 @@ const App = () => {
                   path="edit-movie-selection/:id"
                   element={<AdmineditLocationWiseMovie />}
                 />
-
                 {/* Language */}
                 <Route path="view-all-language" element={<AdminLanguage />} />
                 <Route path="add-language" element={<AdminAddLanguage />} />
@@ -222,25 +220,24 @@ const App = () => {
                   path="edit-language/:id"
                   element={<AdmineditLanguage />}
                 />
-
                 {/* Banner */}
                 <Route path="view-all-banner" element={<AdminBanner />} />
                 <Route path="add-banner" element={<AdminAddBanner />} />
                 <Route path="edit-banner/:id" element={<AdmineditBanner />} />
-
                 {/* Theater */}
                 <Route path="view-all-theater" element={<AdminTheater />} />
                 <Route path="add-theater" element={<AdminAddTheater />} />
                 <Route path="edit-theater/:id" element={<AdmineditTheater />} />
-
                 {/* Show */}
                 <Route path="view-all-shows" element={<AdminShow />} />
                 <Route path="add-show" element={<AdminAddShow />} />
                 <Route path="edit-show/:id" element={<AdminEditShow />} />
-
                 {/* Booking  */}
                 <Route path="view-all-booking" element={<AdminviewBooking />} />
-
+                <Route
+                  path="view-cancel-booking"
+                  element={<AdminviewCancelBooking />}
+                />
                 {/* AdminContact */}
                 <Route path="view-contact" element={<AdminContact />} />
                 <Route

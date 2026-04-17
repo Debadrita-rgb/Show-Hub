@@ -3,23 +3,28 @@
 
     <!-- HEADER -->
     <div style="background: linear-gradient(135deg, #000000, #4c1d95); color:white; padding:20px;">
-      <div style="display:flex; justify-content:space-between;">
-        <img src="https://show-hub-frontend.onrender.com/assets/logo-CWqOHdnZ.png" width="80"/>
-        <span>BOOKING ID: {{bookingId}}</span>
+      
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <img src="https://show-hub-frontend.onrender.com/assets/logo-CWqOHdnZ.png" width="90"/>
+        <span style="font-size:13px;">
+          BOOKING ID: <b>{{bookingId}}</b>
+        </span>
       </div>
 
-      <h2>M-Ticket 🎬</h2>
+      <h2 style="margin-top:15px;">M-Ticket 🎬</h2>
       <p>Hey {{name}}, your booking is confirmed!</p>
     </div>
 
     <!-- MOVIE -->
     <div style="padding:20px;">
-      <div style="display:flex; gap:15px;">
-        <img src="{{movieImage}}" style="width:90px; border-radius:6px;" />
+      <div style="display:flex; gap:15px; align-items:center;">
+        <img src="{{movieImage}}" style="width:100px; border-radius:8px;" />
 
-        <div style="margin-left: 2px;">
-          <h3>{{movieTitle}}</h3>
-          <p>{{theaterName}}<br/>{{location}}</p>
+        <div>
+          <h3 style="margin:0;">{{movieTitle}}</h3>
+          <p style="color:#666; margin:5px 0;">
+            {{theaterName}}<br/>{{location}}
+          </p>
 
           <p><b>Date:</b> {{date}} | {{time}}</p>
         </div>
@@ -41,18 +46,69 @@
       </div>
     </div>
 
-    <!-- TOTAL -->
+    <!-- BUTTON -->
+    <div style="padding:20px; text-align:center;">
+      <a href="https://show-hub-frontend.onrender.com/verify-booking/{{bookingId}}"
+        style="display:inline-block; background:#e74c3c; color:white; padding:12px 25px; text-decoration:none; border-radius:6px;">
+        View Ticket
+      </a>
+    </div>
+
+    <!-- PAYMENT -->
     <div style="padding:20px; border-top:1px solid #eee;">
-      <h3>Total Paid: ₹{{totalAmount}}</h3>
-      <p>Convenience Fee: ₹{{convenienceFee}}</p>
+      
+      <p style="color:#777;">
+        Ticket Price 
+        <span style="float:right;">₹{{ticketPrice}}</span>
+      </p>
+
+      {{#if foodTotal}}
+      <p style="color:#777;">
+        Food Total 
+        <span style="float:right;">₹{{foodTotal}}</span>
+      </p>
+      {{/if}}
+
+      <p style="color:#777;">
+        Convenience Fee 
+        <span style="float:right;">₹{{convenienceFee}}</span>
+      </p>
+
+      <h3>
+        Total Paid 
+        <span style="float:right;">₹{{totalAmount}}</span>
+      </h3>
+
+      <p style="color:#777;">
+        Paid using 
+        <span style="float:right;">Online</span>
+      </p>
+
+    </div>
+
+    <!-- INFO -->
+    <div style="margin:20px; padding:15px; background:#fff3cd; border-left:4px solid #f1c40f; border-radius:5px;">
+      <strong>Contactless & Fast-track Entry with M-ticket</strong>
+      <p style="margin:5px 0;">
+        Safe and contactless entry through M-Ticket scanning!
+      </p>
+    </div>
+
+    <!-- HOW TO USE -->
+    <div style="padding:20px;">
+      <h4>How to use M-Ticket:</h4>
+      <ol style="color:#555;">
+        <li>Login to ShowHub</li>
+        <li>Go to "Your Orders"</li>
+        <li>Show QR code at entry</li>
+      </ol>
     </div>
 
     <!-- FOOTER -->
-    <div style="padding:20px; text-align:center;">
-      <a href="https://show-hub-frontend.onrender.com/verify-booking/{{bookingId}}"
-
-        style="background:#e74c3c; color:white; padding:10px 20px; text-decoration:none;">
-        View Ticket
+    <div style="padding:20px; text-align:center; border-top:1px solid #eee;">
+      <a href="https://show-hub-frontend.onrender.com/contact"
+        style="color:#e74c3c; border:1px solid #e74c3c; padding:10px 15px; border-radius:5px; text-decoration:none;">
+        Need help? Contact Support
       </a>
     </div>
 

@@ -33,7 +33,6 @@ const ViewBooking = () => {
       .catch((err) => console.error("Fetch error:", err));
   }, []);
 
-  
   useEffect(() => {
     let filtered = movies.filter((item) => item.type === activeTab);
 
@@ -131,16 +130,6 @@ const ViewBooking = () => {
                         <p className="text-sm text-gray-500">
                           📧 {order.userId?.email}
                         </p>
-                        {/* STATUS BADGE */}
-                        <span
-                          className={`inline-block px-3 py-1 text-xs rounded-full font-semibold mt-1 ${
-                            order.paymentStatus === "Success"
-                              ? "bg-green-100 text-green-700"
-                              : "bg-red-100 text-red-700"
-                          }`}
-                        >
-                          {order.paymentStatus}
-                        </span>
                       </div>
                       {/* RIGHT */}
                       <div className="space-y-3">
@@ -178,17 +167,24 @@ const ViewBooking = () => {
                                 ? order.ticketPrice
                                 : order.details?.price}
                             </p>{" "}
-                            <p>💸 Fee: ₹{order.convenienceFee}</p>
-                            <p>
-                              🧾 Food Total Price: ₹
-                              {order.foodItems.reduce(
-                                (sum, item) => sum + item.total,
-                                0,
-                              )}
-                            </p>
+                            <p>💸 Convenience Fee: ₹{order.convenienceFee}</p>
+                            {order.foodItems?.length > 0 && (
+                              <p>
+                                🧾 Food Total Price: ₹
+                                {order.foodItems.reduce(
+                                  (sum, item) => sum + item.total,
+                                  0,
+                                )}
+                              </p>
+                            )}
                             <p className="font-semibold text-[#1b4c6d]">
                               Total: ₹{order.totalAmount}
                             </p>
+                            {(order.refundAmount ?? 0) > 0 && (
+                              <p className="font-semibold text-[#1b4c6d]">
+                                Refund Amount: ₹{order.refundAmount}
+                              </p>
+                            )}
                           </div>
                         </div>
                         {/* SEATS (chips style) */}
@@ -203,19 +199,64 @@ const ViewBooking = () => {
                               {order.seats.map((seat, index) => (
                                 <div
                                   key={index}
-                                  className="flex flex-col items-center justify-center px-3 py-2 rounded-xl border border-gray-200 bg-white shadow-sm hover:shadow-md transition"
+                                  className={`flex flex-col items-center justify-center px-3 py-2 rounded-xl border shadow-sm transition
+                                  ${
+                                    seat.status === "Cancelled"
+                                      ? "bg-red-50 border-red-200"
+                                      : "bg-white border-gray-200"
+                                  }`}
                                 >
-                                  <span className="text-sm font-semibold text-blue-600">
+                                  <span
+                                    className={`text-sm font-semibold
+                                    ${
+                                      seat.status === "Cancelled"
+                                        ? "text-red-400 line-through"
+                                        : "text-blue-600"
+                                    }`}
+                                  >
                                     {seat.seatId}
                                   </span>
+
                                   <span className="text-[10px] text-gray-500">
                                     {seat.category}
                                   </span>
+
+                                  {seat.status === "Cancelled" && (
+                                    <span className="text-[9px] text-red-500">
+                                      Cancelled
+                                    </span>
+                                  )}
                                 </div>
                               ))}
                             </div>
                           </div>
                         )}
+                        {/* STATUS BADGE */}
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {/* Payment Status */}
+                          <span
+                            className={`px-3 py-1 text-xs rounded-full font-semibold ${
+                              order.paymentStatus === "Success"
+                                ? "bg-green-100 text-green-700"
+                                : "bg-red-100 text-red-700"
+                            }`}
+                          >
+                            💳 Payment Status: {order.paymentStatus}
+                          </span>
+
+                          {/* Booking Status */}
+                          <span
+                            className={`px-3 py-1 text-xs rounded-full font-semibold ${
+                              order.bookingStatus === "CONFIRMED"
+                                ? "bg-blue-100 text-blue-700"
+                                : order.bookingStatus === "Partially Cancelled"
+                                  ? "bg-yellow-100 text-yellow-700"
+                                  : "bg-red-100 text-red-700"
+                            }`}
+                          >
+                            📌 Booking Status: {order.bookingStatus}
+                          </span>
+                        </div>
                       </div>
                     </div>
                     {/* ICON */}

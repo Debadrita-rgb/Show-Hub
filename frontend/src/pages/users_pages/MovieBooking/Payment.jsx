@@ -2,14 +2,17 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import BASE_URL from "../../../../config";
+import useLockHandler from "../../../hooks/useLockHandler";
 
 const Payment = () => {
   const location = useLocation();
+    useLockHandler();
   const { state } = useLocation();
   const navigate = useNavigate();
   const booking = location.state;
-  // console.log("Booking Data:", state);
+  // console.log("Booking Data:", booking);
   const [showFeeDetails, setShowFeeDetails] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(0);
 
   const ticketPrice = booking.totalPrice;
 
@@ -26,6 +29,77 @@ const Payment = () => {
 
   const totalcgstsgst = cgst + sgst;
 
+  useEffect(() => {
+    const checkLock = async () => {
+      const lockId = localStorage.getItem("lockId");
+
+      if (!lockId) return;
+
+      try {
+        const res = await fetch(
+          `${BASE_URL}/user/get-single-lockedseat/${lockId}`,
+        );
+        const data = await res.json();
+
+        const lockStatus = data?.lockStatus;
+
+        if (lockStatus === "InActive") {
+          // clear localStorage
+          localStorage.removeItem("lockId");
+          localStorage.removeItem("lockExpiry");
+
+          navigate(`/movie/${booking.slug}/${booking.movieId}/book-movie`);
+        }
+      } catch (err) {
+        console.error("Lock check failed", err);
+      }
+    };
+
+    checkLock();
+  }, []);
+
+  useEffect(() => {
+    const expiry = localStorage.getItem("lockExpiry");
+
+    if (!expiry) {
+      navigate("/");
+      return;
+    }
+
+    const interval = setInterval(() => {
+      const now = new Date().getTime();
+      const end = new Date(expiry).getTime();
+
+      const diff = Math.floor((end - now) / 1000);
+
+      if (diff <= 0) {
+        clearInterval(interval);
+
+        alert("⏳ Time is out! Seats released");
+
+        localStorage.removeItem("lockExpiry");
+        localStorage.removeItem("lockId");
+
+        navigate(
+          `/movie/${booking.slug}/${booking.movieId}/book-movie/seat-arrangement`,
+          {
+            state: {
+              selectedDate: booking.showDate,
+              selectedTimeSlot: booking.showTime,
+              seatCount: booking.seats?.length || 0,
+              theaterId: booking.theaterId,
+              expired: true,
+            },
+          },
+        );
+      } else {
+        setTimeLeft(diff);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   const handlePayment = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -33,10 +107,21 @@ const Payment = () => {
         navigate("/signin");
         return;
       }
+
+      const expiry = localStorage.getItem("lockExpiry");
+
+      if (!expiry || new Date(expiry) < new Date()) {
+        alert("⏳ Session expired. Please select seats again.");
+        navigate(
+          `/movie/${booking.slug}/${booking.movieId}/book-movie/seat-arrangement`,
+        );
+        return;
+      }
+
       const decoded = jwtDecode(token);
       const userId = decoded.id;
       // console.log("UserID:", userId);
-      const roundedAmount = Number(finalAmount.toFixed(2));;
+      const roundedAmount = Number(finalAmount.toFixed(2));
 
       const res = await fetch(`${BASE_URL}/user/create-order`, {
         method: "POST",
@@ -68,7 +153,7 @@ const Payment = () => {
         order_id: order.id,
 
         handler: async function (response) {
-          await fetch(`${BASE_URL}/user/save-booking`, {
+          await fetch(`${BASE_URL}/user/confirm-booking`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -76,6 +161,7 @@ const Payment = () => {
             },
             body: JSON.stringify({
               ...booking,
+              lockId: booking.lockId, // IMPORTANT
               paymentId: response.razorpay_payment_id,
               paymentStatus: "Success",
               totalAmount: Number(finalAmount.toFixed(2)),
@@ -86,9 +172,13 @@ const Payment = () => {
               sgst: Number(sgst.toFixed(2)),
               ticketPrice: Number(ticketPrice.toFixed(2)),
               foodTotal: Number(foodTotal.toFixed(2)),
+              bookingStatus: "Confirmed",
             }),
           });
 
+          localStorage.removeItem("lockId");
+          localStorage.removeItem("lockExpiry");
+          
           alert("Payment Successful 🎉");
           navigate("/user-bookings");
         },
@@ -109,101 +199,112 @@ const Payment = () => {
   // console.log("Final Amount:", finalAmount);
 
   return (
-    <div className="max-w-7xl mx-auto p-6 grid grid-cols-1 md:grid-cols-3 gap-6 text-black">
-      {/* PAYMENT OPTIONS */}
-      <div className="md:col-span-2 bg-white rounded shadow p-5">
-        <h2 className="text-lg font-semibold mb-4">Payment Options</h2>
+    <div className="rounded shadow p-5 relative">
+      <button className="absolute top-3 right-3 bg-blue-600 text-white px-3 py-1 rounded text-sm shadow">
+        ⏳ Payment Time left: {Math.floor(timeLeft / 60)}:
+        {String(timeLeft % 60).padStart(2, "0")}
+      </button>
+      <div className="max-w-7xl mx-auto p-6 grid grid-cols-1 md:grid-cols-3 gap-6 text-black">
+        {/* PAYMENT OPTIONS */}
+        <div className="md:col-span-2 bg-white rounded shadow p-5">
+          <h2 className="text-lg font-semibold mb-4">Payment Options</h2>
 
-        <div className="space-y-3">
-          <button className="border p-4 w-full text-left rounded hover:border-red-500">
-            Pay by any UPI App
-          </button>
+          <div className="space-y-3">
+            <button className="border p-4 w-full text-left rounded hover:border-red-500">
+              Pay by any UPI App
+            </button>
 
-          <button className="border p-4 w-full text-left rounded">
-            Debit / Credit Card
-          </button>
+            <button className="border p-4 w-full text-left rounded">
+              Debit / Credit Card
+            </button>
 
-          <button className="border p-4 w-full text-left rounded">
-            Net Banking
-          </button>
+            <button className="border p-4 w-full text-left rounded">
+              Net Banking
+            </button>
+          </div>
         </div>
-      </div>
 
-      {/* ORDER SUMMARY */}
-      <div className="bg-white rounded shadow p-5">
-        <h3 className="font-semibold text-lg mb-3">{booking.movieTitle}</h3>
+        {/* ORDER SUMMARY */}
+        <div className="bg-white rounded shadow p-5 relative">
+          {/* <p className="absolute top-2 right-3 text-red-500 text-sm">
+          Time left: {Math.floor(timeLeft / 60)}:
+          {String(timeLeft % 60).padStart(2, "0")}
+        </p> */}
+          <h3 className="font-semibold text-lg mb-3">{booking.movieTitle}</h3>
 
-        <p className="text-sm text-gray-500">
-          {new Date(booking.showDate).toLocaleDateString()} | {booking.showTime}
-        </p>
+          <p className="text-sm text-gray-500">
+            {new Date(booking.showDate).toLocaleDateString()} |{" "}
+            {booking.showTime}
+          </p>
 
-        <p className="text-sm text-gray-500 mb-3">{booking.theaterName}</p>
+          <p className="text-sm text-gray-500 mb-3">{booking.theaterName}</p>
 
-        <div className="border-t pt-3">
-          {/* Ticket price */}
-          <div className="flex justify-between mb-2">
-            <span>Ticket(s) price</span>
-            <span>₹{ticketPrice}</span>
-          </div>
-
-          {/* Convenience fee */}
-          <div
-            className="flex justify-between cursor-pointer"
-            onClick={() => setShowFeeDetails(!showFeeDetails)}
-          >
-            <span>
-              Convenience fees
-              <span className="ml-1">⌄</span>
-            </span>
-
-            <span>₹{convenienceFee.toFixed(2)}</span>
-          </div>
-
-          {showFeeDetails && (
-            <div className="text-sm text-gray-500 ml-3 mt-1">
-              <div className="flex justify-between">
-                <span>CGST @9%</span>
-                <span>₹{cgst.toFixed(2)}</span>
-              </div>
-
-              <div className="flex justify-between">
-                <span>SGST @9%</span>
-                <span>₹{sgst.toFixed(2)}</span>
-              </div>
+          <div className="border-t pt-3">
+            {/* Ticket price */}
+            <div className="flex justify-between mb-2">
+              <span>Ticket(s) price</span>
+              <span>₹{ticketPrice}</span>
             </div>
-          )}
 
-          {/* Food section */}
-          {booking.foodItems?.length > 0 && (
-            <div className="mt-3">
-              <h4 className="font-medium text-sm mb-1">Food & Beverage</h4>
+            {/* Convenience fee */}
+            <div
+              className="flex justify-between cursor-pointer"
+              onClick={() => setShowFeeDetails(!showFeeDetails)}
+            >
+              <span>
+                Convenience fees
+                <span className="ml-1">⌄</span>
+              </span>
 
-              {booking.foodItems.map((item, i) => (
-                <div key={i} className="flex justify-between text-sm">
-                  <span>
-                    {item.name} (x{item.quantity})
-                  </span>
+              <span>₹{convenienceFee.toFixed(2)}</span>
+            </div>
 
-                  <span>₹{item.price * item.quantity}</span>
+            {showFeeDetails && (
+              <div className="text-sm text-gray-500 ml-3 mt-1">
+                <div className="flex justify-between">
+                  <span>CGST @9%</span>
+                  <span>₹{cgst.toFixed(2)}</span>
                 </div>
-              ))}
+
+                <div className="flex justify-between">
+                  <span>SGST @9%</span>
+                  <span>₹{sgst.toFixed(2)}</span>
+                </div>
+              </div>
+            )}
+
+            {/* Food section */}
+            {booking.foodItems?.length > 0 && (
+              <div className="mt-3">
+                <h4 className="font-medium text-sm mb-1">Food & Beverage</h4>
+
+                {booking.foodItems.map((item, i) => (
+                  <div key={i} className="flex justify-between text-sm">
+                    <span>
+                      {item.name} (x{item.quantity})
+                    </span>
+
+                    <span>₹{item.price * item.quantity}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Total */}
+            <div className="border-t mt-3 pt-3 flex justify-between font-bold text-lg">
+              <span>Amount Payable</span>
+
+              <span>₹{Number(finalAmount).toFixed(2)}</span>
             </div>
-          )}
-
-          {/* Total */}
-          <div className="border-t mt-3 pt-3 flex justify-between font-bold text-lg">
-            <span>Amount Payable</span>
-
-            <span>₹{Number(finalAmount).toFixed(2)}</span>
           </div>
-        </div>
 
-        <button
-          className="w-full mt-4 bg-red-500 text-white py-2 rounded hover:bg-red-600"
-          onClick={handlePayment}
-        >
-          Pay Now
-        </button>
+          <button
+            className="w-full mt-4 bg-red-500 text-white py-2 rounded hover:bg-red-600"
+            onClick={handlePayment}
+          >
+            Pay Now
+          </button>
+        </div>
       </div>
     </div>
   );

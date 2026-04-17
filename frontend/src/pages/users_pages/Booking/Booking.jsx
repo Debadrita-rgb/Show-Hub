@@ -17,8 +17,10 @@ const Booking = () => {
   const [rating, setRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
   const [movie, setMovies] = useState({});
-
   const [filterType, setFilterType] = useState("All");
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancelBookingData, setCancelBookingData] = useState(null);
+  const [selectedSeats, setSelectedSeats] = useState([]);
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -37,10 +39,17 @@ const Booking = () => {
     fetchBookings();
   }, []);
 
-  const filteredBookings =
-    filterType === "All"
-      ? bookings
-      : bookings.filter((b) => b.type === filterType);
+  const filteredBookings = bookings.filter((b) => {
+    if (filterType === "All") {
+    return ["Confirmed", "Partially Cancelled"].includes(b.bookingStatus);
+    }
+
+    if (filterType === "Cancelled") {
+      return b.bookingStatus === "Cancelled";
+    }
+
+    return b.type === filterType;
+  });
 
   const handleRateClick = (booking) => {
     const token = localStorage.getItem("token");
@@ -82,7 +91,7 @@ const Booking = () => {
             ratingBooking.type === "Show"
               ? ratingBooking.details?.showId
               : null,
-          type: ratingBooking.type, 
+          type: ratingBooking.type,
           rating,
           reviewText,
         }),
@@ -125,72 +134,134 @@ const Booking = () => {
     return today > bookingDate;
   };
 
-//     useEffect(() => {
-//       fetch(
-//         `${BASE_URL}/user/get-single-movie/${selectedBooking.movie?.movieId}`,
-//       )
-//         .then((res) => res.json())
-//         .then((data) => {
-//           setMovies(data);
-//         });
-//     }, []);
-// console.log("movie", movie)
-const openGoogleCalender = (booking) => {
-  let title = "";
-  let startDateTime;
-  let endDateTime;
-  let location = "";
-  let details = "Booked via ShowHub 🎬";
+  const openGoogleCalender = (booking) => {
+    let title = "";
+    let startDateTime;
+    let endDateTime;
+    let location = "";
+    let details = "Booked via ShowHub 🎬";
 
-  if (booking.type === "Movie") {
-    title = booking.movieTitle;
+    if (booking.type === "Movie") {
+      title = booking.movieTitle;
 
-    // Extract only YYYY-MM-DD
-    const datePart = booking.showDate.split("T")[0];
+      // Extract only YYYY-MM-DD
+      const datePart = booking.showDate.split("T")[0];
 
-    const start = new Date(`${datePart}T${booking.showTime}`);
-    startDateTime = start;
+      const start = new Date(`${datePart}T${booking.showTime}`);
+      startDateTime = start;
 
-    const duration = booking.movie?.totalTiming; // fallback
-    endDateTime = new Date(start.getTime() + duration * 60000);
+      const duration = booking.movie?.totalTiming; // fallback
+      endDateTime = new Date(start.getTime() + duration * 60000);
 
-location = `${booking.theaterName || "Cinema Hall"}, ${booking.theater?.location_name || ""}`;
-  } else {
-    title = booking.details?.showTitle;
+      location = `${booking.theaterName || "Cinema Hall"}, ${booking.theater?.location_name || ""}`;
+    } else {
+      title = booking.details?.showTitle;
 
-    const start = new Date(
-      `${booking.details?.date}T${booking.details?.startTime}`,
-    );
+      const start = new Date(
+        `${booking.details?.date}T${booking.details?.startTime}`,
+      );
 
-    startDateTime = start;
+      startDateTime = start;
 
-    const duration = Number(booking.details?.duration || 60);
-    endDateTime = new Date(start.getTime() + duration * 60000);
+      const duration = Number(booking.details?.duration || 60);
+      endDateTime = new Date(start.getTime() + duration * 60000);
 
-location = `${booking.theaterName || "Event Venue"}, ${booking.details?.locationName || ""}`;
-  }
+      location = `${booking.theaterName || "Event Venue"}, ${booking.details?.locationName || ""}`;
+    }
 
-  const formatDate = (date) => {
-    if (isNaN(date)) return ""; //safety check
-    return date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+    const formatDate = (date) => {
+      if (isNaN(date)) return ""; //safety check
+      return date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+    };
+
+    const startStr = formatDate(startDateTime);
+    const endStr = formatDate(endDateTime);
+
+    const url = `https://calendar.google.com/calendar/u/0/r/eventedit?text=${encodeURIComponent(
+      title,
+    )}&dates=${startStr}/${endStr}&details=${encodeURIComponent(
+      details,
+    )}&location=${encodeURIComponent(location)}&ctz=Asia/Kolkata`;
+
+    window.open(url, "_blank");
   };
 
-  const startStr = formatDate(startDateTime);
-  const endStr = formatDate(endDateTime);
+  const handleCancelClick = async (booking) => {
+    if (booking.type === "Show") return;
 
-  const url = `https://calendar.google.com/calendar/u/0/r/eventedit?text=${encodeURIComponent(
-    title,
-  )}&dates=${startStr}/${endStr}&details=${encodeURIComponent(
-    details,
-  )}&location=${encodeURIComponent(location)}&ctz=Asia/Kolkata`;
+    const confirmCancel = window.confirm("Cancel full booking?");
+    if (!confirmCancel) return;
 
-  window.open(url, "_blank");
-};
+    const token = localStorage.getItem("token");
 
+    const res = await fetch(`${BASE_URL}/user/cancel-booking`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ bookingId: booking._id }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      toast.success("Booking cancelled ✅");
+
+      // refresh bookings
+      setBookings((prev) =>
+        prev.map((b) =>
+          b._id === booking._id ? { ...b, bookingStatus: "Cancelled" } : b,
+        ),
+      );
+    } else {
+      toast.error(data.message);
+    }
+  };
+
+  const handleSeatSelect = (e, seatId) => {
+    if (e.target.checked) {
+      setSelectedSeats((prev) => [...prev, seatId]);
+    } else {
+      setSelectedSeats((prev) => prev.filter((id) => id !== seatId));
+    }
+  };
+
+  const cancelSelectedSeats = async () => {
+    if (selectedSeats.length === 0) {
+      toast.error("Select seats first");
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(`${BASE_URL}/user/cancel-seats`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        bookingId: cancelBookingData._id,
+        seatIds: selectedSeats,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      toast.success("Seats cancelled ✅");
+
+      // refresh UI
+      setSelectedBooking(null);
+      setSelectedSeats([]);
+    } else {
+      toast.error(data.message);
+    }
+  };
   return (
     <section className="px-4 sm:px-6 md:px-16 py-12">
       <ToastContainer position="top-right" />
-
       <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-10 text-white">
         My Booking
       </h2>
@@ -228,14 +299,23 @@ location = `${booking.theaterName || "Event Venue"}, ${booking.details?.location
         >
           Show
         </button>
+        <button
+          onClick={() => setFilterType("Cancelled")}
+          className={`${
+            filterType === "Cancelled Booking"
+              ? "text-purple-900 border-b-2 border-red-500"
+              : "text-purple-950"
+          }`}
+        >
+          Cancelled
+        </button>
       </div>
-
       {/* BOOKING CARDS */}
       <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
         {filteredBookings.map((booking) => (
           <div
             key={booking._id}
-            className="rounded-xl p-4 sm:p-6 flex flex-col sm:flex-row sm:justify-between gap-4 bg-white/10 backdrop-blur-md border border-purple-800 shadow-lg"
+            className="relative rounded-xl p-4 sm:p-6 pb-12 flex flex-col sm:flex-row sm:justify-between gap-4 bg-white/10 backdrop-blur-md border border-purple-800 shadow-lg"
           >
             {/* LEFT SECTION */}
             <div className="flex gap-4 sm:gap-6">
@@ -271,13 +351,31 @@ location = `${booking.theaterName || "Event Venue"}, ${booking.details?.location
 
                     {booking?.seats?.map((seat, index) => {
                       const seatLabel = seat?.seatId
-                        ? seat.seatId.split("-").slice(1).join("")
-                        : "N/A";
+                        ?.split("-")
+                        .slice(1)
+                        .join("");
 
                       return (
                         <div key={index} className="flex justify-between">
-                          <span>{seat?.category}</span>
-                          <span>{seatLabel}</span>
+                          <span
+                            className={
+                              seat.status === "Cancelled"
+                                ? "line-through text-red-400"
+                                : ""
+                            }
+                          >
+                            {seat.category}
+                          </span>
+
+                          <span
+                            className={
+                              seat.status === "Cancelled"
+                                ? "line-through text-red-400"
+                                : ""
+                            }
+                          >
+                            {seatLabel}
+                          </span>
                         </div>
                       );
                     })}
@@ -302,21 +400,20 @@ location = `${booking.theaterName || "Event Venue"}, ${booking.details?.location
             </div>
 
             {/* BUTTON */}
-            <div className="flex sm:flex-col justify-end sm:justify-start">
+            <div className="flex flex-wrap sm:flex-col justify-end sm:justify-start gap-2 sm:gap-0">
+              {" "}
               <button
                 onClick={() => setSelectedBooking(booking)}
                 className="border border-purple-600 px-3 sm:px-4 py-2 rounded text-sm hover:bg-purple-200 hover:text-black sm:mb-2"
               >
                 View Booking Info
               </button>
-
               <button
                 onClick={() => openGoogleCalender(booking)}
                 className="border border-purple-600 px-3 sm:px-4 py-2 rounded text-sm hover:bg-purple-200 hover:text-black sm:mb-2"
               >
                 Save Date Google Calender
               </button>
-
               {canRateBooking(booking) && (
                 <button
                   onClick={() => handleRateClick(booking)}
@@ -325,11 +422,102 @@ location = `${booking.theaterName || "Event Venue"}, ${booking.details?.location
                   Give Rating
                 </button>
               )}
+              {/* Cancel booking  */}
+              {!canRateBooking(booking) && (
+                <div className="relative group w-full sm:w-auto">
+                  <button
+                    disabled={booking.type === "Show"}
+                    onClick={() => {
+                      if (booking.type === "Show") return; // extra safety
+                      setCancelBookingData(booking);
+                      setShowCancelModal(true);
+                    }}
+                    className={`w-full sm:w-auto border px-3 sm:px-4 py-2 rounded text-sm 
+                      ${
+                        booking.type === "Show"
+                          ? "border-gray-400 text-gray-400 cursor-not-allowed"
+                          : "border-purple-600 hover:bg-purple-200 hover:text-black"
+                      }`}
+                  >
+                    Cancel Booking
+                  </button>
+
+                  {/* TOOLTIP */}
+                  <div className="absolute right-0 bottom-full mb-2 hidden group-hover:block bg-black text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                    {booking.type === "Show"
+                      ? "Cancellation not available for live show"
+                      : "Cancel Booking"}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         ))}
       </div>
+      {/* booking and seat cancellation */}
 
+      {showCancelModal && cancelBookingData && (
+        <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-xl w-[90%] max-w-md relative">
+            <button
+              className="absolute top-4 right-4 text-gray-500 hover:text-red-500 text-xl"
+              onClick={() => {
+                setShowCancelModal(false);
+                setSelectedSeats([]);
+              }}
+            >
+              ✖
+            </button>
+            <h2 className="text-lg font-bold mb-4 text-black">
+              Cancel Booking
+            </h2>
+
+            {/* FULL CANCEL */}
+            <button
+              onClick={() => handleCancelClick(cancelBookingData)}
+              className="w-full bg-red-600 text-white py-2 rounded mb-3"
+            >
+              Cancel Full Booking
+            </button>
+
+            {/* PARTIAL CANCEL (only if >1 seat) */}
+            {cancelBookingData.seats.filter((s) => s.status === "Booked")
+              .length > 1 && (
+              <>
+                <h3 className="font-medium mt-3 mb-2 text-black">
+                  Select seats to cancel
+                </h3>
+
+                {cancelBookingData.seats.map(
+                  (seat, i) =>
+                    seat.status === "Booked" && (
+                      <div
+                        key={i}
+                        className="flex justify-between items-center mb-2 text-black"
+                      >
+                        <span>{seat.seatId}</span>
+
+                        <input
+                          type="checkbox"
+                          onChange={(e) => handleSeatSelect(e, seat.seatId)}
+                        />
+                      </div>
+                    ),
+                )}
+
+                <button
+                  onClick={cancelSelectedSeats}
+                  className="w-full bg-yellow-500 text-white py-2 rounded mt-3"
+                >
+                  Cancel Selected Seats
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* show booking details */}
       {selectedBooking && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-50 px-4 text-black">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto relative">
@@ -370,13 +558,31 @@ location = `${booking.theaterName || "Event Venue"}, ${booking.details?.location
                 <div className="space-y-1 text-sm">
                   {selectedBooking?.seats?.map((seat, index) => {
                     const seatLabel = seat?.seatId
-                      ? seat.seatId.split("-").slice(1).join("")
-                      : "N/A";
+                      ?.split("-")
+                      .slice(1)
+                      .join("");
 
                     return (
                       <div key={index} className="flex justify-between">
-                        <span className="text-gray-600">{seat.category}</span>
-                        <span className="font-medium">{seatLabel}</span>
+                        <span
+                          className={
+                            seat.status === "Cancelled"
+                              ? "line-through text-red-400"
+                              : ""
+                          }
+                        >
+                          {seat.category}
+                        </span>
+
+                        <span
+                          className={
+                            seat.status === "Cancelled"
+                              ? "line-through text-red-400"
+                              : ""
+                          }
+                        >
+                          {seatLabel}
+                        </span>
                       </div>
                     );
                   })}
@@ -487,7 +693,6 @@ location = `${booking.theaterName || "Event Venue"}, ${booking.details?.location
           </div>
         </div>
       )}
-
       {/* Rating Modal  */}
       {showRateModal && (
         <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50">

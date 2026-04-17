@@ -31,19 +31,24 @@ const bookingSchema = new mongoose.Schema(
         seatId: String,
         category: String,
         price: Number,
+        status: {
+          type: String,
+          enum: ["Booked", "Cancelled"],
+          default: "Booked",
+        },
       },
     ],
     ticketPrice: Number,
 
     foodItems: [
-  {
-    foodId: String,
-    name: String,
-    quantity: Number,
-    price: Number,
-    total: Number
-  }
-],
+      {
+        foodId: String,
+        name: String,
+        quantity: Number,
+        price: Number,
+        total: Number,
+      },
+    ],
     type: String,
     foodTotal: Number,
 
@@ -56,11 +61,24 @@ const bookingSchema = new mongoose.Schema(
     totalAmount: Number,
 
     paymentId: String,
-
+    bookingStatus: {
+      type: String,
+      enum: ["Confirmed", "Cancelled", "Partially Cancelled"],
+      default: "Confirmed",
+    },
     paymentStatus: {
       type: String,
       enum: ["Pending", "Success", "Failed"],
       default: "Pending",
+    },
+    refundAmount: {
+      type: Number,
+      default: 0,
+    },
+    refundStatus: {
+      type: String,
+      enum: ["None","Completed"],
+      default: "None",
     },
   },
   { timestamps: true },

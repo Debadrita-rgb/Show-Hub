@@ -84,6 +84,7 @@ const foodHTML =
     movieImage: movie.movieimage,
     seatsHTML,
     foodHTML,
+    foodTotal,
   });
 
   return {

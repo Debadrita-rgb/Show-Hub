@@ -22,6 +22,7 @@ export default function AdminSidebar({ isOpen, toggleSidebar }) {
   const [miscOpen, setMiscOpen] = useState(false);
   const [movieOpen, setMovieOpen] = useState(false);
   const [showOpen, setShowOpen] = useState(false);
+  const [bookingOpen, setBookingOpen] = useState(false);
 
   return (
     <>
@@ -44,7 +45,7 @@ export default function AdminSidebar({ isOpen, toggleSidebar }) {
             to="/admin/view-all-category"
             className="block items-center p-2 ps-3 rounded transition duration-200 text-white hover:text-[#1b4c6d] hover:bg-gray-100 hover:rounded-2xl"
           >
-            <MdCategory size={22} className="inline-block mr-2" />
+            <MdCategory size={10} className="inline-block mr-2" />
             Category
           </Link>
 
@@ -67,7 +68,7 @@ export default function AdminSidebar({ isOpen, toggleSidebar }) {
                   to="/admin/viewMovie"
                   className="block items-center p-2 ps-3 rounded transition duration-200 text-white hover:text-[#1b4c6d] hover:bg-gray-100 hover:rounded-2xl"
                 >
-                  <FaFilm size={22} className="inline-block mr-2" />
+                  <FaFilm size={10} className="inline-block mr-2" />
                   View Movie
                 </Link>
 
@@ -75,14 +76,14 @@ export default function AdminSidebar({ isOpen, toggleSidebar }) {
                   to="/admin/view-all-theater"
                   className="block items-center p-2 ps-3 rounded transition duration-200 text-white hover:text-[#1b4c6d] hover:bg-gray-100 hover:rounded-2xl"
                 >
-                  <FaTheaterMasks size={22} className="inline-block mr-2" />
+                  <FaTheaterMasks size={10} className="inline-block mr-2" />
                   View Theater
                 </Link>
                 <Link
                   to="/admin/view-all-movie-selection"
                   className="block items-center p-2 ps-3 rounded transition duration-200 text-white hover:text-[#1b4c6d] hover:bg-gray-100 hover:rounded-2xl"
                 >
-                  <MdLocationOn size={22} className="inline-block mr-2" />
+                  <MdLocationOn size={10} className="inline-block mr-2" />
                   Location Wise Movie Selection{" "}
                 </Link>
               </div>
@@ -108,20 +109,53 @@ export default function AdminSidebar({ isOpen, toggleSidebar }) {
                   to="/admin/view-all-shows"
                   className="block items-center p-2 ps-3 rounded transition duration-200 text-white hover:text-[#1b4c6d] hover:bg-gray-100 hover:rounded-2xl"
                 >
-                  <FaTicketAlt size={22} className="inline-block mr-2" />
+                  <FaTicketAlt size={10} className="inline-block mr-2" />
                   Show Events
                 </Link>
               </div>
             )}
           </div>
 
-          <Link
+          {/* Dropdown for Movie section  */}
+          <div>
+            <button
+              onClick={() => setBookingOpen(!bookingOpen)}
+              className="flex items-center justify-between w-full p-4 rounded transition duration-200 text-white hover:text-[#1b4c6d] hover:bg-gray-100 hover:rounded-2xl"
+            >
+              <div className="flex items-center space-x-2">
+                <FaCalendarCheck />
+                <span>Booking Section</span>
+              </div>
+              {bookingOpen ? <BsChevronUp /> : <BsChevronDown />}
+            </button>
+
+            {bookingOpen && (
+              <div className="ml-6 space-y-2 mt-2">
+                <Link
+                  to="/admin/view-all-booking"
+                  className="block items-center p-2 ps-3 rounded transition duration-200 text-white hover:text-[#1b4c6d] hover:bg-gray-100 hover:rounded-2xl"
+                >
+                  <FaCalendarCheck size={10} className="inline-block mr-2" />
+                  View Booking
+                </Link>
+
+                <Link
+                  to="/admin/view-cancel-booking"
+                  className="block items-center p-2 ps-3 rounded transition duration-200 text-white hover:text-[#1b4c6d] hover:bg-gray-100 hover:rounded-2xl"
+                >
+                  <FaCalendarCheck size={10} className="inline-block mr-2" />
+                  View Cancel Booking
+                </Link>
+              </div>
+            )}
+          </div>
+          {/* <Link
             to="/admin/view-all-booking"
             className="block items-center p-2 ps-3 rounded transition duration-200 text-white hover:text-[#1b4c6d] hover:bg-gray-100 hover:rounded-2xl"
           >
-            <FaCalendarCheck size={22} className="inline-block mr-2" />
+            <FaCalendarCheck size={10} className="inline-block mr-2" />
             Booking
-          </Link>
+          </Link> */}
 
           {/* Dropdown for Miscellaneous */}
           <div>
@@ -142,14 +176,14 @@ export default function AdminSidebar({ isOpen, toggleSidebar }) {
                   to="/admin/view-all-banner"
                   className="block items-center p-2 ps-3 rounded transition duration-200 text-white hover:text-[#1b4c6d] hover:bg-gray-100 hover:rounded-2xl"
                 >
-                  <MdPhotoLibrary size={22} className="inline-block mr-2" />
+                  <MdPhotoLibrary size={10} className="inline-block mr-2" />
                   View Banner
                 </Link>
                 <Link
                   to="/admin/view-all-language"
                   className="block items-center p-2 ps-3 rounded transition duration-200 text-white hover:text-[#1b4c6d] hover:bg-gray-100 hover:rounded-2xl"
                 >
-                  <FaLanguage size={22} className="inline-block mr-2" />
+                  <FaLanguage size={10} className="inline-block mr-2" />
                   View Language
                 </Link>
 
@@ -157,28 +191,28 @@ export default function AdminSidebar({ isOpen, toggleSidebar }) {
                   to="/admin/view-gallery"
                   className="block items-center p-2 ps-3 rounded transition duration-200 text-white hover:text-[#1b4c6d] hover:bg-gray-100 hover:rounded-2xl"
                 >
-                  <MdCollections size={22} className="inline-block mr-2" />
+                  <MdCollections size={10} className="inline-block mr-2" />
                   View Gallery
                 </Link> */}
                 <Link
                   to="/admin/view-contact"
                   className="block items-center p-2 ps-3 rounded transition duration-200 text-white hover:text-[#1b4c6d] hover:bg-gray-100 hover:rounded-2xl"
                 >
-                  <MdContactPhone size={22} className="inline-block mr-2" />
+                  <MdContactPhone size={10} className="inline-block mr-2" />
                   View Contact
                 </Link>
                 <Link
                   to="/admin/view-all-user"
                   className="flex items-center space-x-2 p-4 rounded transition duration-200 text-white hover:text-[#1b4c6d] hover:bg-gray-100 hover:rounded-2xl"
                 >
-                  <FaUser size={22} className="inline-block mr-2" />
+                  <FaUser size={10} className="inline-block mr-2" />
                   View User
                 </Link>
                 <Link
                   to="/admin/view-feedback"
                   className="block items-center p-2 ps-3 rounded transition duration-200 text-white hover:text-[#1b4c6d] hover:bg-gray-100 hover:rounded-2xl"
                 >
-                  <MdFeedback size={22} className="inline-block mr-2" />
+                  <MdFeedback size={10} className="inline-block mr-2" />
                   View Feedback
                 </Link>
                 <Link

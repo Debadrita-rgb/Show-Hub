@@ -116,6 +116,8 @@ const AdminNavbar = ({ toggleSidebar, isSidebarOpen }) => {
         return "Add Shows";
       case "/admin/view-all-booking":
         return "View Booking";
+      case "/admin/view-cancel-booking":
+        return "View Cancel Booking";
       default:
         return "Admin Dashboard";
     }

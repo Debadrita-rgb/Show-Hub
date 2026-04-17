@@ -30,7 +30,7 @@ const navigate = useNavigate();
       const userId = decoded.id;
       // console.log("UserID:", userId);
 
-      const res = await fetch(`${BASE_URL}/user/create-show-order`, {
+      const res = await fetch(`${BASE_URL}/user/create-order`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -77,6 +77,7 @@ const navigate = useNavigate();
               cgst: Number(cgst.toFixed(2)),
               sgst: Number(sgst.toFixed(2)),
               Price: Number(showPrice.toFixed(2)),
+              bookingStatus: "Confirmed",
             }),
           });
 

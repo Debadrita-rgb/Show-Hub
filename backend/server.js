@@ -27,6 +27,7 @@ app.use(
 );
 
 app.use(express.json());
+app.use(express.text()); 
 
 const PORT = process.env.PORT || 5000;
 

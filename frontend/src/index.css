@@ -2,10 +2,20 @@
 body {
   margin: 0;
   font-family: 'Inter', sans-serif;
-  background: #0f172a;
+
+  background: linear-gradient(
+    to bottom right,
+    #000000,
+    #4c1d95,
+    #000000
+  );
+
   min-height: 100vh;
   color: white;
   overflow-x: hidden;
+
+  /* Optional glow effect */
+  background-attachment: fixed;
 }
 html,
 body,

@@ -6,7 +6,6 @@ const { generateToken, jwtAuthMiddleware } = require("../middleware/jwt");
 const axios = require("axios");
 const dayjs = require("dayjs");
 
-// Import your models (adjust paths as needed)
 const User = require("../models/User");
 const Category = require("../models/Category");
 const Movie = require("../models/Movie");
@@ -79,7 +78,6 @@ router.post("/login", async (req, res) => {
       role: "ADMIN",
     };
     const token = generateToken(payload);
-    // console.log("Token has been generated =", token);
     return res.status(200).json({
       success: true,
       message: "Login Successful",
@@ -111,19 +109,123 @@ router.get("/dashboardData", jwtAuthMiddleware, async (req, res) => {
   }
 });
 
-// router.get(`/get-moviecategory-active`, jwtAuthMiddleware, async (req, res) => {
-//   try {
-//     const items = await Category.find({ isActive: true, type: "Movie" });
-//     res.json(items);
-//   } catch (error) {
-//     console.error("Server Error:", error);
-//     res.status(500).json({ error: "Failed to fetch items" });
-//   }
-// });
+router.get("/dashboard-revenue", jwtAuthMiddleware, async (req, res) => {
+  try {
+    const revenue = await Booking.aggregate([
+      {
+        $match: {
+          paymentStatus: "Success",
+        },
+      },
+      {
+        $group: {
+          _id: {
+            day: { $dayOfMonth: "$createdAt" },
+            month: { $month: "$createdAt" },
+            year: { $year: "$createdAt" },
+          },
+          totalRevenue: { $sum: "$totalAmount" },
+        },
+      },
+      { $sort: { "_id.year": -1, "_id.month": -1, "_id.day": -1 } },
+    ]);
+
+    res.json({ success: true, revenue });
+  } catch (err) {
+    res.status(500).json({ success: false });
+  }
+});
+
+router.get("/dashboard-popular-movies", jwtAuthMiddleware, async (req, res) => {
+    try {
+      const data = await Booking.aggregate([
+        { $match: { paymentStatus: "Success" } },
+        {
+          $group: {
+            _id: "$movieId",
+            totalBookings: { $sum: 1 },
+          },
+        },
+        { $sort: { totalBookings: -1 } },
+        { $limit: 5 },
+        {
+          $lookup: {
+            from: "movies",
+            localField: "_id",
+            foreignField: "_id",
+            as: "movie",
+          },
+        },
+        { $unwind: "$movie" },
+      ]);
+
+      res.json({ success: true, data });
+    } catch (err) {
+      res.status(500).json({ success: false });
+    }
+  },
+);
+
+router.get("/dashboard-busiest-theaters", jwtAuthMiddleware, async (req, res) => {
+    try {
+      const data = await Booking.aggregate([
+        { $match: { paymentStatus: "Success" } },
+        {
+          $unwind: "$seats",
+        },
+        {
+          $group: {
+            _id: "$theaterId",
+            seatsBooked: { $sum: 1 },
+          },
+        },
+        { $sort: { seatsBooked: -1 } },
+        { $limit: 5 },
+      ]);
+
+      res.json({ success: true, data });
+    } catch (err) {
+      res.status(500).json({ success: false });
+    }
+  },
+);
+
+router.get("/dashboard-peak-hours", jwtAuthMiddleware, async (req, res) => {
+  try {
+    const data = await Booking.aggregate([
+      {
+        $group: {
+          _id: { $hour: "$createdAt" },
+          bookings: { $sum: 1 },
+        },
+      },
+      { $sort: { bookings: -1 } },
+    ]);
+
+    res.json({ success: true, data });
+  } catch (err) {
+    res.status(500).json({ success: false });
+  }
+});
+
+router.get("/dashboard-cancellation-rate", jwtAuthMiddleware, async (req, res) => {
+    try {
+      const total = await Booking.countDocuments();
+      const cancelled = await Booking.countDocuments({
+        bookingStatus: "Cancelled",
+      });
+
+      const rate = (cancelled / total) * 100;
+
+      res.json({ success: true, rate });
+    } catch (err) {
+      res.status(500).json({ success: false });
+    }
+  },
+);
 
 // Generic CRUD Route Generator
 const generateCRUDRoutes = (path, Model) => {
-  //GET all items
   router.get(`/get-${path}`, jwtAuthMiddleware, async (req, res) => {
     try {
       const items = await Model.find().sort({ createdAt: -1 });
@@ -134,7 +236,6 @@ const generateCRUDRoutes = (path, Model) => {
     }
   });
 
-  // GET single item by ID
   router.get(`/get-single-${path}/:id`, jwtAuthMiddleware, async (req, res) => {
     try {
       const item = await Model.findById(req.params.id);
@@ -288,7 +389,6 @@ router.post(`/add-single-movie`, jwtAuthMiddleware, async(req, res) =>{
 try {
   const { trailerlink, ...rest } = req.body;
 
-  // Validate YouTube URL
   if (trailerlink && !isValidYouTubeURL(trailerlink)) {
     return res.status(400).json({
       error: "Only valid YouTube URLs are allowed",
@@ -410,7 +510,6 @@ router.post(`/add-locationwise-movie`, jwtAuthMiddleware, async (req, res) => {
       });
     }
 
-    // get existing shows for same hall
     const existingShows = await LocationWiseMovie.find({
       theater,
       hall_name,
@@ -433,7 +532,6 @@ router.post(`/add-locationwise-movie`, jwtAuthMiddleware, async (req, res) => {
             end = end.add(1, "day");
           }
 
-          // overlap check
           if (newStart.isBefore(end) && newEnd.isAfter(start)) {
             return res.status(400).json({
               success: false,
@@ -444,7 +542,6 @@ router.post(`/add-locationwise-movie`, jwtAuthMiddleware, async (req, res) => {
       }
     }
 
-    //Check Timing overlap
     const checkOverlap = (shows) => {
       const parsed = shows.map((s) => {
         let start = dayjs(`1970-01-01T${s.startTime}`);
@@ -486,7 +583,6 @@ router.post(`/add-locationwise-movie`, jwtAuthMiddleware, async (req, res) => {
       shows,
       language,
     });
-    // console.log("newMovie", newMovie);
     await newMovie.save();
 
     res.json({
@@ -500,6 +596,7 @@ router.post(`/add-locationwise-movie`, jwtAuthMiddleware, async (req, res) => {
     });
   }
 });
+
 // get the total location wise movie data
 router.get(`/get-locationwise-movie`, jwtAuthMiddleware, async (req, res) => {
   try {
@@ -586,7 +683,6 @@ router.post("/add-show", async (req, res) => {
       startDate,
       endDate,
     } = req.body; 
-// console.log("req.body", req.body)
     const show = new Show({
       showName,
       showImage,
@@ -601,7 +697,6 @@ router.post("/add-show", async (req, res) => {
       startDate,
       endDate,
     });
-// console.log("show", show)
     await show.save();
 
     res.status(201).json({
@@ -621,7 +716,10 @@ router.post("/add-show", async (req, res) => {
 // get bookinging details 
 router.get("/get-booked-details", jwtAuthMiddleware, async (req, res) => {
   try {
-    const bookings = await Booking.find()
+    const bookings = await Booking.find({
+      bookingStatus: { $in: ["Confirmed", "Partially Cancelled"] },
+      paymentStatus: "Success",
+    })
       .populate("userId", "name email")
       .populate("theaterId", "theater_name location_name")
       .sort({ createdAt: -1 });
@@ -632,7 +730,6 @@ router.get("/get-booked-details", jwtAuthMiddleware, async (req, res) => {
       theaterName: booking.theaterId?.theater_name || "Theater not found",
       locationName: booking.theaterId?.location_name || "Location not found",
     }));
-// console.log("enrichedBookings", enrichedBookings);
 
     res.json(enrichedBookings);
   } catch (error) {
@@ -640,4 +737,30 @@ router.get("/get-booked-details", jwtAuthMiddleware, async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+module.exports = router;
+
+// get cancelled booking details 
+router.get("/get-cancelled-booked-details", jwtAuthMiddleware, async (req, res) => {
+    try {
+      const bookings = await Booking.find({
+        bookingStatus: "Cancelled",
+      })
+        .populate("userId", "name email")
+        .populate("theaterId", "theater_name location_name")
+        .sort({ createdAt: -1 });
+
+      const enrichedBookings = bookings.map((booking) => ({
+        ...booking.toObject(),
+        MovieName: booking.movieTitle,
+        theaterName: booking.theaterId?.theater_name || "Theater not found",
+        locationName: booking.theaterId?.location_name || "Location not found",
+      }));
+
+      res.json(enrichedBookings);
+    } catch (error) {
+      console.error("Error fetching booked party halls:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  },
+);
 module.exports = router;

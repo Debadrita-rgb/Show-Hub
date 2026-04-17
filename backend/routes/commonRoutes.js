@@ -3,9 +3,7 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const jsonwebtoken = require("../middleware/auth")("ADMIN");
 const { generateToken, jwtAuthMiddleware } = require("../middleware/jwt");
-// Import your models (adjust paths as needed)
 const User = require("../models/User");
-const Movie = require("../models/Movie");
 
 router.post("/login", async (req, res) => {
   try {
