@@ -33,7 +33,7 @@ const { calculateEndTime } = require("../utils/timeHelper");
 //     }
 //     const newAdmin = new User({
 //       name,
-//       email: email.toLowerCase(),
+//       email: email.toLowerCase(), 
 //       password, // Auto-hashed by the User model
 //       role: "ADMIN",
 //     });
@@ -111,27 +111,187 @@ router.get("/dashboardData", jwtAuthMiddleware, async (req, res) => {
 
 router.get("/dashboard-revenue", jwtAuthMiddleware, async (req, res) => {
   try {
-    const revenue = await Booking.aggregate([
-      {
-        $match: {
-          paymentStatus: "Success",
+    let { type, startDate, endDate, month, date } = req.query;
+// console.log("TYPE:", type);
+// console.log("MONTH:", month);
+// console.log("DATE:", date);
+    const match = {
+      paymentStatus: "Success",
+      // type: "Movie",
+    };
+
+    let groupStage;
+
+    //  1. SINGLE DATE
+    if (date) {
+      const d = new Date(date);
+      match.createdAt = {
+        $gte: new Date(d.setHours(0, 0, 0, 0)),
+        $lte: new Date(d.setHours(23, 59, 59, 999)),
+      };
+
+      groupStage = {
+        _id: {
+          day: { $dayOfMonth: "$createdAt" },
+          month: { $month: "$createdAt" },
+          year: { $year: "$createdAt" },
         },
-      },
-      {
-        $group: {
+        totalRevenue: { $sum: "$totalAmount" },
+      };
+    }
+
+    //  2. MONTH FILTER (Dropdown OR Monthly Tab)
+    else if (type === "monthly") {
+      const today = new Date();
+
+      const selectedMonth = month ? Number(month) - 1 : today.getMonth();
+      const year = today.getFullYear();
+
+      const start = new Date(year, selectedMonth, 1);
+      const end = new Date(year, selectedMonth + 1, 0, 23, 59, 59, 999);
+
+      match.createdAt = {
+        $gte: start,
+        $lte: end,
+      };
+
+      // GROUP BY DAY (NOT RANGE)
+      groupStage = {
+        _id: {
+          day: { $dayOfMonth: "$createdAt" },
+          month: { $month: "$createdAt" },
+          year: { $year: "$createdAt" },
+        },
+        totalRevenue: { $sum: "$totalAmount" },
+      };
+    }
+
+    //  3. WEEKLY (Friday → Today)
+    else if (type === "weekly") {
+      const today = new Date();
+      const day = today.getDay(); // 0=Sun
+
+      // Find last Friday
+      const diff = day >= 5 ? day - 5 : 7 - (5 - day);
+      const friday = new Date(today);
+      friday.setDate(today.getDate() - diff);
+      friday.setHours(0, 0, 0, 0);
+
+      match.createdAt = {
+        $gte: friday,
+        $lte: today,
+      };
+
+      groupStage = {
+        _id: {
+          day: { $dayOfMonth: "$createdAt" },
+          month: { $month: "$createdAt" },
+          year: { $year: "$createdAt" },
+        },
+        totalRevenue: { $sum: "$totalAmount" },
+      };
+    }
+
+    //  4. CUSTOM RANGE (MOST IMPORTANT FIX)
+    else if (startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+
+      match.createdAt = { $gte: start, $lte: end };
+
+      const diffDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+
+      // < 7 days → daily
+      if (diffDays <= 7) {
+        groupStage = {
           _id: {
             day: { $dayOfMonth: "$createdAt" },
             month: { $month: "$createdAt" },
             year: { $year: "$createdAt" },
           },
           totalRevenue: { $sum: "$totalAmount" },
+        };
+      }
+
+      // < 31 days → weekly chunks
+      else if (diffDays <= 31) {
+        groupStage = {
+          _id: {
+            range: {
+              $concat: [
+                {
+                  $toString: {
+                    $subtract: [
+                      { $dayOfMonth: "$createdAt" },
+                      { $mod: [{ $dayOfMonth: "$createdAt" }, 7] },
+                    ],
+                  },
+                },
+                "-",
+                {
+                  $toString: {
+                    $add: [
+                      {
+                        $subtract: [
+                          { $dayOfMonth: "$createdAt" },
+                          { $mod: [{ $dayOfMonth: "$createdAt" }, 7] },
+                        ],
+                      },
+                      6,
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          totalRevenue: { $sum: "$totalAmount" },
+        };
+      }
+
+      // > 31 days → monthly
+      else {
+        groupStage = {
+          _id: {
+            month: { $month: "$createdAt" },
+            year: { $year: "$createdAt" },
+          },
+          totalRevenue: { $sum: "$totalAmount" },
+        };
+      }
+    }
+
+    //  5. DEFAULT → TODAY
+    else {
+      const today = new Date();
+      match.createdAt = {
+        $gte: new Date(today.setHours(0, 0, 0, 0)),
+        $lte: new Date(today.setHours(23, 59, 59, 999)),
+      };
+
+      groupStage = {
+        _id: {
+          day: { $dayOfMonth: "$createdAt" },
+          month: { $month: "$createdAt" },
         },
+        totalRevenue: { $sum: "$totalAmount" },
+      };
+    }
+
+    const revenue = await Booking.aggregate([
+      { $match: match },
+      { $group: groupStage },
+      {
+        $sort:
+          type === "monthly"
+            ? { "_id.range": 1 }
+            : { "_id.year": 1, "_id.month": 1, "_id.day": 1 },
       },
-      { $sort: { "_id.year": -1, "_id.month": -1, "_id.day": -1 } },
     ]);
 
+// console.log("revenue", revenue);
     res.json({ success: true, revenue });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ success: false });
   }
 });
@@ -169,23 +329,59 @@ router.get("/dashboard-popular-movies", jwtAuthMiddleware, async (req, res) => {
 router.get("/dashboard-busiest-theaters", jwtAuthMiddleware, async (req, res) => {
     try {
       const data = await Booking.aggregate([
-        { $match: { paymentStatus: "Success" } },
-        {
-          $unwind: "$seats",
-        },
+        { $match: { paymentStatus: "Success", type: "Movie" } },
+
+        //  NO unwind → faster
         {
           $group: {
-            _id: "$theaterId",
-            seatsBooked: { $sum: 1 },
+            _id: {
+              theaterId: "$theaterId",
+              hallName: "$hallName",
+            },
+            seatsBooked: { $sum: { $size: "$seats" } },
           },
         },
+
+        //  Correct lookup
+        {
+          $lookup: {
+            from: "theaters",
+            localField: "_id.theaterId", // 👈 FIXED
+            foreignField: "_id",
+            as: "theater",
+          },
+        },
+
+        { $unwind: "$theater" },
+
+        //  Clean output
+        {
+          $project: {
+            _id: 0,
+            theaterId: "$_id.theaterId",
+            theaterName: "$theater.theater_name",
+            locationName: "$theater.location_name",
+
+            hallName: {
+              $cond: [
+                { $ifNull: ["$_id.hallName", false] },
+                "$_id.hallName",
+                "$$REMOVE",
+              ],
+            },
+
+            seatsBooked: 1,
+          },
+        },
+
         { $sort: { seatsBooked: -1 } },
         { $limit: 5 },
       ]);
 
       res.json({ success: true, data });
     } catch (err) {
-      res.status(500).json({ success: false });
+      console.error("Busiest Theater Error:", err);
+      res.status(500).json({ success: false, error: err.message });
     }
   },
 );
