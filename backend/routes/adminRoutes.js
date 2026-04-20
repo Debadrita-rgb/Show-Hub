@@ -112,9 +112,7 @@ router.get("/dashboardData", jwtAuthMiddleware, async (req, res) => {
 router.get("/dashboard-revenue", jwtAuthMiddleware, async (req, res) => {
   try {
     let { type, startDate, endDate, month, date } = req.query;
-// console.log("TYPE:", type);
-// console.log("MONTH:", month);
-// console.log("DATE:", date);
+
     const match = {
       paymentStatus: "Success",
       // type: "Movie",
@@ -122,7 +120,6 @@ router.get("/dashboard-revenue", jwtAuthMiddleware, async (req, res) => {
 
     let groupStage;
 
-    //  1. SINGLE DATE
     if (date) {
       const d = new Date(date);
       match.createdAt = {
@@ -140,7 +137,6 @@ router.get("/dashboard-revenue", jwtAuthMiddleware, async (req, res) => {
       };
     }
 
-    //  2. MONTH FILTER (Dropdown OR Monthly Tab)
     else if (type === "monthly") {
       const today = new Date();
 
@@ -155,7 +151,6 @@ router.get("/dashboard-revenue", jwtAuthMiddleware, async (req, res) => {
         $lte: end,
       };
 
-      // GROUP BY DAY (NOT RANGE)
       groupStage = {
         _id: {
           day: { $dayOfMonth: "$createdAt" },
@@ -166,12 +161,10 @@ router.get("/dashboard-revenue", jwtAuthMiddleware, async (req, res) => {
       };
     }
 
-    //  3. WEEKLY (Friday → Today)
     else if (type === "weekly") {
       const today = new Date();
-      const day = today.getDay(); // 0=Sun
+      const day = today.getDay();  
 
-      // Find last Friday
       const diff = day >= 5 ? day - 5 : 7 - (5 - day);
       const friday = new Date(today);
       friday.setDate(today.getDate() - diff);
@@ -192,7 +185,6 @@ router.get("/dashboard-revenue", jwtAuthMiddleware, async (req, res) => {
       };
     }
 
-    //  4. CUSTOM RANGE (MOST IMPORTANT FIX)
     else if (startDate && endDate) {
       const start = new Date(startDate);
       const end = new Date(endDate);
@@ -201,7 +193,6 @@ router.get("/dashboard-revenue", jwtAuthMiddleware, async (req, res) => {
 
       const diffDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
 
-      // < 7 days → daily
       if (diffDays <= 7) {
         groupStage = {
           _id: {
@@ -213,7 +204,6 @@ router.get("/dashboard-revenue", jwtAuthMiddleware, async (req, res) => {
         };
       }
 
-      // < 31 days → weekly chunks
       else if (diffDays <= 31) {
         groupStage = {
           _id: {
@@ -248,7 +238,6 @@ router.get("/dashboard-revenue", jwtAuthMiddleware, async (req, res) => {
         };
       }
 
-      // > 31 days → monthly
       else {
         groupStage = {
           _id: {
@@ -260,7 +249,6 @@ router.get("/dashboard-revenue", jwtAuthMiddleware, async (req, res) => {
       }
     }
 
-    //  5. DEFAULT → TODAY
     else {
       const today = new Date();
       match.createdAt = {
@@ -288,7 +276,6 @@ router.get("/dashboard-revenue", jwtAuthMiddleware, async (req, res) => {
       },
     ]);
 
-// console.log("revenue", revenue);
     res.json({ success: true, revenue });
   } catch (err) {
     console.error(err);
@@ -331,7 +318,6 @@ router.get("/dashboard-busiest-theaters", jwtAuthMiddleware, async (req, res) =>
       const data = await Booking.aggregate([
         { $match: { paymentStatus: "Success", type: "Movie" } },
 
-        //  NO unwind → faster
         {
           $group: {
             _id: {
@@ -342,11 +328,10 @@ router.get("/dashboard-busiest-theaters", jwtAuthMiddleware, async (req, res) =>
           },
         },
 
-        //  Correct lookup
         {
           $lookup: {
             from: "theaters",
-            localField: "_id.theaterId", // 👈 FIXED
+            localField: "_id.theaterId",
             foreignField: "_id",
             as: "theater",
           },
@@ -354,7 +339,6 @@ router.get("/dashboard-busiest-theaters", jwtAuthMiddleware, async (req, res) =>
 
         { $unwind: "$theater" },
 
-        //  Clean output
         {
           $project: {
             _id: 0,

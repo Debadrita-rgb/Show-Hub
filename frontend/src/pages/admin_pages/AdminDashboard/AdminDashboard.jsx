@@ -28,7 +28,6 @@ const AdminDashboard = () => {
     nUser: 0,
     movieCount: 0,
     showCount: 0,
-    // recentInternships: [],
   });
   const [analytics, setAnalytics] = useState({
     revenue: [],
@@ -111,12 +110,7 @@ const AdminDashboard = () => {
           hours: hours.data.data,
           cancelRate: cancelRate.data.rate,
         }));
-        // console.log({
-        //   movies: movies.data,
-        //   theaters: theaters.data,
-        //   hours: hours.data,
-        //   cancelRate: cancelRate.data,
-        // });
+ 
       } catch (err) {
         console.error(err);
       }
@@ -136,9 +130,6 @@ const AdminDashboard = () => {
       params.type = "custom";
     } else if (activeTab === "Monthly") {
       params.type = "monthly";
-      // if (selectedMonth) {
-      //   params.month = selectedMonth;
-      // }
       params.month = selectedMonth || new Date().getMonth() + 1;
     } else if (activeTab === "Weekly") {
       params.type = "weekly";
@@ -170,9 +161,9 @@ const AdminDashboard = () => {
 
   const getWeekDates = () => {
     const today = new Date();
-    const day = today.getDay(); // 0 = Sunday
+    const day = today.getDay(); 
 
-    const diff = day >= 5 ? day - 5 : 7 - (5 - day); // last Friday
+    const diff = day >= 5 ? day - 5 : 7 - (5 - day); 
     const friday = new Date(today);
     friday.setDate(today.getDate() - diff);
 
@@ -217,7 +208,7 @@ const AdminDashboard = () => {
       const day = String(d.label).padStart(2, "0");
 
       return {
-        date: `${day}/${formattedMonth}`, // ✅ 01/03 format
+        date: `${day}/${formattedMonth}`,
         revenue: revenueMap[d.key] || 0,
       };
     });
@@ -237,7 +228,6 @@ const AdminDashboard = () => {
     }));
   } else {
     revenueData = (analytics.revenue || []).map((r) => {
-      // DAILY or CUSTOM (day-based)
       if (r._id.day) {
         return {
           date: `${r._id.day}/${r._id.month}`,
@@ -245,7 +235,6 @@ const AdminDashboard = () => {
         };
       }
 
-      // RANGE (weekly/month chunks)
       if (r._id.range) {
         return {
           date: r._id.range,
@@ -253,7 +242,6 @@ const AdminDashboard = () => {
         };
       }
 
-      // MONTHLY (year/month grouping)
       if (r._id.month && r._id.year) {
         return {
           date: `${r._id.month}/${r._id.year}`,
@@ -262,7 +250,7 @@ const AdminDashboard = () => {
       }
 
       return {
-        date: "N/A", // fallback
+        date: "N/A", 
         revenue: Number(r.totalRevenue).toFixed(2) || 0,
       };
     });
@@ -538,9 +526,9 @@ const AdminDashboard = () => {
               <BarChart data={theaterChartData}>
                 <XAxis
                   dataKey="name"
-                  tick={{ fontSize: 10 }} // 👈 smaller text
-                  interval={0} // 👈 show all labels
-                  angle={-5} // 👈 slight tilt for readability
+                  tick={{ fontSize: 10 }} 
+                  interval={0} 
+                  angle={-5} 
                   textAnchor="end"
                 />{" "}
                 <YAxis />
