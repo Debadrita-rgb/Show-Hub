@@ -47,6 +47,11 @@ const bookingSchema = new mongoose.Schema(
         quantity: Number,
         price: Number,
         total: Number,
+        foodStatus: {
+          type: String,
+          enum: ["Booked", "Cancelled"],
+          default: "Booked",
+        },
       },
     ],
     type: String,
@@ -77,8 +82,12 @@ const bookingSchema = new mongoose.Schema(
     },
     refundStatus: {
       type: String,
-      enum: ["None","Completed"],
+      enum: ["None", "Partially Refunded", "Fully Refunded"],
       default: "None",
+    },
+    foodRefundAmount: {
+      type: Number,
+      default: 0,
     },
   },
   { timestamps: true },

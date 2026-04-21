@@ -26,16 +26,21 @@ const sendCancelEmail = async ({
       name: user.name,
       bookingId: booking._id,
       movieTitle: booking.movieTitle,
-      theaterName: booking.theaterName,
+      theaterName: booking.theater_name,
       cancelType,
       refundAmount,
       seats: seatIds.length ? seatIds.join(", ") : null,
+      showDate,
+      showTime,
     });
 
     const msg = {
       to: user.email,
-      from: process.env.EMAIL_USER,
-      subject: "❌ Booking Cancelled & Refund",
+      from: {
+        email: process.env.EMAIL_USER,
+        name: "ShowHub",
+      },
+      subject: "🎬 Booking Cancelled & Refund",
       html,
     };
 

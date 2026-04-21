@@ -166,9 +166,10 @@ const proceedPayment = () => {
   const foodDetails = cart.map((item) => ({
     foodId: item._id,
     name: item.title,
-    price: item.foodPrice, 
+    price: item.foodPrice,
     quantity: item.qty,
     total: item.foodPrice * item.qty,
+    foodStatus: "Booked",
   }));
 
   navigate("/payment", {

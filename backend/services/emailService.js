@@ -8,7 +8,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const sendWithRetry = async (msg, retries = 3) => {
   try {
     await sgMail.send(msg);
-    console.log("✅ Email sent successfully");
+    // console.log("✅ Email sent successfully");
   } catch (error) {
     console.error(`❌ Email failed. Retries left: ${retries}`, error.message);
 
@@ -24,9 +24,6 @@ const sendWithRetry = async (msg, retries = 3) => {
 // Main background function
 const sendBookingEmail = async (booking, user, theater, movie) => {
   try {
-//     console.log("📧 Preparing email...");
-// console.log("Template function:", buildEmailTemplate);
-
     const msg = buildEmailTemplate(booking, user, theater, movie);
 
     const pdfBuffer = await generateInvoice(booking, user);

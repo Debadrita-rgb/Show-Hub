@@ -89,7 +89,10 @@ const foodHTML =
 
   return {
     to: user.email,
-    from: process.env.EMAIL_USER,
+    from: {
+      email: process.env.EMAIL_USER,
+      name: "ShowHub",
+    },
     subject: "🎬 Booking Confirmed - ShowHub",
     html,
   };

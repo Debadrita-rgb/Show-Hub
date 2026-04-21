@@ -21,6 +21,7 @@ const Booking = () => {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelBookingData, setCancelBookingData] = useState(null);
   const [selectedSeats, setSelectedSeats] = useState([]);
+const [selectedFoods, setSelectedFoods] = useState([]);
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -186,6 +187,13 @@ const Booking = () => {
     window.open(url, "_blank");
   };
 
+  const closeCancelModal = () => {
+    setShowCancelModal(false);
+    setCancelBookingData(null);
+    setSelectedSeats([]);
+    setSelectedFoods([]);
+  };
+
   const handleCancelClick = async (booking) => {
     if (booking.type === "Show") return;
 
@@ -215,6 +223,7 @@ const Booking = () => {
           b._id === booking._id ? { ...b, bookingStatus: "Cancelled" } : b,
         ),
       );
+      closeCancelModal();
     } else {
       toast.error(data.message);
     }
@@ -225,6 +234,14 @@ const Booking = () => {
       setSelectedSeats((prev) => [...prev, seatId]);
     } else {
       setSelectedSeats((prev) => prev.filter((id) => id !== seatId));
+    }
+  };
+
+  const handleFoodSelect = (e, foodId) => {
+    if (e.target.checked) {
+      setSelectedFoods((prev) => [...prev, foodId]);
+    } else {
+      setSelectedFoods((prev) => prev.filter((id) => id !== foodId));
     }
   };
 
@@ -253,15 +270,87 @@ const Booking = () => {
     if (res.ok) {
       toast.success("Seats cancelled ✅");
 
-      // refresh UI
-      setSelectedBooking(null);
-      setSelectedSeats([]);
+      setBookings((prevBookings) =>
+        prevBookings.map((booking) => {
+          if (booking._id !== cancelBookingData._id) return booking;
+
+          return {
+            ...booking,
+            bookingStatus:
+              booking.seats.filter(
+                (s) =>
+                  !selectedSeats.includes(s.seatId) && s.status === "Booked",
+              ).length === 0
+                ? "Cancelled"
+                : "Partially Cancelled",
+
+            seats: booking.seats.map((seat) =>
+              selectedSeats.includes(seat.seatId)
+                ? { ...seat, status: "Cancelled" }
+                : seat,
+            ),
+          };
+        }),
+      );
+
       setShowCancelModal(false);
 
+      setSelectedSeats([]);
+      setCancelBookingData(null);
+      closeCancelModal();
     } else {
       toast.error(data.message);
     }
   };
+
+  const cancelSelectedFood = async () => {
+    if (selectedFoods.length === 0) {
+      toast.error("Select food items first");
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(`${BASE_URL}/user/cancel-food`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        bookingId: cancelBookingData._id,
+        foodIds: selectedFoods,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      toast.success("Food items cancelled ✅");
+
+      setBookings((prevBookings) =>
+        prevBookings.map((booking) => {
+          if (booking._id !== cancelBookingData._id) return booking;
+
+          return {
+            ...booking,
+            foodItems: booking.foodItems.map((food) =>
+              selectedFoods.includes(food.foodId)
+                ? { ...food, foodStatus: "Cancelled" }
+                : food,
+            ),
+          };
+        }),
+      );
+
+      setSelectedFoods([]);
+      closeCancelModal(); 
+    } else {
+      toast.error(data.message);
+    }
+  };
+const isCancelledTab = filterType === "Cancelled";
+
   return (
     <section className="px-4 sm:px-6 md:px-16 py-12">
       <ToastContainer position="top-right" />
@@ -305,7 +394,7 @@ const Booking = () => {
         <button
           onClick={() => setFilterType("Cancelled")}
           className={`${
-            filterType === "Cancelled Booking"
+            filterType === "Cancelled"
               ? "text-purple-900 border-b-2 border-red-500"
               : "text-purple-950"
           }`}
@@ -313,6 +402,7 @@ const Booking = () => {
           Cancelled
         </button>
       </div>
+
       {/* BOOKING CARDS */}
       <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
         {filteredBookings.map((booking) => (
@@ -382,6 +472,39 @@ const Booking = () => {
                         </div>
                       );
                     })}
+
+                    {/* FOOD */}
+                    {booking.foodItems?.length > 0 && (
+                      <div className="text-xs sm:text-sm text-gray-400 mt-2">
+                        <p className="font-medium text-white">
+                          Food & Beverages
+                        </p>
+
+                        {booking.foodItems.map((food, index) => (
+                          <div key={index} className="flex justify-between">
+                            <span
+                              className={
+                                food.foodStatus === "Cancelled"
+                                  ? "line-through text-red-400"
+                                  : ""
+                              }
+                            >
+                              {food.name} × {food.quantity}
+                            </span>
+
+                            <span
+                              className={
+                                food.foodStatus === "Cancelled"
+                                  ? "line-through text-red-400"
+                                  : ""
+                              }
+                            >
+                              ₹{food.total}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
                 {/* PRICE */}
@@ -399,6 +522,17 @@ const Booking = () => {
                 >
                   Payment: {booking.paymentStatus}
                 </p>
+                <p
+                  className={`text-xs mt-1 ${
+                    booking.bookingStatus === "Cancelled"
+                      ? "text-red-500"
+                      : booking.bookingStatus === "Partially Cancelled"
+                        ? "text-yellow-400"
+                        : "text-green-400"
+                  }`}
+                >
+                  Booking Status: {booking.bookingStatus}
+                </p>
               </div>
             </div>
 
@@ -411,12 +545,14 @@ const Booking = () => {
               >
                 View Booking Info
               </button>
-              <button
-                onClick={() => openGoogleCalender(booking)}
-                className="border border-purple-600 px-3 sm:px-4 py-2 rounded text-sm hover:bg-purple-200 hover:text-black sm:mb-2"
-              >
-                Save Date Google Calender
-              </button>
+              {booking.bookingStatus !== "Cancelled" && (
+                <button
+                  onClick={() => openGoogleCalender(booking)}
+                  className="border border-purple-600 px-3 sm:px-4 py-2 rounded text-sm hover:bg-purple-200 hover:text-black sm:mb-2"
+                >
+                  Save Date Google Calender
+                </button>
+              )}
               {canRateBooking(booking) && (
                 <button
                   onClick={() => handleRateClick(booking)}
@@ -426,33 +562,34 @@ const Booking = () => {
                 </button>
               )}
               {/* Cancel booking  */}
-              {!canRateBooking(booking) && (
-                <div className="relative group w-full sm:w-auto">
-                  <button
-                    disabled={booking.type === "Show"}
-                    onClick={() => {
-                      if (booking.type === "Show") return; // extra safety
-                      setCancelBookingData(booking);
-                      setShowCancelModal(true);
-                    }}
-                    className={`w-full sm:w-auto border px-3 sm:px-4 py-2 rounded text-sm 
+              {!canRateBooking(booking) &&
+                booking.bookingStatus !== "Cancelled" && (
+                  <div className="relative group w-full sm:w-auto">
+                    <button
+                      disabled={booking.type === "Show"}
+                      onClick={() => {
+                        if (booking.type === "Show") return; // extra safety
+                        setCancelBookingData(booking);
+                        setShowCancelModal(true);
+                      }}
+                      className={`w-full sm:w-auto border px-3 sm:px-4 py-2 rounded text-sm 
                       ${
                         booking.type === "Show"
                           ? "border-gray-400 text-gray-400 cursor-not-allowed"
                           : "border-purple-600 hover:bg-purple-200 hover:text-black"
                       }`}
-                  >
-                    Cancel Booking
-                  </button>
+                    >
+                      Cancel Booking
+                    </button>
 
-                  {/* TOOLTIP */}
-                  <div className="absolute right-0 bottom-full mb-2 hidden group-hover:block bg-black text-white text-xs px-2 py-1 rounded whitespace-nowrap">
-                    {booking.type === "Show"
-                      ? "Cancellation not available for live show"
-                      : "Cancel Booking"}
+                    {/* TOOLTIP */}
+                    <div className="absolute right-0 bottom-full mb-2 hidden group-hover:block bg-black text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                      {booking.type === "Show"
+                        ? "Cancellation not available for live show"
+                        : "Cancel Booking"}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
             </div>
           </div>
         ))}
@@ -464,10 +601,7 @@ const Booking = () => {
           <div className="bg-white p-6 rounded-xl w-[90%] max-w-md relative">
             <button
               className="absolute top-4 right-4 text-gray-500 hover:text-red-500 text-xl"
-              onClick={() => {
-                setShowCancelModal(false);
-                setSelectedSeats([]);
-              }}
+              onClick={closeCancelModal}
             >
               ✖
             </button>
@@ -513,6 +647,46 @@ const Booking = () => {
                   className="w-full bg-yellow-500 text-white py-2 rounded mt-3"
                 >
                   Cancel Selected Seats
+                </button>
+              </>
+            )}
+
+            {/* FOOD CANCEL SECTION */}
+            {cancelBookingData.foodItems?.filter(
+              (f) => f.foodStatus === "Booked",
+            ).length > 0 && (
+              <>
+                <h3 className="font-medium mt-4 mb-2 text-black">
+                  Select food items to cancel
+                </h3>
+
+                {cancelBookingData.foodItems.map(
+                  (food, i) =>
+                    food.foodStatus === "Booked" && (
+                      <div
+                        key={i}
+                        className="flex justify-between items-center mb-2 text-black"
+                      >
+                        <div>
+                          <p>{food.name}</p>
+                          <p className="text-xs text-gray-500">
+                            ₹{food.price} × {food.quantity}
+                          </p>
+                        </div>
+
+                        <input
+                          type="checkbox"
+                          onChange={(e) => handleFoodSelect(e, food.foodId)}
+                        />
+                      </div>
+                    ),
+                )}
+
+                <button
+                  onClick={cancelSelectedFood}
+                  className="w-full bg-orange-500 text-white py-2 rounded mt-3"
+                >
+                  Cancel Selected Food
                 </button>
               </>
             )}
@@ -628,11 +802,23 @@ const Booking = () => {
                 <div className="space-y-2 text-sm">
                   {selectedBooking.foodItems.map((food, i) => (
                     <div key={i} className="flex justify-between">
-                      <span>
+                      <span
+                        className={
+                          food.foodStatus === "Cancelled"
+                            ? "line-through text-red-400"
+                            : ""
+                        }
+                      >
                         {food.name} × {food.quantity}
                       </span>
 
-                      <span className="font-medium">
+                      <span
+                        className={
+                          food.foodStatus === "Cancelled"
+                            ? "line-through text-red-400"
+                            : ""
+                        }
+                      >
                         ₹{food.price * food.quantity}
                       </span>
                     </div>
@@ -671,20 +857,45 @@ const Booking = () => {
                   ₹{selectedBooking.totalAmount?.toFixed(2)}
                 </span>
               </div>
+
+              {/* REFUND DETAILS */}
+              {selectedBooking.refundAmount > 0 && (
+                <div className="p-5 border-b text-sm space-y-2">
+                  <h3 className="font-semibold text-gray-800 mb-2">
+                    💰 Refund Details
+                  </h3>
+
+                  <div className="flex justify-between">
+                    <span>Refund Amount</span>
+                    <span className="text-red-500 font-semibold">
+                      ₹{selectedBooking.refundAmount.toFixed(2)}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between">
+                    <span>Refund Status</span>
+                    <span
+                      className={`font-medium ${
+                        selectedBooking.refundStatus === "Fully Refunded"
+                          ? "text-green-600"
+                          : selectedBooking.refundStatus ===
+                              "Partially Refunded"
+                            ? "text-yellow-500"
+                            : "text-gray-500"
+                      }`}
+                    >
+                      {selectedBooking.refundStatus}
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* QR CODE */}
+            {selectedBooking.bookingStatus !== "Cancelled" && (
+
             <div className="flex flex-col items-center p-6">
               <QRCode
-                // value={JSON.stringify({
-                //   bookingId: selectedBooking._id,
-                //   type: selectedBooking.type,
-                //   title:
-                //     selectedBooking.type === "Movie"
-                //       ? selectedBooking.movieTitle
-                //       : selectedBooking.details?.showTitle,
-                //   paymentId: selectedBooking.paymentId,
-                // })}
                 value={`${window.location.origin}/verify-booking/${selectedBooking._id}`}
                 size={160}
               />
@@ -693,6 +904,7 @@ const Booking = () => {
                 Scan this code at the entry
               </p>
             </div>
+            )}
           </div>
         </div>
       )}

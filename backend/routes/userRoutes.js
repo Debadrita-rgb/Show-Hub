@@ -22,6 +22,8 @@ const LocationWiseMovie = require("../models/LocationWIseMovieSelection");
 const Theater = require("../models/Theater");
 const Show = require("../models/Show");
 const SeatLock = require("../models/SeatLock");
+const RefundPayment = require("../models/RefundPayment");
+
 const razorpay = require("../api/razorpay");
 const formatDate = require("../utils/dateHelper");
 
@@ -1010,10 +1012,10 @@ router.get("/get-booked-seats", async (req, res) => {
   const { movieId, theaterId, showDate, showTime } = req.query;
 
   const dateStr = new Date(showDate).toISOString().split("T")[0];
-await SeatLock.updateMany(
-  { expiresAt: { $lt: new Date() }, lockStatus: "Active" },
-  { $set: { lockStatus: "InActive" } },
-);
+  await SeatLock.updateMany(
+    { expiresAt: { $lt: new Date() }, lockStatus: "Active" },
+    { $set: { lockStatus: "InActive" } },
+  );
 
   const bookings = await Booking.find({
     movieId,
@@ -1139,21 +1141,21 @@ router.post("/release-lock", async (req, res) => {
   }
 });
 
-  router.get(`/get-single-lockedseat/:lockId`, async (req, res) => {
-    try {
-      const { lockId } = req.params;
-      const item = await SeatLock.findById(lockId);
+router.get(`/get-single-lockedseat/:lockId`, async (req, res) => {
+  try {
+    const { lockId } = req.params;
+    const item = await SeatLock.findById(lockId);
 
-      if (!item) {
-        return res.status(404).json({ error: `${path} not found` });
-      }
-
-      res.status(200).json(item);
-    } catch (error) {
-      console.error("GET single error:", error);
-      res.status(500).json({ error: "Failed to fetch item" });
+    if (!item) {
+      return res.status(404).json({ error: `${path} not found` });
     }
-  });
+
+    res.status(200).json(item);
+  } catch (error) {
+    console.error("GET single error:", error);
+    res.status(500).json({ error: "Failed to fetch item" });
+  }
+});
 
 router.post("/confirm-booking", jwtAuthMiddleware, async (req, res) => {
   try {
@@ -1168,10 +1170,10 @@ router.post("/confirm-booking", jwtAuthMiddleware, async (req, res) => {
     }
 
     if (lock.expiresAt < new Date()) {
-        await SeatLock.updateOne(
-          { _id: lockId },
-          { $set: { lockStatus: "InActive" } },
-        );
+      await SeatLock.updateOne(
+        { _id: lockId },
+        { $set: { lockStatus: "InActive" } },
+      );
 
       return res.status(400).json({
         message: "Payment Session expired. Please reselect seats.",
@@ -1190,15 +1192,15 @@ router.post("/confirm-booking", jwtAuthMiddleware, async (req, res) => {
 
     await booking.save();
 
-await SeatLock.updateOne(
-  { _id: lockId },
-  {
-    $set: {
-      lockStatus: "InActive",
-      usedForBooking: true,
-    },
-  },
-);
+    await SeatLock.updateOne(
+      { _id: lockId },
+      {
+        $set: {
+          lockStatus: "InActive",
+          usedForBooking: true,
+        },
+      },
+    );
     const user = await User.findById(req.user.id);
     const theater = await Theater.findById(booking.theaterId);
     const movie = await Movie.findById(booking.movieId);
@@ -1221,6 +1223,31 @@ await SeatLock.updateOne(
   }
 });
 
+const formatDateTime = (showDate, showTime) => {
+  const datePart = new Date(showDate);
+
+  // merge date + time
+  const fullDateTime = new Date(
+    `${datePart.toISOString().split("T")[0]}T${showTime}`,
+  );
+
+  // Format Date (24th April, 2026)
+  const formattedDate = fullDateTime.toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+
+  // Format Time (12-hour IST)
+  const formattedTime = fullDateTime.toLocaleTimeString("en-IN", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+
+  return { formattedDate, formattedTime };
+};
+
 //Full Booking Cancel
 router.post("/cancel-booking", jwtAuthMiddleware, async (req, res) => {
   try {
@@ -1232,40 +1259,86 @@ router.post("/cancel-booking", jwtAuthMiddleware, async (req, res) => {
       return res.status(404).json({ message: "Booking not found" });
     }
 
-    booking.seats = booking.seats.map((seat) => ({
-      ...seat.toObject(),
-      status: "Cancelled",
-    }));
+    let remainingRefund = 0;
+    let refundedSeats = [];
+
+    booking.seats = booking.seats.map((seat) => {
+      if (seat.status === "Booked") {
+        remainingRefund += seat.price;
+
+        refundedSeats.push({
+          seatId: seat.seatId,
+          category: seat.category,
+          price: seat.price,
+        });
+
+        return { ...seat.toObject(), status: "Cancelled" };
+      }
+      return seat;
+    });
 
     booking.bookingStatus = "Cancelled";
 
-    const refundAmount = booking.totalAmount - booking.convenienceFee;
+    booking.refundAmount = (booking.refundAmount || 0) + remainingRefund;
 
-    booking.refundAmount = refundAmount;
-    booking.refundStatus = "Completed";
+    booking.refundStatus = "Fully Refunded";
 
     await booking.save();
 
-    await razorpay.payments.refund(booking.paymentId, {
-      amount: refundAmount * 100,
-    });
+    let refundDoc = null;
+
+    if (remainingRefund > 0) {
+      //  create refund record
+      refundDoc = await RefundPayment.create({
+        userId: booking.userId,
+        bookingId: booking._id,
+        movieId: booking.movieId,
+        paymentId: booking.paymentId,
+        seats: refundedSeats,
+        refundAmount: remainingRefund,
+        refundType: "Full",
+      });
+
+      try {
+        await razorpay.payments.refund(booking.paymentId, {
+          amount: remainingRefund * 100,
+        });
+
+        refundDoc.refundStatus = "Success";
+      } catch (err) {
+        refundDoc.refundStatus = "Failed";
+        console.error("Refund error:", err);
+      }
+
+      await refundDoc.save();
+    }
 
     const user = await User.findById(booking.userId);
+
+    const { formattedDate, formattedTime } = formatDateTime(
+      booking.showDate,
+      booking.showTime,
+    );
 
     setImmediate(() => {
       sendCancelEmail({
         user,
         booking,
-        refundAmount,
-        cancelType: "FULL",
+        refundAmount: remainingRefund,
+        cancelType: "Full",
+        showDate: formattedDate,
+        showTime: formattedTime,
       });
     });
 
     res.json({
       message: "Full booking cancelled",
-      refundAmount,
+      refundAmount: remainingRefund,
+      totalRefund: booking.refundAmount,
+      refundStatus: booking.refundStatus,
     });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Error cancelling booking" });
   }
 });
@@ -1281,46 +1354,157 @@ router.post("/cancel-seats", jwtAuthMiddleware, async (req, res) => {
       return res.status(404).json({ message: "Booking not found" });
     }
 
-    let refundAmount = 0;
+    let currentRefund = 0;
+    let refundedSeats = [];
 
     booking.seats = booking.seats.map((seat) => {
       if (seatIds.includes(seat.seatId) && seat.status !== "Cancelled") {
-        refundAmount += seat.price;
+        currentRefund += seat.price;
+        refundedSeats.push({
+          seatId: seat.seatId,
+          category: seat.category,
+          price: seat.price,
+        });
+
         return { ...seat.toObject(), status: "Cancelled" };
       }
       return seat;
     });
+
+    if (currentRefund === 0) {
+      return res.status(400).json({ message: "No valid seats to cancel" });
+    }
 
     const activeSeats = booking.seats.filter((s) => s.status === "Booked");
 
     booking.bookingStatus =
       activeSeats.length === 0 ? "Cancelled" : "Partially Cancelled";
 
-    booking.refundAmount = (booking.refundAmount || 0) + refundAmount;
-    booking.refundStatus = "Completed";
+    booking.refundAmount = (booking.refundAmount || 0) + currentRefund;
+
+    booking.refundStatus =
+      activeSeats.length === 0 ? "Fully Refunded" : "Partially Refunded";
 
     await booking.save();
 
-    await razorpay.payments.refund(booking.paymentId, {
-      amount: refundAmount * 100,
+    //  Create refund record
+    const refundDoc = await RefundPayment.create({
+      userId: booking.userId,
+      bookingId: booking._id,
+      movieId: booking.movieId,
+      paymentId: booking.paymentId,
+      seats: refundedSeats,
+      refundAmount: currentRefund,
+      refundType: "Partial",
     });
 
-const user = await User.findById(booking.userId);
+    //  Razorpay
+    try {
+      await razorpay.payments.refund(booking.paymentId, {
+        amount: currentRefund * 100,
+      });
+      refundDoc.refundStatus = "Success";
+    } catch (err) {
+      refundDoc.refundStatus = "Failed";
+      console.error("Refund error:", err);
+    }
 
-await sendCancelEmail({
-  user,
-  booking,
-  refundAmount,
-  cancelType: "PARTIAL",
-  seatIds,
-});
+    await refundDoc.save();
+
+    const user = await User.findById(booking.userId);
+
+    const { formattedDate, formattedTime } = formatDateTime(
+      booking.showDate,
+      booking.showTime,
+    );
+
+    await sendCancelEmail({
+      user,
+      booking,
+      refundAmount: currentRefund,
+      cancelType: "Partial",
+      seatIds,
+      showDate: formattedDate,
+      showTime: formattedTime,
+    });
 
     res.json({
       message: "Seats cancelled",
+      refundAmount: currentRefund,
+      totalRefund: booking.refundAmount,
+      refundStatus: booking.refundStatus,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error cancelling seats" });
+  }
+});
+
+//Food Cancel
+router.post("/cancel-food", jwtAuthMiddleware, async (req, res) => {
+  try {
+    const { bookingId, foodIds } = req.body;
+
+    const booking = await Booking.findById(bookingId);
+
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    let refundAmount = 0;
+    let refundedFoods = [];
+
+    //  update food + calculate refund
+    booking.foodItems = booking.foodItems.map((food) => {
+      if (foodIds.includes(food.foodId) && food.foodStatus === "Booked") {
+        refundAmount += food.total;
+
+        refundedFoods.push({
+          foodId: food.foodId,
+          name: food.name,
+          quantity: food.quantity,
+          price: food.price,
+          total: food.total,
+        });
+
+        return { ...food.toObject(), foodStatus: "Cancelled" };
+      }
+      return food;
+    });
+
+    if (refundAmount === 0) {
+      return res.status(400).json({ message: "No valid food selected" });
+    }
+
+    //  Update booking refund fields
+    booking.refundAmount += refundAmount;
+    booking.foodRefundAmount = (booking.foodRefundAmount || 0) + refundAmount;
+
+    booking.refundStatus =
+      booking.refundAmount >= booking.totalAmount
+        ? "Fully Refunded"
+        : "Partially Refunded";
+
+    await booking.save();
+
+    //  Save refund history
+    await RefundPayment.create({
+      userId: booking.userId,
+      bookingId: booking._id,
+      movieId: booking.movieId,
+      paymentId: booking.paymentId,
+      foodItems: refundedFoods,
+      refundAmount,
+      refundType: "Food",
+    });
+
+    res.json({
+      message: "Food cancelled & refund processed ",
       refundAmount,
     });
   } catch (err) {
-    res.status(500).json({ message: "Error cancelling seats" });
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
   }
 });
 
@@ -1385,11 +1569,20 @@ router.post("/verify-ticket", async (req, res) => {
       return res.json({ valid: false });
     }
 
+    const activeSeats = booking.seats.filter(
+      (seat) => seat.status === "Booked",
+    );
+
+    if (activeSeats.length === 0) {
+      return res.json({ valid: false, message: "All seats cancelled" });
+    }
+
     res.json({
       valid: true,
       movie: booking.movieTitle,
-      seats: booking.seats,
+      seats: activeSeats,
       showTime: booking.showTime,
+      showDate: booking.showDate,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
