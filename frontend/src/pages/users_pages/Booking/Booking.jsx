@@ -439,44 +439,47 @@ const isCancelledTab = filterType === "Cancelled";
 
                 {/* SEATS */}
                 {booking.type === "Movie" && (
-                  <div className="text-xs sm:text-sm text-gray-400 mt-2">
-                    <p className="font-medium text-white">Seats</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 sm:gap-x-10 mt-2 border-t pt-2 text-xs sm:text-sm text-gray-400">
+                    {/* SEATS SECTION */}
+                    <div>
+                      <p className="font-medium text-white mb-1">Seats</p>
 
-                    {booking?.seats?.map((seat, index) => {
-                      const seatLabel = seat?.seatId
-                        ?.split("-")
-                        .slice(1)
-                        .join("");
+                      {booking?.seats?.map((seat, index) => {
+                        const seatLabel = seat?.seatId
+                          ?.split("-")
+                          .slice(1)
+                          .join("");
 
-                      return (
-                        <div key={index} className="flex justify-between">
-                          <span
-                            className={
-                              seat.status === "Cancelled"
-                                ? "line-through text-red-400"
-                                : ""
-                            }
-                          >
-                            {seat.category}
-                          </span>
+                        return (
+                          <div key={index} className="flex justify-between">
+                            <span
+                              className={
+                                seat.status === "Cancelled"
+                                  ? "line-through text-red-400"
+                                  : ""
+                              }
+                            >
+                              {seat.category}
+                            </span>
 
-                          <span
-                            className={
-                              seat.status === "Cancelled"
-                                ? "line-through text-red-400"
-                                : ""
-                            }
-                          >
-                            {seatLabel}
-                          </span>
-                        </div>
-                      );
-                    })}
+                            <span
+                              className={
+                                seat.status === "Cancelled"
+                                  ? "line-through text-red-400"
+                                  : ""
+                              }
+                            >
+                              {seatLabel}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
 
-                    {/* FOOD */}
+                    {/* FOOD SECTION */}
                     {booking.foodItems?.length > 0 && (
-                      <div className="text-xs sm:text-sm text-gray-400 mt-2">
-                        <p className="font-medium text-white">
+                      <div>
+                        <p className="font-medium text-white mb-1">
                           Food & Beverages
                         </p>
 
@@ -893,17 +896,16 @@ const isCancelledTab = filterType === "Cancelled";
 
             {/* QR CODE */}
             {selectedBooking.bookingStatus !== "Cancelled" && (
+              <div className="flex flex-col items-center p-6">
+                <QRCode
+                  value={`${window.location.origin}/verify-booking/${selectedBooking._id}`}
+                  size={160}
+                />
 
-            <div className="flex flex-col items-center p-6">
-              <QRCode
-                value={`${window.location.origin}/verify-booking/${selectedBooking._id}`}
-                size={160}
-              />
-
-              <p className="text-xs text-gray-500 mt-3">
-                Scan this code at the entry
-              </p>
-            </div>
+                <p className="text-xs text-gray-500 mt-3">
+                  Scan this code at the entry
+                </p>
+              </div>
             )}
           </div>
         </div>
