@@ -1236,6 +1236,7 @@ router.post("/cancel-booking", jwtAuthMiddleware, async (req, res) => {
 
     let remainingRefund = 0;
     let refundedSeats = [];
+    let refundedFood = [];
 
     booking.seats = booking.seats.map((seat) => {
       if (seat.status === "Booked") {
@@ -1251,6 +1252,24 @@ router.post("/cancel-booking", jwtAuthMiddleware, async (req, res) => {
       }
       return seat;
     });
+
+    if (booking.foodItems && booking.foodItems.length > 0) {
+      booking.foodItems = booking.foodItems.map((food) => {
+        if (food.foodStatus === "Booked") {
+          // OPTIONAL: if you want refund for food
+          remainingRefund += food.price * food.quantity;
+
+          refundedFood.push({
+            name: food.name,
+            quantity: food.quantity,
+            price: food.price,
+          });
+
+          return { ...food.toObject(), foodStatus: "Cancelled" };
+        }
+        return food;
+      });
+    }
 
     booking.bookingStatus = "Cancelled";
 
@@ -1296,7 +1315,7 @@ router.post("/cancel-booking", jwtAuthMiddleware, async (req, res) => {
         booking,
         refundAmount: remainingRefund,
         cancelType: "Full",
-        showDate: booking.showTime,
+        showDate: booking.showDate,
         showTime: booking.showTime,
       });
     });
@@ -1308,9 +1327,16 @@ router.post("/cancel-booking", jwtAuthMiddleware, async (req, res) => {
       refundStatus: booking.refundStatus,
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Error cancelling booking" });
+    console.error("CANCEL ERROR:", err);
+    res.status(500).json({
+      message: "Error cancelling booking",
+      error: err.message,
+    });
   }
+  // catch (err) {
+  //   console.error(err);
+  //   res.status(500).json({ message: "Error cancelling booking" });
+  // }
 });
 
 // Partial Seat Cancel
@@ -1394,7 +1420,7 @@ router.post("/cancel-seats", jwtAuthMiddleware, async (req, res) => {
       refundAmount: currentRefund,
       cancelType: "Partial",
       seatIds,
-      showDate: booking.showTime,
+      showDate: booking.showDatee,
       showTime: booking.showTime,
     });
 
@@ -1405,9 +1431,16 @@ router.post("/cancel-seats", jwtAuthMiddleware, async (req, res) => {
       refundStatus: booking.refundStatus,
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Error cancelling seats" });
+    console.error("CANCEL ERROR:", err);
+    res.status(500).json({
+      message: "Error cancelling booking",
+      error: err.message,
+    });
   }
+  // catch (err) {
+  //   console.error(err);
+  //   res.status(500).json({ message: "Error cancelling seats" });
+  // }
 });
 
 //Food Cancel
