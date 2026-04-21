@@ -30,8 +30,8 @@ const sendCancelEmail = async ({
       cancelType,
       refundAmount,
       seats: seatIds.length ? seatIds.join(", ") : null,
-      showDate: booking.showDate,
-      showTime: booking.showTime,
+      // showDate: booking.showDate,
+      // showTime: booking.showTime,
     });
 
     const msg = {
