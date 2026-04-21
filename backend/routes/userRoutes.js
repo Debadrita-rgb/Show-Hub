@@ -1298,7 +1298,7 @@ router.post("/cancel-booking", jwtAuthMiddleware, async (req, res) => {
           amount: remainingRefund * 100,
         });
 
-        refundDoc.refundStatus = "Success";
+        refundDoc.refundStatus = "Completed";
       } catch (err) {
         refundDoc.refundStatus = "Failed";
         console.error("Refund error:", err);
@@ -1397,7 +1397,7 @@ router.post("/cancel-seats", jwtAuthMiddleware, async (req, res) => {
       await razorpay.payments.refund(booking.paymentId, {
         amount: currentRefund * 100,
       });
-      refundDoc.refundStatus = "Success";
+      refundDoc.refundStatus = "Completed";
     } catch (err) {
       refundDoc.refundStatus = "Failed";
       console.error("Refund error:", err);
