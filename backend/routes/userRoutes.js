@@ -1315,8 +1315,6 @@ router.post("/cancel-booking", jwtAuthMiddleware, async (req, res) => {
         booking,
         refundAmount: remainingRefund,
         cancelType: "Full",
-        showDate: booking.showDate,
-        showTime: booking.showTime,
       });
     });
 
@@ -1420,8 +1418,6 @@ router.post("/cancel-seats", jwtAuthMiddleware, async (req, res) => {
       refundAmount: currentRefund,
       cancelType: "Partial",
       seatIds,
-      showDate: booking.showDatee,
-      showTime: booking.showTime,
     });
 
     res.json({
