@@ -478,7 +478,7 @@ const isCancelledTab = filterType === "Cancelled";
 
                     {/* FOOD SECTION */}
                     {booking.foodItems?.length > 0 && (
-                      <div>
+                      <div className="sm:pl-6">
                         <p className="font-medium text-white mb-1">
                           Food & Beverages
                         </p>

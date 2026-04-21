@@ -1223,31 +1223,6 @@ router.post("/confirm-booking", jwtAuthMiddleware, async (req, res) => {
   }
 });
 
-const formatDateTime = (showDate, showTime) => {
-  const datePart = new Date(showDate);
-
-  // merge date + time
-  const fullDateTime = new Date(
-    `${datePart.toISOString().split("T")[0]}T${showTime}`,
-  );
-
-  // Format Date (24th April, 2026)
-  const formattedDate = fullDateTime.toLocaleDateString("en-IN", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-
-  // Format Time (12-hour IST)
-  const formattedTime = fullDateTime.toLocaleTimeString("en-IN", {
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  });
-
-  return { formattedDate, formattedTime };
-};
-
 //Full Booking Cancel
 router.post("/cancel-booking", jwtAuthMiddleware, async (req, res) => {
   try {
@@ -1315,19 +1290,14 @@ router.post("/cancel-booking", jwtAuthMiddleware, async (req, res) => {
 
     const user = await User.findById(booking.userId);
 
-    const { formattedDate, formattedTime } = formatDateTime(
-      booking.showDate,
-      booking.showTime,
-    );
-
     setImmediate(() => {
       sendCancelEmail({
         user,
         booking,
         refundAmount: remainingRefund,
         cancelType: "Full",
-        showDate: formattedDate,
-        showTime: formattedTime,
+        showDate: booking.showTime,
+        showTime: booking.showTime,
       });
     });
 
@@ -1413,10 +1383,10 @@ router.post("/cancel-seats", jwtAuthMiddleware, async (req, res) => {
 
     const user = await User.findById(booking.userId);
 
-    const { formattedDate, formattedTime } = formatDateTime(
-      booking.showDate,
-      booking.showTime,
-    );
+    // const { formattedDate, formattedTime } = formatDateTime(
+    //   booking.showDate,
+    //   booking.showTime,
+    // );
 
     await sendCancelEmail({
       user,
@@ -1424,8 +1394,8 @@ router.post("/cancel-seats", jwtAuthMiddleware, async (req, res) => {
       refundAmount: currentRefund,
       cancelType: "Partial",
       seatIds,
-      showDate: formattedDate,
-      showTime: formattedTime,
+      showDate: booking.showTime,
+      showTime: booking.showTime,
     });
 
     res.json({
