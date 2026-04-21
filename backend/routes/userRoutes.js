@@ -1297,7 +1297,7 @@ router.post("/cancel-seats", jwtAuthMiddleware, async (req, res) => {
       activeSeats.length === 0 ? "Cancelled" : "Partially Cancelled";
 
     booking.refundAmount = (booking.refundAmount || 0) + refundAmount;
-    booking.refundStatus = "Initiated";
+    booking.refundStatus = "Completed";
 
     await booking.save();
 

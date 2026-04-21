@@ -1,13 +1,29 @@
 <div style="font-family: Arial, sans-serif; background:#f2f2f2; padding:20px;">
-  <div style="max-width:700px; margin:auto; background:#ffffff; border-radius:10px; overflow:hidden;">
+  <div
+    style="max-width:700px; margin:auto; background:#ffffff; border-radius:10px; overflow:hidden;"
+  >
 
     <!-- HEADER -->
-    <div style="background: linear-gradient(135deg, #000000, #4c1d95); color:white; padding:20px;">
-      
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <img src="https://show-hub-frontend.onrender.com/assets/logo-CWqOHdnZ.png" width="90"/>
+    <div
+      style="background: linear-gradient(135deg, #000000, #4c1d95); color:white; padding:20px;"
+    >
+
+      <div
+        style="display:flex; justify-content:space-between; align-items:center;"
+      >
+        <span style="display:inline-block;">
+          <img
+            src="https://show-hub-frontend.onrender.com/assets/logo-CWqOHdnZ.png"
+            width="90"
+            alt="ShowHub"
+            style="display:block; font-size:18px; font-weight:bold; color:#000;"
+          />
+        </span>
+
+        <!-- Booking ID -->
         <span style="font-size:13px;">
-          BOOKING ID: <b>{{bookingId}}</b>
+          BOOKING ID:
+          <b>{{bookingId}}</b>
         </span>
       </div>
 
@@ -23,7 +39,7 @@
         <div>
           <h3 style="margin:0;">{{movieTitle}}</h3>
           <p style="color:#666; margin:5px 0;">
-            {{theaterName}}<br/>{{location}}
+            {{theaterName}}<br />{{location}}
           </p>
 
           <p><b>Date:</b> {{date}} | {{time}}</p>
@@ -48,46 +64,50 @@
 
     <!-- BUTTON -->
     <div style="padding:20px; text-align:center;">
-      <a href="https://show-hub-frontend.onrender.com/verify-booking/{{bookingId}}"
-        style="display:inline-block; background:#e74c3c; color:white; padding:12px 25px; text-decoration:none; border-radius:6px;">
+      <a
+        href="https://show-hub-frontend.onrender.com/verify-booking/{{bookingId}}"
+        style="display:inline-block; background:#e74c3c; color:white; padding:12px 25px; text-decoration:none; border-radius:6px;"
+      >
         View Ticket
       </a>
     </div>
 
     <!-- PAYMENT -->
     <div style="padding:20px; border-top:1px solid #eee;">
-      
+
       <p style="color:#777;">
-        Ticket Price 
+        Ticket Price
         <span style="float:right;">₹{{ticketPrice}}</span>
       </p>
 
       {{#if foodTotal}}
-      <p style="color:#777;">
-        Food Total 
-        <span style="float:right;">₹{{foodTotal}}</span>
-      </p>
+        <p style="color:#777;">
+          Food Total
+          <span style="float:right;">₹{{foodTotal}}</span>
+        </p>
       {{/if}}
 
       <p style="color:#777;">
-        Convenience Fee 
+        Convenience Fee
         <span style="float:right;">₹{{convenienceFee}}</span>
       </p>
 
       <h3>
-        Total Paid 
+        Total Paid
         <span style="float:right;">₹{{totalAmount}}</span>
       </h3>
 
       <p style="color:#777;">
-        Paid using 
+        Paid using
         <span style="float:right;">Online</span>
       </p>
 
     </div>
 
     <!-- INFO -->
-    <div style="margin:20px; padding:15px; background:#fff3cd; border-left:4px solid #f1c40f; border-radius:5px;">
+    <div
+      style="margin:20px; padding:15px; background:#fff3cd; border-left:4px solid #f1c40f; border-radius:5px;"
+    >
       <strong>Contactless & Fast-track Entry with M-ticket</strong>
       <p style="margin:5px 0;">
         Safe and contactless entry through M-Ticket scanning!
@@ -106,8 +126,10 @@
 
     <!-- FOOTER -->
     <div style="padding:20px; text-align:center; border-top:1px solid #eee;">
-      <a href="https://show-hub-frontend.onrender.com/contact"
-        style="color:#e74c3c; border:1px solid #e74c3c; padding:10px 15px; border-radius:5px; text-decoration:none;">
+      <a
+        href="https://show-hub-frontend.onrender.com/contact"
+        style="color:#e74c3c; border:1px solid #e74c3c; padding:10px 15px; border-radius:5px; text-decoration:none;"
+      >
         Need help? Contact Support
       </a>
     </div>

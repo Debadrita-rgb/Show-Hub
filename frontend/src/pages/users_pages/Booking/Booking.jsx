@@ -207,6 +207,7 @@ const Booking = () => {
 
     if (res.ok) {
       toast.success("Booking cancelled ✅");
+      setShowCancelModal(false);
 
       // refresh bookings
       setBookings((prev) =>
@@ -255,6 +256,8 @@ const Booking = () => {
       // refresh UI
       setSelectedBooking(null);
       setSelectedSeats([]);
+      setShowCancelModal(false);
+
     } else {
       toast.error(data.message);
     }
