@@ -1308,11 +1308,13 @@ router.post("/cancel-booking", jwtAuthMiddleware, async (req, res) => {
     }
 
     const user = await User.findById(booking.userId);
+    const theater = await Theater.findById(booking.theaterId);
 
     setImmediate(() => {
       sendCancelEmail({
         user,
         booking,
+        theater,
         refundAmount: remainingRefund,
         cancelType: "Full",
       });
@@ -1406,6 +1408,7 @@ router.post("/cancel-seats", jwtAuthMiddleware, async (req, res) => {
     await refundDoc.save();
 
     const user = await User.findById(booking.userId);
+    const theater = await Theater.findById(booking.theaterId);
 
     // const { formattedDate, formattedTime } = formatDateTime(
     //   booking.showDate,
@@ -1415,9 +1418,11 @@ router.post("/cancel-seats", jwtAuthMiddleware, async (req, res) => {
     await sendCancelEmail({
       user,
       booking,
+      theater,
       refundAmount: currentRefund,
       cancelType: "Partial",
       seatIds,
+
     });
 
     res.json({
@@ -1443,6 +1448,7 @@ router.post("/cancel-seats", jwtAuthMiddleware, async (req, res) => {
 router.post("/cancel-food", jwtAuthMiddleware, async (req, res) => {
   try {
     const { bookingId, foodIds } = req.body;
+    // foods = { foodId: qtyToCancel }
 
     const booking = await Booking.findById(bookingId);
 
@@ -1453,29 +1459,60 @@ router.post("/cancel-food", jwtAuthMiddleware, async (req, res) => {
     let refundAmount = 0;
     let refundedFoods = [];
 
-    //  update food + calculate refund
     booking.foodItems = booking.foodItems.map((food) => {
-      if (foodIds.includes(food.foodId) && food.foodStatus === "Booked") {
-        refundAmount += food.total;
+      const cancelQty = foodIds?.[food.foodId]; //  safe access
+
+if (
+  cancelQty &&
+  (food.foodStatus === "Booked" ||
+    food.foodStatus === "Partially Cancelled")
+)
+{        const validCancelQty = Math.min(
+          cancelQty,
+          food.quantity - (food.cancelledQty || 0),
+        );
+
+        if (validCancelQty <= 0) return food;
+
+        const cancelAmount = validCancelQty * food.price;
+        refundAmount += cancelAmount;
 
         refundedFoods.push({
           foodId: food.foodId,
           name: food.name,
-          quantity: food.quantity,
+          cancelledQty: validCancelQty,
           price: food.price,
-          total: food.total,
+          total: cancelAmount,
         });
 
-        return { ...food.toObject(), foodStatus: "Cancelled" };
+        const newCancelledQty = (food.cancelledQty || 0) + validCancelQty;
+        const remainingQty = food.quantity - newCancelledQty;
+
+        return {
+          ...food.toObject(),
+
+          //  KEEP ORIGINAL
+          quantity: food.quantity,
+          total: food.total,
+
+          //  NEW TRACKING FIELDS
+          cancelledQty: newCancelledQty,
+          remainingQty: remainingQty,
+          cancelledTotal: (food.cancelledTotal || 0) + cancelAmount,
+
+          //  STATUS
+          foodStatus: remainingQty === 0 ? "Cancelled" : "Partially Cancelled",
+        };
       }
+
       return food;
     });
+
 
     if (refundAmount === 0) {
       return res.status(400).json({ message: "No valid food selected" });
     }
 
-    //  Update booking refund fields
     booking.refundAmount += refundAmount;
     booking.foodRefundAmount = (booking.foodRefundAmount || 0) + refundAmount;
 
@@ -1486,7 +1523,6 @@ router.post("/cancel-food", jwtAuthMiddleware, async (req, res) => {
 
     await booking.save();
 
-    //  Save refund history
     await RefundPayment.create({
       userId: booking.userId,
       bookingId: booking._id,
@@ -1497,13 +1533,27 @@ router.post("/cancel-food", jwtAuthMiddleware, async (req, res) => {
       refundType: "Food",
     });
 
+    const user = await User.findById(booking.userId);
+    const theater = await Theater.findById(booking.theaterId);
+
+    setImmediate(() => {
+      sendCancelEmail({
+        user,
+        booking,
+        theater,
+        refundAmount,
+        cancelType: "Food",
+        foodItems: refundedFoods,
+      });
+    });
+
     res.json({
-      message: "Food cancelled & refund processed ",
+      message: "Food partially cancelled & refund processed",
       refundAmount,
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: err.message });
   }
 });
 

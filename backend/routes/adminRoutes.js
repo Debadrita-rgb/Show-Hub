@@ -133,7 +133,14 @@ router.get("/dashboard-revenue", jwtAuthMiddleware, async (req, res) => {
           month: { $month: "$createdAt" },
           year: { $year: "$createdAt" },
         },
-        totalRevenue: { $sum: "$totalAmount" },
+        totalRevenue: {
+          $sum: {
+            $subtract: [
+              { $ifNull: ["$totalAmount", 0] },
+              { $ifNull: ["$refundAmount", 0] },
+            ],
+          },
+        },
       };
     }
 
@@ -157,7 +164,14 @@ router.get("/dashboard-revenue", jwtAuthMiddleware, async (req, res) => {
           month: { $month: "$createdAt" },
           year: { $year: "$createdAt" },
         },
-        totalRevenue: { $sum: "$totalAmount" },
+        totalRevenue: {
+          $sum: {
+            $subtract: [
+              { $ifNull: ["$totalAmount", 0] },
+              { $ifNull: ["$refundAmount", 0] },
+            ],
+          },
+        },
       };
     }
 
@@ -181,7 +195,14 @@ router.get("/dashboard-revenue", jwtAuthMiddleware, async (req, res) => {
           month: { $month: "$createdAt" },
           year: { $year: "$createdAt" },
         },
-        totalRevenue: { $sum: "$totalAmount" },
+        totalRevenue: {
+          $sum: {
+            $subtract: [
+              { $ifNull: ["$totalAmount", 0] },
+              { $ifNull: ["$refundAmount", 0] },
+            ],
+          },
+        },
       };
     }
 
@@ -200,7 +221,14 @@ router.get("/dashboard-revenue", jwtAuthMiddleware, async (req, res) => {
             month: { $month: "$createdAt" },
             year: { $year: "$createdAt" },
           },
-          totalRevenue: { $sum: "$totalAmount" },
+          totalRevenue: {
+            $sum: {
+              $subtract: [
+                { $ifNull: ["$totalAmount", 0] },
+                { $ifNull: ["$refundAmount", 0] },
+              ],
+            },
+          },
         };
       }
 
@@ -234,7 +262,14 @@ router.get("/dashboard-revenue", jwtAuthMiddleware, async (req, res) => {
               ],
             },
           },
-          totalRevenue: { $sum: "$totalAmount" },
+          totalRevenue: {
+            $sum: {
+              $subtract: [
+                { $ifNull: ["$totalAmount", 0] },
+                { $ifNull: ["$refundAmount", 0] },
+              ],
+            },
+          },
         };
       }
 
@@ -244,7 +279,14 @@ router.get("/dashboard-revenue", jwtAuthMiddleware, async (req, res) => {
             month: { $month: "$createdAt" },
             year: { $year: "$createdAt" },
           },
-          totalRevenue: { $sum: "$totalAmount" },
+          totalRevenue: {
+            $sum: {
+              $subtract: [
+                { $ifNull: ["$totalAmount", 0] },
+                { $ifNull: ["$refundAmount", 0] },
+              ],
+            },
+          },
         };
       }
     }
@@ -261,7 +303,14 @@ router.get("/dashboard-revenue", jwtAuthMiddleware, async (req, res) => {
           day: { $dayOfMonth: "$createdAt" },
           month: { $month: "$createdAt" },
         },
-        totalRevenue: { $sum: "$totalAmount" },
+        totalRevenue: {
+          $sum: {
+            $subtract: [
+              { $ifNull: ["$totalAmount", 0] },
+              { $ifNull: ["$refundAmount", 0] },
+            ],
+          },
+        },
       };
     }
 

@@ -83,7 +83,7 @@ const foodHTML =
     seatsCount: booking.seats?.length || 1,
     movieImage: movie.movieimage,
     seatsHTML,
-    foodHTML,
+    foodHTML, 
     foodTotal,
   });
 

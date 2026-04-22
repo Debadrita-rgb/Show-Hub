@@ -171,7 +171,7 @@ const Payment = () => {
               cgst: Number(cgst.toFixed(2)),
               sgst: Number(sgst.toFixed(2)),
               ticketPrice: Number(ticketPrice.toFixed(2)),
-              foodTotal: Number(foodTotal.toFixed(2)),
+              foodTotal: Number(booking.foodTotal.toFixed(2)),
               bookingStatus: "Confirmed",
             }),
           });

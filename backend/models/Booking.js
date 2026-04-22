@@ -40,16 +40,43 @@ const bookingSchema = new mongoose.Schema(
     ],
     ticketPrice: Number,
 
+    // foodItems: [
+    //   {
+    //     foodId: String,
+    //     name: String,
+    //     quantity: Number,
+    //     price: Number,
+    //     total: Number,
+    //     foodStatus: {
+    //       type: String,
+    //       enum: ["Booked", "Cancelled", "Partially Cancelled"],
+    //       default: "Booked",
+    //     },
+    //   },
+    // ],
     foodItems: [
       {
         foodId: String,
         name: String,
-        quantity: Number,
+
+        quantity: Number, // total booked initially
+        remainingQty: Number, // still active
+        cancelledQty: {
+          type: Number,
+          default: 0,
+        },
+
         price: Number,
-        total: Number,
+
+        total: Number, // total for remainingQty
+        cancelledTotal: {
+          type: Number,
+          default: 0,
+        },
+
         foodStatus: {
           type: String,
-          enum: ["Booked", "Cancelled"],
+          enum: ["Booked", "Partially Cancelled", "Cancelled"],
           default: "Booked",
         },
       },

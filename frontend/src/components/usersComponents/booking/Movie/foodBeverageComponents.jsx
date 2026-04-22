@@ -170,6 +170,7 @@ const proceedPayment = () => {
     quantity: item.qty,
     total: item.foodPrice * item.qty,
     foodStatus: "Booked",
+    remainingQty: item.qty,
   }));
 
   navigate("/payment", {

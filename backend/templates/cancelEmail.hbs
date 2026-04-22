@@ -18,17 +18,20 @@
 
       <p><b>Booking ID:</b> {{bookingId}}</p>
       <p><b>Movie:</b> {{movieTitle}}</p>
-      <p><b>Theater:</b> {{theaterName}}</p>
-      {{!-- <p>
+      <p><b>Theater:</b> {{theaterName}}<br />{{location}}</p>
+      <p>
         <b>Date:</b>
-        {{showDate}}
+        {{date}}
         <br />
         <b>Time:</b>
-        {{showTime}}
-      </p> --}}
+        {{time}}
+      </p>
       {{#if seats}}
         <p><b>Cancelled Seats:</b> {{seats}}</p>
       {{/if}}
+
+            {{{foodHTML}}}
+
 
       <p><b>Refund Amount:</b> ₹{{refundAmount}}</p>
 

@@ -21,7 +21,7 @@ const Booking = () => {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelBookingData, setCancelBookingData] = useState(null);
   const [selectedSeats, setSelectedSeats] = useState([]);
-const [selectedFoods, setSelectedFoods] = useState([]);
+  const [selectedFoods, setSelectedFoods] = useState({});
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -42,7 +42,7 @@ const [selectedFoods, setSelectedFoods] = useState([]);
 
   const filteredBookings = bookings.filter((b) => {
     if (filterType === "All") {
-    return ["Confirmed", "Partially Cancelled"].includes(b.bookingStatus);
+      return ["Confirmed", "Partially Cancelled"].includes(b.bookingStatus);
     }
 
     if (filterType === "Cancelled") {
@@ -304,7 +304,7 @@ const [selectedFoods, setSelectedFoods] = useState([]);
   };
 
   const cancelSelectedFood = async () => {
-    if (selectedFoods.length === 0) {
+    if (Object.keys(selectedFoods).length === 0) {
       toast.error("Select food items first");
       return;
     }
@@ -325,31 +325,68 @@ const [selectedFoods, setSelectedFoods] = useState([]);
 
     const data = await res.json();
 
-    if (res.ok) {
-      toast.success("Food items cancelled ✅");
-
-      setBookings((prevBookings) =>
-        prevBookings.map((booking) => {
-          if (booking._id !== cancelBookingData._id) return booking;
-
-          return {
-            ...booking,
-            foodItems: booking.foodItems.map((food) =>
-              selectedFoods.includes(food.foodId)
-                ? { ...food, foodStatus: "Cancelled" }
-                : food,
-            ),
-          };
-        }),
-      );
-
-      setSelectedFoods([]);
-      closeCancelModal(); 
-    } else {
+    if (!res.ok) {
       toast.error(data.message);
+      return;
     }
+
+    toast.success("Food items cancelled ✅");
+
+    const updatedBookingId = cancelBookingData._id;
+
+    setBookings((prev) =>
+      prev.map((booking) => {
+        if (booking._id !== updatedBookingId) return booking;
+
+        return {
+          ...booking,
+          foodItems: booking.foodItems.map((food) => {
+            const cancelQty = selectedFoods[food.foodId] || 0;
+
+            if (cancelQty > 0) {
+              const newCancelledQty = (food.cancelledQty || 0) + cancelQty;
+
+              return {
+                ...food,
+                cancelledQty: newCancelledQty,
+              };
+            }
+
+            return food;
+          }),
+        };
+      }),
+    );
+
+    // 🔥 IMPORTANT: ALSO UPDATE MODAL DATA
+    setCancelBookingData((prev) => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        foodItems: prev.foodItems.map((food) => {
+          const cancelQty = selectedFoods[food.foodId] || 0;
+
+          if (cancelQty > 0) {
+            const newCancelledQty = (food.cancelledQty || 0) + cancelQty;
+
+            return {
+              ...food,
+              cancelledQty: newCancelledQty,
+            };
+          }
+
+          return food;
+        }),
+      };
+    });
+
+    // reset
+    setSelectedFoods({});
+    closeCancelModal();
   };
-const isCancelledTab = filterType === "Cancelled";
+
+  const isCancelledTab = filterType === "Cancelled";
 
   return (
     <section className="px-4 sm:px-6 md:px-16 py-12">
@@ -479,33 +516,64 @@ const isCancelledTab = filterType === "Cancelled";
                     {/* FOOD SECTION */}
                     {booking.foodItems?.length > 0 && (
                       <div className="sm:pl-6">
-                        <p className="font-medium text-white mb-1">
+                        <p className="font-medium text-white mb-3">
                           Food & Beverages
                         </p>
 
-                        {booking.foodItems.map((food, index) => (
-                          <div key={index} className="flex justify-between">
-                            <span
-                              className={
-                                food.foodStatus === "Cancelled"
-                                  ? "line-through text-red-400"
-                                  : ""
-                              }
-                            >
-                              {food.name} × {food.quantity}
-                            </span>
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-xs text-left text-white">
+                            <thead className="bg-purple-900 hover:bg-purple-800 text-xs text-white">
+                              <tr>
+                                <th className="p-2 text-xs">Food Name</th>
+                                <th className="p-2 text-xs">Total Quantity</th>
+                                <th className="p-2 text-xs">Cancelled Qty</th>
+                                <th className="p-2 text-xs">Per Food Cost</th>
+                                <th className="p-2 text-xs">Total Food Cost</th>
+                              </tr>
+                            </thead>
 
-                            <span
-                              className={
-                                food.foodStatus === "Cancelled"
-                                  ? "line-through text-red-400"
-                                  : ""
-                              }
-                            >
-                              ₹{food.total}
-                            </span>
-                          </div>
-                        ))}
+                            <tbody>
+                              {booking.foodItems.map((food, index) => {
+                                const cancelledQty = food.cancelledQty || 0;
+                                const remainingQty =
+                                  food.quantity - cancelledQty;
+
+                                const isFullyCancelled = remainingQty === 0;
+                                const displayQty = remainingQty;
+                                const displayAmount = remainingQty * food.price;
+                                return (
+                                  <tr
+                                    key={index}
+                                    className={` border-gray-700 ${
+                                      isFullyCancelled
+                                        ? "text-red-500 line-through"
+                                        : ""
+                                    }`}
+                                  >
+                                    {/* Food Name */}
+                                    <td className="p-2 ">{food.name}</td>
+
+                                    {/* Quantity */}
+                                    <td className="p-2 ">{displayQty}</td>
+
+                                    {/* Cancelled Qty */}
+                                    <td className="p-2  text-red-400">
+                                      {cancelledQty || 0}
+                                    </td>
+
+                                    {/* Per item price */}
+                                    <td className="p-2 ">₹{food.price}</td>
+
+                                    {/* Total cost after cancellation */}
+                                    <td className="p-2  font-medium">
+                                      ₹{remainingQty * food.price}
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -601,13 +669,17 @@ const isCancelledTab = filterType === "Cancelled";
 
       {showCancelModal && cancelBookingData && (
         <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-xl w-[90%] max-w-md relative">
+          <div
+            className="bg-white p-6 rounded-xl w-[90%] max-w-md relative 
+                    max-h-[85vh] overflow-y-auto"
+          >
             <button
               className="absolute top-4 right-4 text-gray-500 hover:text-red-500 text-xl"
               onClick={closeCancelModal}
             >
               ✖
             </button>
+
             <h2 className="text-lg font-bold mb-4 text-black">
               Cancel Booking
             </h2>
@@ -620,7 +692,7 @@ const isCancelledTab = filterType === "Cancelled";
               Cancel Full Booking
             </button>
 
-            {/* PARTIAL CANCEL (only if >1 seat) */}
+            {/* PARTIAL CANCEL (SEATS) */}
             {cancelBookingData.seats.filter((s) => s.status === "Booked")
               .length > 1 && (
               <>
@@ -656,16 +728,22 @@ const isCancelledTab = filterType === "Cancelled";
 
             {/* FOOD CANCEL SECTION */}
             {cancelBookingData.foodItems?.filter(
-              (f) => f.foodStatus === "Booked",
+              (f) => f.foodStatus !== "Cancelled",
             ).length > 0 && (
               <>
                 <h3 className="font-medium mt-4 mb-2 text-black">
                   Select food items to cancel
                 </h3>
 
-                {cancelBookingData.foodItems.map(
-                  (food, i) =>
-                    food.foodStatus === "Booked" && (
+                {cancelBookingData.foodItems
+                  ?.filter((f) => f.foodStatus !== "Cancelled")
+                  .map((food, i) => {
+                    const cancelledQty = food.cancelledQty || 0;
+                    const remainingQty = food.quantity - cancelledQty;
+
+                    if (remainingQty <= 0) return null;
+
+                    return (
                       <div
                         key={i}
                         className="flex justify-between items-center mb-2 text-black"
@@ -673,17 +751,32 @@ const isCancelledTab = filterType === "Cancelled";
                         <div>
                           <p>{food.name}</p>
                           <p className="text-xs text-gray-500">
-                            ₹{food.price} × {food.quantity}
+                            ₹{food.price} × {remainingQty}
                           </p>
+
+                          {cancelledQty > 0 && (
+                            <p className="text-xs text-red-500">
+                              Cancelled: {cancelledQty}
+                            </p>
+                          )}
                         </div>
 
                         <input
-                          type="checkbox"
-                          onChange={(e) => handleFoodSelect(e, food.foodId)}
+                          type="number"
+                          min="0"
+                          max={remainingQty}
+                          value={selectedFoods[food.foodId] || 0}
+                          onChange={(e) =>
+                            setSelectedFoods((prev) => ({
+                              ...prev,
+                              [food.foodId]: Number(e.target.value),
+                            }))
+                          }
+                          className="w-16 border rounded px-2"
                         />
                       </div>
-                    ),
-                )}
+                    );
+                  })}
 
                 <button
                   onClick={cancelSelectedFood}
