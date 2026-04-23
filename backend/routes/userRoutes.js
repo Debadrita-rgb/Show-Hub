@@ -50,9 +50,8 @@ router.post("/send-otp", async (req, res) => {
     const user = await User.findOne({ email });
     const safeUser = user || { name: name || "User", email };
 
-
     setImmediate(() => {
-      sendotpEmail({ safeUser, otp });
+      sendotpEmail({ user: safeUser, otp });
     });
 
     // await sgMail.send(msg);

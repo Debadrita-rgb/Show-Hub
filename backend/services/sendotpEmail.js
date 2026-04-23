@@ -18,7 +18,7 @@ const sendotpEmail = async ({user, otp }) => {
 
 
     const html = template({
-      name: user.name,
+      name: user.name || "User",
       otp: otp,
       year: new Date().getFullYear(),
     });
@@ -37,9 +37,9 @@ const sendotpEmail = async ({user, otp }) => {
 
     await sgMail.send(msg);
 
-    console.log("✅ Cancel email sent");
+    console.log("✅ OTP email sent");
   } catch (err) {
-    console.log("❌ Cancel Email Error:", err.message);
+    console.log("❌ OTP Email Error:", err.message);
   }
 };
 
