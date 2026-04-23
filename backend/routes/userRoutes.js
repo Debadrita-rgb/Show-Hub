@@ -27,8 +27,9 @@ const RefundPayment = require("../models/RefundPayment");
 const razorpay = require("../api/razorpay");
 const formatDate = require("../utils/dateHelper");
 
-const sendBookingEmail = require("../services/emailService.js");
+const sendBookingEmail = require("../services/bookingemailService.js");
 const sendCancelEmail = require("../services/sendCancelEmail.js");
+const sendotpEmail = require("../services/sendotpEmail.js");
 
 const sgMail = require("@sendgrid/mail");
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
@@ -46,44 +47,13 @@ router.post("/send-otp", async (req, res) => {
       password,
       expiresAt: Date.now() + 5 * 60 * 1000,
     };
-    const msg = {
-      to: email,
-      from: {
-        email: process.env.EMAIL_USER,
-        name: "ShowHub",
-      },
-      subject:
-        "Showhub Login: Here's the 6-digit verification code you requested",
-      html: `<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+    const user = await User.findOne({ email });
+    const safeUser = user || { name: name || "User", email };
 
-      <div style="max-width: 500px; margin: auto; background: #ffffff; border-radius: 10px; padding: 30px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
 
-  <div style="text-align:center;">
-      <img src="https://show-hub-frontend.onrender.com/assets/admin_login_logo-CDHIE2pX.png" width="80" />
-    </div>
-      <div style="border: 1px solid #eee; padding: 20px; border-radius: 8px; background: #fafafa;">
-      <p>Hello <b>${name || "User"}</b>,</p>
-    <p style="margin-bottom: 10px;">Your one-time verification code:</p>
-    <div style="font-size: 36px; font-weight: bold;">${otp}</div>
-  </div>
-
-        <p style="font-size: 14px; color: #777;">
-          This code will expire in <b>5 minutes</b>.
-        </p>
-
-        <p style="font-size: 12px; color: #aaa; margin-top: 20px;">
-          If you didn’t request this, you can safely ignore this email.
-        </p>
-
-      </div>
-
-      <p style="text-align:center; font-size:12px; color:#aaa; margin-top:20px;">
-        © ${new Date().getFullYear()} ShowHub. All rights reserved.
-      </p>
-
-    </div>
-    `,
-    };
+    setImmediate(() => {
+      sendotpEmail({ safeUser, otp });
+    });
 
     await sgMail.send(msg);
 
@@ -125,6 +95,7 @@ router.post("/verify-otp", async (req, res) => {
         email,
         password: hashedPassword,
         role: "USER",
+        isGoogleUser: true,
       });
 
       await user.save();
@@ -189,6 +160,13 @@ router.post("/login", async (req, res) => {
       return res.status(404).json({
         success: false,
         message: "Given email is not valid",
+      });
+    }
+
+    if (!userData.isActive) {
+      return res.status(403).json({
+        success: false,
+        message: "Your account is deactivated. Please contact admin.",
       });
     }
 
@@ -1422,7 +1400,6 @@ router.post("/cancel-seats", jwtAuthMiddleware, async (req, res) => {
       refundAmount: currentRefund,
       cancelType: "Partial",
       seatIds,
-
     });
 
     res.json({
@@ -1460,14 +1437,14 @@ router.post("/cancel-food", jwtAuthMiddleware, async (req, res) => {
     let refundedFoods = [];
 
     booking.foodItems = booking.foodItems.map((food) => {
-      const cancelQty = foodIds?.[food.foodId]; //  safe access
+      const cancelQty = foodIds?.[food.foodId];
 
-if (
-  cancelQty &&
-  (food.foodStatus === "Booked" ||
-    food.foodStatus === "Partially Cancelled")
-)
-{        const validCancelQty = Math.min(
+      if (
+        cancelQty &&
+        (food.foodStatus === "Booked" ||
+          food.foodStatus === "Partially Cancelled")
+      ) {
+        const validCancelQty = Math.min(
           cancelQty,
           food.quantity - (food.cancelledQty || 0),
         );
@@ -1491,11 +1468,9 @@ if (
         return {
           ...food.toObject(),
 
-          //  KEEP ORIGINAL
           quantity: food.quantity,
           total: food.total,
 
-          //  NEW TRACKING FIELDS
           cancelledQty: newCancelledQty,
           remainingQty: remainingQty,
           cancelledTotal: (food.cancelledTotal || 0) + cancelAmount,
@@ -1507,7 +1482,6 @@ if (
 
       return food;
     });
-
 
     if (refundAmount === 0) {
       return res.status(400).json({ message: "No valid food selected" });

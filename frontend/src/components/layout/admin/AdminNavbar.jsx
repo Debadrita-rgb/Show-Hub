@@ -62,6 +62,12 @@ const AdminNavbar = ({ toggleSidebar, isSidebarOpen }) => {
     if (location.pathname.startsWith("/admin/view-feedback-details/")) {
       return "View Feedback Details";
     }
+    if (location.pathname.startsWith("/admin/view-single-user/")) {
+      return "View User Details";
+    }
+    if (location.pathname.startsWith("/admin/view-booked-single-user/")) {
+      return "View User Booking Details";
+    }
     if (location.pathname.startsWith("/admin/edit-theater/")) {
       return "Edit Theater";
     }

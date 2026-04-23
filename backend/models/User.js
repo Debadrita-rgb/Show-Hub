@@ -9,6 +9,9 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
+    unique: true,
+    lowercase: true,
+    trim: true,
   },
   password: {
     type: String,
@@ -31,7 +34,10 @@ const userSchema = new mongoose.Schema({
   gender: String,
   married: String,
   anniversary: Date,
-  
+  isGoogleUser: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 userSchema.pre("save", async function (next) {

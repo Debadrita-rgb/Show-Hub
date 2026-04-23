@@ -969,7 +969,10 @@ router.get("/get-booked-details", jwtAuthMiddleware, async (req, res) => {
 module.exports = router;
 
 // get cancelled booking details 
-router.get("/get-cancelled-booked-details", jwtAuthMiddleware, async (req, res) => {
+(router.get(
+  "/get-cancelled-booked-details",
+  jwtAuthMiddleware,
+  async (req, res) => {
     try {
       const bookings = await Booking.find({
         bookingStatus: "Cancelled",
@@ -991,5 +994,27 @@ router.get("/get-cancelled-booked-details", jwtAuthMiddleware, async (req, res) 
       res.status(500).json({ message: "Internal server error" });
     }
   },
-);
+),
+  router.get("/get-user-booked-details/:id", jwtAuthMiddleware, async (req, res) => {
+      try {
+        const userId = req.params.id;
+
+        const bookings = await Booking.find({ userId })
+          .populate("movieId")
+          .populate("theaterId")
+          .populate("userId")
+          .sort({ createdAt: -1 });
+
+        if (!bookings.length) {
+          return res.status(404).json({ message: "No bookings found" });
+        }
+
+        res.status(200).json(bookings);
+      } catch (error) {
+        console.error("Error fetching bookings:", error);
+        res.status(500).json({ message: "Server error" });
+      }
+    },
+  ));
+
 module.exports = router;

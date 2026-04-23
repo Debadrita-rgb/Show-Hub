@@ -128,7 +128,6 @@ const Booking = () => {
 
     const today = new Date();
 
-    // remove time part
     bookingDate.setHours(0, 0, 0, 0);
     today.setHours(0, 0, 0, 0);
 
@@ -151,7 +150,7 @@ const Booking = () => {
       const start = new Date(`${datePart}T${booking.showTime}`);
       startDateTime = start;
 
-      const duration = booking.movie?.totalTiming; // fallback
+      const duration = booking.movie?.totalTiming;
       endDateTime = new Date(start.getTime() + duration * 60000);
 
       location = `${booking.theaterName || "Cinema Hall"}, ${booking.theater?.location_name || ""}`;
@@ -171,7 +170,7 @@ const Booking = () => {
     }
 
     const formatDate = (date) => {
-      if (isNaN(date)) return ""; //safety check
+      if (isNaN(date)) return ""; 
       return date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
     };
 
@@ -358,7 +357,6 @@ const Booking = () => {
       }),
     );
 
-    // 🔥 IMPORTANT: ALSO UPDATE MODAL DATA
     setCancelBookingData((prev) => {
       if (!prev) return prev;
 
@@ -381,7 +379,6 @@ const Booking = () => {
       };
     });
 
-    // reset
     setSelectedFoods({});
     closeCancelModal();
   };
@@ -639,7 +636,7 @@ const Booking = () => {
                     <button
                       disabled={booking.type === "Show"}
                       onClick={() => {
-                        if (booking.type === "Show") return; // extra safety
+                        if (booking.type === "Show") return;
                         setCancelBookingData(booking);
                         setShowCancelModal(true);
                       }}

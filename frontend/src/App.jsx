@@ -53,8 +53,8 @@ import AdmineditMovie from "./pages/admin_pages/Movie/editMovie.jsx";
 
 //User
 import AdminUser from "./pages/admin_pages/User/viewUser.jsx";
-import AdminAddUser from "./pages/admin_pages/User/addUser.jsx";
-import AdmineditUser from "./pages/admin_pages/User/editUser.jsx";
+import AdminViewUser from "./pages/admin_pages/User/viewUserDetails.jsx";
+import AdminViewBookingDetails from "./pages/admin_pages/User/viewBookingDetails.jsx"
 
 //Category
 import AdminCategory from "./pages/admin_pages/Category/viewCategory.jsx";
@@ -188,8 +188,14 @@ const App = () => {
                 <Route path="editMovie/:id" element={<AdmineditMovie />} />
                 {/* User */}
                 <Route path="view-all-user" element={<AdminUser />} />
-                <Route path="add-user" element={<AdminAddUser />} />
-                <Route path="edit-user/:id" element={<AdmineditUser />} />
+                <Route
+                  path="view-single-user/:id"
+                  element={<AdminViewUser />}
+                />
+                <Route
+                  path="view-booked-single-user/:id"
+                  element={<AdminViewBookingDetails />}
+                />
                 {/* Gallery */}
                 <Route path="view-gallery" element={<AdminviewGallery />} />
                 <Route path="add-gallery" element={<AdminaddGallery />} />
