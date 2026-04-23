@@ -55,7 +55,7 @@ router.post("/send-otp", async (req, res) => {
       sendotpEmail({ safeUser, otp });
     });
 
-    await sgMail.send(msg);
+    // await sgMail.send(msg);
 
     res.json({ success: true });
   } catch (error) {
