@@ -5,6 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import DynamicForm from "../../../components/commonComponent/CrudComponent/DynamicFormComponent";
 import BASE_URL from "../../../../config";
+import { getYouTubeVideoId } from "../../../utils/youtube";
 
 const EditMovie = () => {
   const navigate = useNavigate();
@@ -93,8 +94,9 @@ const EditMovie = () => {
           movieDescription: data.movieDescription || "",
           category: data.category || [],
           format: data.format || [],
-          trailerlink: data.trailerlink || "",
-          // isRecommended: data.isRecommended ?? false,
+          trailerlink: data.trailerlink
+            ? `https://www.youtube.com/watch?v=${data.trailerlink}`
+            : "", // isRecommended: data.isRecommended ?? false,
         });
         setCasting(
           data.casting || [

@@ -34,12 +34,10 @@ const ShowTrailerVideo = () => {
     }, [movie, slug, id]);
   
   if (!movie) return <p className="text-white p-10">Loading...</p>;
-const getEmbedUrl = (url) => {
-  if (!url) return null;
 
-  const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/);
-
-  return match ? `https://www.youtube.com/embed/${match[1]}` : null;
+const getEmbedUrl = (videoId) => {
+  if (!videoId) return null;
+  return `https://www.youtube.com/embed/${videoId}`;
 };
 
   return (

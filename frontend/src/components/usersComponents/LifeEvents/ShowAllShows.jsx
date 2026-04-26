@@ -45,32 +45,50 @@ const [showFilters, setShowFilters] = useState(false);
 // console.log(shows)
 
   // FILTER LOGIC
- const filteredShows = useMemo(() => {
-   const today = new Date();
-   today.setHours(0, 0, 0, 0);
+  const filteredShows = useMemo(() => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
-   return shows.filter((show) => {
-     // genre filter
-     if (
-       selectedFilters.genre.length > 0 &&
-       !selectedFilters.genre.some((g) => show.subCategory?.includes(g))
-     ) {
-       return false;
-     }
+  return shows.filter((show) => {
+    // ✅ GENRE FILTER
+    if (
+      selectedFilters.genre.length > 0 &&
+      !selectedFilters.genre.some((g) =>
+        show.subCategory?.includes(g)
+      )
+    ) {
+      return false;
+    }
 
-     if (!show.locations || show.locations.length === 0) return false;
+    // ✅ MULTIPLE LOCATION CASE
+    if (show.isMultipleLocation) {
+      if (!show.locations || show.locations.length === 0) return false;
 
-     // get latest location date
-     const latestDate = show.locations.reduce((latest, loc) => {
-       const d = new Date(loc.date);
-       return d > latest ? d : latest;
-     }, new Date(show.locations[0].date));
+      const validLocations = show.locations.filter((loc) => loc.date);
 
-     latestDate.setHours(0, 0, 0, 0);
+      if (validLocations.length === 0) return false;
 
-     return latestDate >= today;
-   });
- }, [shows, selectedFilters]);
+      const latestDate = validLocations.reduce((latest, loc) => {
+        const d = new Date(loc.date);
+        return d > latest ? d : latest;
+      }, new Date(validLocations[0].date));
+
+      latestDate.setHours(0, 0, 0, 0);
+
+      return latestDate >= today;
+    }
+
+    // ✅ SINGLE LOCATION CASE (use startDate/endDate)
+    if (show.startDate && show.endDate) {
+      const end = new Date(show.endDate);
+      end.setHours(0, 0, 0, 0);
+
+      return end >= today;
+    }
+
+    return false;
+  });
+}, [shows, selectedFilters]);
 
   return (
     <div className="min-h-screen px-6 md:px-16 py-16">

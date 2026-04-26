@@ -3,6 +3,8 @@ import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import { useNavigate, useParams } from "react-router-dom";
 import BASE_URL from "../../../../config";
+import { getYouTubeVideoId } from "../../../utils/youtube";
+
 
 const EditShow = () => {
   const { id } = useParams();
@@ -141,7 +143,9 @@ const EditShow = () => {
           category: data.category || "",
           isMultipleLocation: data.isMultipleLocation || false,
           ageLimit: data.ageLimit || "",
-          showVideoEmbedURL: data.showVideoEmbedURL || "",
+          showVideoEmbedURL: data.showVideoEmbedURL
+            ? `https://www.youtube.com/watch?v=${data.showVideoEmbedURL}`
+            : "",
           description: data.description || "",
           startDate: data.startDate?.slice(0, 10) || "",
           endDate: data.endDate?.slice(0, 10) || "",
@@ -170,11 +174,12 @@ const EditShow = () => {
         );
 
         //   artists
-        setArtists(
-          data.artists?.length
-            ? data.artists
-            : [{ artist_name: "", designation: "", artist_image: "" }],
-        );
+        setArtists(data.artists || []);
+        // setArtists(
+        //   data.artists?.length
+        //     ? data.artists
+        //     : [{ artist_name: "", designation: "", artist_image: "" }],
+        // );
 
         //   load subcategories of selected category
         const selectedCategory = categories.find(
@@ -213,6 +218,30 @@ const EditShow = () => {
 
       setSelectedSubCategories([]);
     }
+
+    if (name === "isMultipleLocation") {
+      const newValue = checked;
+
+      setFormData({
+        ...formData,
+        isMultipleLocation: newValue,
+        startDate: "",
+        endDate: "",
+      });
+
+      setLocations([
+        {
+          locationName: "",
+          theaterName: "",
+          startTime: "",
+          date: "",
+          duration: "",
+          price: "",
+        },
+      ]);
+
+      return;
+    }
   };
 
   /* ARTIST FUNCTIONS  */
@@ -242,13 +271,19 @@ const EditShow = () => {
 
     try {
       const token = localStorage.getItem("token");
-
+    const videoId = getYouTubeVideoId(formData.showVideoEmbedURL);const filteredArtists = artists.filter(
+      (a) =>
+        a.artist_name?.trim() !== "" ||
+        a.designation?.trim() !== "" ||
+        a.artist_image?.trim() !== "",
+    );
       const payload = {
         ...formData,
         locations,
         subCategory: selectedSubCategories,
         languages: selectedLanguages,
-        artists,
+        artists: filteredArtists.length > 0 ? filteredArtists : [],
+        showVideoEmbedURL: videoId,
       };
 
       await axios.put(
@@ -418,18 +453,20 @@ const EditShow = () => {
                   className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring text-black"
                 />
               </div>
-              <div>
-                <label className="mb-1 text-sm font-semibold text-gray-700">
-                  Show Date
-                </label>
-                <input
-                  name="date"
-                  type="date"
-                  value={loc.date}
-                  onChange={(e) => handleLocationChange(index, e)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring text-black"
-                />
-              </div>
+              {formData.isMultipleLocation && (
+                <div>
+                  <label className="mb-1 text-sm font-semibold text-gray-700">
+                    Show Date
+                  </label>
+                  <input
+                    name="date"
+                    type="date"
+                    value={loc.date}
+                    onChange={(e) => handleLocationChange(index, e)}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring text-black"
+                  />
+                </div>
+              )}
               <div>
                 <label className="mb-1 text-sm font-semibold text-gray-700">
                   Show Duration in Minutes
@@ -467,6 +504,32 @@ const EditShow = () => {
               )}
             </div>
           ))}
+
+          {!formData.isMultipleLocation && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+              <div>
+                <label>Start Date</label>
+                <input
+                  type="date"
+                  name="startDate"
+                  value={formData.startDate}
+                  onChange={handleChange}
+                  className="w-full p-3 border rounded-lg"
+                />
+              </div>
+
+              <div>
+                <label>End Date</label>
+                <input
+                  type="date"
+                  name="endDate"
+                  value={formData.endDate}
+                  onChange={handleChange}
+                  className="w-full p-3 border rounded-lg"
+                />
+              </div>
+            </div>
+          )}
 
           {/* ADD BUTTON */}
 
@@ -548,14 +611,14 @@ const EditShow = () => {
                 name="designation"
                 placeholder="Designation"
                 value={artist.designation}
-                // onChange={(e) =>
-                //   handleArtistChange(index, "designation", e.target.value)
-                // }
+                onChange={(e) =>
+                  handleArtistChange(index, "designation", e.target.value)
+                }
                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring text-black"
               />
               <button
                 type="button"
-                // onClick={addArtist}
+                onClick={addArtist}
                 className="bg-green-500 text-white rounded-lg px-4"
               >
                 +
@@ -613,35 +676,7 @@ const EditShow = () => {
           />
         </div>
         {/* DATES */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-          <div>
-            <label className="mb-1 text-sm font-semibold text-gray-700">
-              Start Date
-            </label>
-
-            <input
-              type="date"
-              name="startDate"
-              value={formData.startDate}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring text-black"
-            />
-          </div>
-
-          <div>
-            <label className="mb-1 text-sm font-semibold text-gray-700">
-              End Date
-            </label>
-
-            <input
-              type="date"
-              name="endDate"
-              value={formData.endDate}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring text-black"
-            />
-          </div>
-        </div>
+        
         <button
           type="submit"
           className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 mt-6"

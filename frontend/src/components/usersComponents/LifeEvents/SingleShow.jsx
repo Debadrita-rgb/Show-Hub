@@ -5,10 +5,14 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { Link } from "react-router-dom";
 import BASE_URL from "../../../../config";
+import YouTubePlayer from "./youTubePlayerComponent";
 
 const SingleShow = () => {
   const { id } = useParams();
   const [openVenueModal, setOpenVenueModal] = useState(false);
+  const [showDateSelector, setShowDateSelector] = useState(false);
+  const [showAllDates, setShowAllDates] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
   const [show, setShow] = useState(null);
   const navigate = useNavigate();
   const [ratingSummary, setRatingSummary] = useState({
@@ -16,6 +20,22 @@ const SingleShow = () => {
     totalVotes: 0,
   });
   const [reviews, setReviews] = useState([]);
+  
+  const getDateRange = (start, end) => {
+    const dates = [];
+    let current = new Date(start);
+    const last = new Date(end);
+
+    current.setHours(0, 0, 0, 0);
+    last.setHours(0, 0, 0, 0);
+
+    while (current <= last) {
+      dates.push(new Date(current));
+      current.setDate(current.getDate() + 1);
+    }
+
+    return dates;
+  };
   
   const review_settings = {
     dots: false,
@@ -59,7 +79,7 @@ const SingleShow = () => {
   if (show?.showVideoEmbedURL) {
     slides.push({
       type: "video",
-      url: show.showVideoEmbedURL.replace(/"/g, ""),
+      videoId: show.showVideoEmbedURL, 
     });
   }
 
@@ -164,6 +184,14 @@ const SingleShow = () => {
   };
   // console.log(movie);
 
+  const formatDateOnly = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  };
+
   const handleSubmit = (location) => {
     const bookingData = {
       showId: show?._id,
@@ -173,7 +201,11 @@ const SingleShow = () => {
       startTime: location?.startTime,
       duration: location?.duration,
       price: location?.price,
-      date: location?.date,
+      date: selectedDate
+        ? formatDateOnly(selectedDate)
+        : location?.date
+          ? formatDateOnly(new Date(location.date))
+          : null,
     };
 
     // console.log("Booking Data:", bookingData);
@@ -234,12 +266,7 @@ const SingleShow = () => {
                     className="w-full h-[220px] sm:h-[300px] md:h-[360px] lg:h-[420px] object-cover rounded-lg"
                   />
                 ) : (
-                  <iframe
-                    src={media.url}
-                    title="show video"
-                    className="w-full h-[220px] sm:h-[300px] md:h-[360px] lg:h-[420px] rounded-lg"
-                    allowFullScreen
-                  />
+                  <YouTubePlayer videoId={media.videoId} />
                 )}
               </div>
             ))}
@@ -321,13 +348,80 @@ const SingleShow = () => {
 
                   {canBookShow(show) && (
                     <button
-                      onClick={() => handleSubmit(show.locations[0])}
+                      onClick={() => setShowDateSelector(true)}
                       className="bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 rounded-md text-sm"
                     >
-                      Book Now
+                      Select booking Date
                     </button>
                   )}
                 </div>
+              )}
+
+              {showDateSelector &&
+                show?.startDate &&
+                show?.endDate &&
+                (() => {
+                  const allDates = getDateRange(show.startDate, show.endDate);
+                  const visibleDates = showAllDates
+                    ? allDates
+                    : allDates.slice(0, 10);
+
+                  return (
+                    <div className="mt-3 flex flex-wrap gap-2 items-center">
+                      {visibleDates.map((date, index) => {
+                        const isDisabled = !isBookingAvailable(date);
+
+                        return (
+                          <button
+                            key={index}
+                            disabled={isDisabled}
+                            onClick={() => setSelectedDate(date)}
+                            className={`px-3 py-1 rounded-md text-sm border
+              ${
+                selectedDate?.toDateString() === date.toDateString()
+                  ? "bg-red-500 text-white"
+                  : "bg-white text-black"
+              }
+              ${
+                isDisabled
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-red-700"
+              }
+            `}
+                          >
+                            {date.toLocaleDateString("en-IN", {
+                              day: "numeric",
+                              month: "short",
+                            })}
+                          </button>
+                        );
+                      })}
+
+                      {/* Show More / Less Button */}
+                      {allDates.length > 10 && (
+                        <button
+                          onClick={() => setShowAllDates(!showAllDates)}
+                          className="px-3 py-1 text-sm text-blue-600 underline"
+                        >
+                          {showAllDates ? "Show Less" : "Show More"}
+                        </button>
+                      )}
+                    </div>
+                  );
+                })()}
+
+              {selectedDate && (
+                <button
+                  onClick={() =>
+                    handleSubmit({
+                      ...show.locations[0],
+                      date: selectedDate,
+                    })
+                  }
+                  className="mt-3 w-full bg-green-500 text-white py-2 rounded-md"
+                >
+                  Confirm Booking
+                </button>
               )}
             </div>
           ) : show?.locations?.length > 1 ? (
@@ -440,7 +534,13 @@ const SingleShow = () => {
                       View On Maps
                     </a>
                     <button
-                      onClick={() => handleSubmit(loc)}
+                      // onClick={() => handleSubmit(loc)}
+                      onClick={() =>
+                        handleSubmit({
+                          ...loc,
+                          date: loc.date,
+                        })
+                      }
                       disabled={!isBookingAvailable(loc.date)}
                       className={`px-5 py-2 rounded-md text-sm font-semibold transition
     ${

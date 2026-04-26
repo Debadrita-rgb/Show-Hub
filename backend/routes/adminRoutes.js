@@ -618,20 +618,17 @@ router.post(`/add-single-movie`, jwtAuthMiddleware, async(req, res) =>{
 try {
   const { trailerlink, ...rest } = req.body;
 
-  if (trailerlink && !isValidYouTubeURL(trailerlink)) {
-    return res.status(400).json({
-      error: "Only valid YouTube URLs are allowed",
-    });
-  }
-
   const item = new Movie({
     ...rest,
-    trailerlink,
+    trailerlink: trailerlink || null,
   });
 
   await item.save();
 
-  res.json({ message: `${path} added`, item });
+res.status(201).json({
+  message: "Movie added successfully",
+  item,
+});
 } catch (error) {
   console.error("Server Error:", error);
   res.status(500).json({
@@ -911,10 +908,38 @@ router.post("/add-show", async (req, res) => {
       artists,
       startDate,
       endDate,
-    } = req.body; 
+      showVideoEmbedURL,
+    } = req.body;
+    
+     if (isMultipleLocation) {
+       // Multiple location → keep dates inside locations
+       startDate = null;
+       endDate = null;
+
+       locations = locations.map((loc) => ({
+         ...loc,
+         date: loc.date, // keep
+       }));
+     } else {
+       // Single location → remove location date
+       locations = locations.map((loc) => ({
+         ...loc,
+         date: null, // ❌ remove date
+       }));
+
+       // Optional validation
+       if (!startDate || !endDate) {
+         return res.status(400).json({
+           success: false,
+           message: "Start Date and End Date are required",
+         });
+       }
+     }
+
     const show = new Show({
       showName,
       showImage,
+      showVideoEmbedURL,
       category,
       subCategory,
       isMultipleLocation,

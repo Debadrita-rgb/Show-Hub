@@ -10,7 +10,10 @@ const locationSchema = new mongoose.Schema({
   locationName: String,
   theaterName: String,
   startTime: String,
-  date: String,
+  date: {
+    type: String,
+    default: null, // important
+  },
   duration: String,
   price: Number,
 });
@@ -52,8 +55,14 @@ const showSchema = new mongoose.Schema(
 
     artists: [artistSchema],
 
-    startDate: Date,
-    endDate: Date,
+    startDate: {
+      type: Date,
+      default: null,
+    },
+    endDate: {
+      type: Date,
+      default: null,
+    },
   },
 
   { timestamps: true },

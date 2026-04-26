@@ -26,7 +26,7 @@ export default function SignIn() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const { email, password } = formData;
+    const { email, password, cpassword } = formData;
 
     if (password !== cpassword) {
       toast.error("Password and Confirm Password do not match");

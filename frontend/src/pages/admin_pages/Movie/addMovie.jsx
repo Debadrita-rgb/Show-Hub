@@ -5,6 +5,7 @@ import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import BASE_URL from "../../../../config";
+import { getYouTubeVideoId } from "../../../utils/youtube";
 
 const AddMovie = () => {
   const location = useLocation();
@@ -111,7 +112,14 @@ const AddMovie = () => {
         (item) => !item.castname || !item.inmoviecastname || !item.castimageURL,
       )
     ) {
-      toast.error("Please complete casting data");
+      toast.error("Please add atleast 1 casting member data");
+      return;
+    }
+
+    if (
+      crew.some((item) => !item.name || !item.designation || !item.dpimageUrl)
+    ) {
+      toast.error("Please add atleast 1 crew member data");
       return;
     }
 
@@ -126,9 +134,16 @@ const AddMovie = () => {
 
     try {
       const token = localStorage.getItem("token");
+      const videoId = getYouTubeVideoId(formData.trailerlink);
+
+      if (formData.trailerlink && !videoId) {
+        toast.error("Invalid YouTube URL");
+        return;
+      }
 
       const dataToSend = {
         ...formData,
+        trailerlink: videoId,
         casting,
         crew,
       };
@@ -210,10 +225,6 @@ const AddMovie = () => {
       name: "trailerlink",
       label: "Trailer Link",
       type: "text",
-      validation: {
-        pattern: /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\//,
-        message: "Enter valid YouTube URL",
-      },
     },
     { name: "movieDescription", label: "Movie Description", type: "tiptap" },
   ];

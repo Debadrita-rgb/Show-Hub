@@ -3,6 +3,8 @@ import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import { useLocation, useNavigate } from "react-router-dom";
 import BASE_URL from "../../../../config";
+import { getYouTubeVideoId } from "../../../utils/youtube";
+
 
 const AddShow = () => {
   const navigate = useNavigate();
@@ -207,13 +209,37 @@ const handleChange = (e) => {
 
     try {
       const token = localStorage.getItem("token");
+const videoId = getYouTubeVideoId(formData.showVideoEmbedURL);
+
+if (formData.showVideoEmbedURL && !videoId) {
+  toast.error("Invalid YouTube URL");
+  return;
+}
+const filteredArtists = artists.filter(
+  (a) =>
+    a.artist_name.trim() !== "" ||
+    a.designation.trim() !== "" ||
+    a.artist_image.trim() !== "",
+);
 
       const payload = {
         ...formData,
         locations,
         subCategory: selectedSubCategories,
-        artists,
+        artists: filteredArtists.length > 0 ? filteredArtists : [],
+        showVideoEmbedURL: videoId,
       };
+
+      if (formData.isMultipleLocation) {
+        payload.locations = locations;
+        payload.startDate = "";
+        payload.endDate = "";
+      } else {
+        payload.locations = locations.map((loc) => ({
+          ...loc,
+          date: null,
+        }));
+      }
 
       await axios.post(`${BASE_URL}/admin/add-show`, payload, {
         headers: { Authorization: `Bearer ${token}` },
@@ -282,7 +308,7 @@ const handleChange = (e) => {
                   {cat.name}
                 </option>
               ))}
-            </select> 
+            </select>
           </div>
 
           {/* SUBCATEGORY */}
@@ -339,13 +365,13 @@ const handleChange = (e) => {
 
         {/* LOCATION SECTION */}
 
-        <div className="mt-6 bg-gray-50 border rounded-xl p-3">
+        <div className="mt-6 bg-gray-50 border rounded-xl p-4 sm:p-6">
+          {" "}
           <h3 className="text-lg font-semibold mb-4">Show Locations</h3>
-
           {locations.map((loc, index) => (
             <div
               key={index}
-              className="grid grid-cols-1 md:grid-cols-6 gap-3 mb-4 items-center"
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 mb-4 items-center"
             >
               <div>
                 <label className="mb-1 text-sm font-semibold text-gray-700">
@@ -356,7 +382,7 @@ const handleChange = (e) => {
                   placeholder="Location"
                   value={loc.locationName}
                   onChange={(e) => handleLocationChange(index, e)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring text-black"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring text-black min-w-0"
                 />
               </div>
               <div>
@@ -383,7 +409,7 @@ const handleChange = (e) => {
                   className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring text-black"
                 />
               </div>
-              <div>
+              {/* <div>
                 <label className="mb-1 text-sm font-semibold text-gray-700">
                   Show Date
                 </label>
@@ -394,7 +420,21 @@ const handleChange = (e) => {
                   onChange={(e) => handleLocationChange(index, e)}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring text-black"
                 />
-              </div>
+              </div> */}
+              {formData.isMultipleLocation && (
+                <div>
+                  <label className="mb-1 text-sm font-semibold text-gray-700">
+                    Show Date
+                  </label>
+                  <input
+                    name="date"
+                    type="date"
+                    value={loc.date}
+                    onChange={(e) => handleLocationChange(index, e)}
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                  />
+                </div>
+              )}
               <div>
                 <label className="mb-1 text-sm font-semibold text-gray-700">
                   Show Duration in Minutes
@@ -419,6 +459,7 @@ const handleChange = (e) => {
                   className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring text-black"
                 />
               </div>
+
               {/* REMOVE BUTTON */}
 
               {formData.isMultipleLocation && locations.length > 1 && (
@@ -432,9 +473,38 @@ const handleChange = (e) => {
               )}
             </div>
           ))}
+          {!formData.isMultipleLocation && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+              <div>
+                <label className="mb-1 text-sm font-semibold text-gray-700">
+                  Start Date
+                </label>
 
+                <input
+                  type="date"
+                  name="startDate"
+                  value={formData.startDate}
+                  onChange={handleChange}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring text-black"
+                />
+              </div>
+
+              <div>
+                <label className="mb-1 text-sm font-semibold text-gray-700">
+                  End Date
+                </label>
+
+                <input
+                  type="date"
+                  name="endDate"
+                  value={formData.endDate}
+                  onChange={handleChange}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring text-black"
+                />
+              </div>
+            </div>
+          )}
           {/* ADD BUTTON */}
-
           {formData.isMultipleLocation && (
             <button
               type="button"
@@ -449,7 +519,7 @@ const handleChange = (e) => {
 
         <div className="mt-6">
           <label className="mb-1 text-sm font-semibold text-gray-700">
-            Movie Language
+            Show Language
           </label>
 
           {/* Selected Languages */}
@@ -474,7 +544,7 @@ const handleChange = (e) => {
             onChange={addLanguage}
             className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring text-black"
           >
-            <option>Select Movie Language</option>
+            <option>Select Show Language</option>
 
             {languages.map((lang) => (
               <option key={lang._id} value={lang.title}>
@@ -542,7 +612,7 @@ const handleChange = (e) => {
         </div>
 
         {/* AGE + DESCRIPTION */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
           <div className="mt-6">
             <label className="mb-1 text-sm font-semibold text-gray-700">
               Age Limit
@@ -583,36 +653,6 @@ const handleChange = (e) => {
         </div>
 
         {/* DATES */}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-          <div>
-            <label className="mb-1 text-sm font-semibold text-gray-700">
-              Start Date
-            </label>
-
-            <input
-              type="date"
-              name="startDate"
-              value={formData.startDate}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring text-black"
-            />
-          </div>
-
-          <div>
-            <label className="mb-1 text-sm font-semibold text-gray-700">
-              End Date
-            </label>
-
-            <input
-              type="date"
-              name="endDate"
-              value={formData.endDate}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring text-black"
-            />
-          </div>
-        </div>
 
         <button
           type="submit"
