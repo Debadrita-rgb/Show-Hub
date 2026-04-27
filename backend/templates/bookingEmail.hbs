@@ -37,7 +37,7 @@
         <img src="{{movieImage}}" style="width:100px; border-radius:8px;" />
 
         <div>
-          <h3 style="margin:0;">{{movieTitle}}</h3>
+          <h3 style="margin:0;">{{title}}</h3>
           <p style="color:#666; margin:5px 0;">
             {{theaterName}}<br />{{location}}
           </p>
@@ -46,15 +46,19 @@
         </div>
       </div>
 
+{{#if seatsHTML}}
+
       <!-- SEATS -->
       <div style="margin-top:15px;">
         <h4>💺 Seats</h4>
         {{{seatsHTML}}}
       </div>
+{{/if}}
 
+{{#if foodHTML}}
       <!-- FOOD -->
       {{{foodHTML}}}
-
+{{/if}}
       <!-- SUMMARY -->
       <div style="margin-top:15px;">
         <p>Total Tickets: {{seatsCount}}</p>

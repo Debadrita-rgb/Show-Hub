@@ -164,14 +164,14 @@ const Payment = () => {
               lockId: booking.lockId, // IMPORTANT
               paymentId: response.razorpay_payment_id,
               paymentStatus: "Success",
-              totalAmount: Number(finalAmount.toFixed(2)),
+              totalAmount: Number((finalAmount || 0).toFixed(2)),
               userId: userId,
-              convenienceFee: Number(convenienceFee.toFixed(2)),
+              convenienceFee: Number((convenienceFee || 0).toFixed(2)),
               type: "Movie",
               cgst: Number(cgst.toFixed(2)),
               sgst: Number(sgst.toFixed(2)),
-              ticketPrice: Number(ticketPrice.toFixed(2)),
-              foodTotal: Number(booking.foodTotal.toFixed(2)),
+              ticketPrice: Number((ticketPrice || 0).toFixed(2)),
+              foodTotal: Number((foodTotal || 0).toFixed(2)),
               bookingStatus: "Confirmed",
             }),
           });

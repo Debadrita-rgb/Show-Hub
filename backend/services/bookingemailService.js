@@ -22,9 +22,9 @@ const sendWithRetry = async (msg, retries = 3) => {
 };
 
 // Main background function
-const sendBookingEmail = async (booking, user, theater, movie) => {
+const sendBookingEmail = async (booking, user, theater, movie, type) => {
   try {
-    const msg = buildEmailTemplate(booking, user, theater, movie);
+    const msg = buildEmailTemplate(booking, user, theater, movie, type);
 
     const pdfBuffer = await generateInvoice(booking, user);
 

@@ -15,7 +15,7 @@ const navigate = useNavigate();
   const convenienceFee = showPrice * 0.18;
 
   const cgst = convenienceFee / 2;
-  const sgst = convenienceFee / 2;
+  const sgst = convenienceFee / 2; 
 
   const totalcgstsgst = cgst + sgst;
 
@@ -60,7 +60,7 @@ const navigate = useNavigate();
         order_id: order.id,
 
         handler: async function (response) {
-          await fetch(`${BASE_URL}/user/save-show-booking`, {
+          await fetch(`${BASE_URL}/user/confirm-show-booking`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -70,13 +70,13 @@ const navigate = useNavigate();
               details: booking,
               paymentId: response.razorpay_payment_id,
               paymentStatus: "Success",
-              totalAmount: Number(finalAmount.toFixed(2)),
+              totalAmount: Number((finalAmount || 0).toFixed(2)),
               userId: userId,
-              convenienceFee: Number(convenienceFee.toFixed(2)),
+              convenienceFee: Number((convenienceFee || 0).toFixed(2)),
               type: "Show",
               cgst: Number(cgst.toFixed(2)),
               sgst: Number(sgst.toFixed(2)),
-              Price: Number(showPrice.toFixed(2)),
+              Price: Number((showPrice || 0).toFixed(2)),
               bookingStatus: "Confirmed",
             }),
           });
