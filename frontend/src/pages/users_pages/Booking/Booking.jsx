@@ -170,7 +170,7 @@ const Booking = () => {
     }
 
     const formatDate = (date) => {
-      if (isNaN(date)) return ""; 
+      if (isNaN(date)) return "";
       return date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
     };
 
@@ -385,6 +385,40 @@ const Booking = () => {
 
   const isCancelledTab = filterType === "Cancelled";
 
+  const getActiveMedia = (media = []) => {
+    if (!media || media.length === 0) return null;
+
+    // 1. Active Image (priority)
+    const activeImage = media.find(
+      (item) => item.type === "image" && item.isActive,
+    );
+
+    if (activeImage) return activeImage.url;
+
+    // 2. Active YouTube (fallback)
+    const activeVideo = media.find(
+      (item) => item.type === "youtube" && item.isActive,
+    );
+
+    if (activeVideo) {
+      return `https://img.youtube.com/vi/${activeVideo.url}/hqdefault.jpg`;
+
+      // type: "youtube",
+      // url: activeVideo.url,
+    }
+
+    return null;
+  };
+
+  const imageUrl = getActiveMedia() || "/no-image.png";
+  const handleNavigate = (booking) => {
+    if (booking.type === "Movie") {
+      navigate(`/movie/${booking.movie?.slug}/${booking.movie?._id}`);
+    } else {
+      navigate(`/single-show/${booking.details?.showId}`);
+    }
+  };
+
   return (
     <section className="px-4 sm:px-6 md:px-16 py-12">
       <ToastContainer position="top-right" />
@@ -447,19 +481,31 @@ const Booking = () => {
             {/* LEFT SECTION */}
             <div className="flex gap-4 sm:gap-6">
               {/* POSTER */}
-              <div className="w-20 h-28 sm:w-28 sm:h-40 bg-gray-200 rounded flex items-center justify-center overflow-hidden">
-                <img
-                  src={
+              <div
+                onClick={() => handleNavigate(booking)}
+                className="w-20 h-28 sm:w-28 sm:h-40 bg-gray-200 rounded flex items-center justify-center overflow-hidden cursor-pointer"
+              >
+                {(() => {
+                  const imageUrl =
                     booking.type === "Movie"
                       ? booking.movie?.movieimage
-                      : booking.show?.showImage
-                  }
-                />
+                      : getActiveMedia(booking.show?.media) || "/no-image.png";
+
+                  return (
+                    <img
+                      src={imageUrl}
+                      className="w-full h-full object-cover"
+                    />
+                  );
+                })()}
               </div>
 
               {/* DETAILS */}
               <div className="flex-1">
-                <h2 className="text-base sm:text-lg font-semibold text-white">
+                <h2
+                  onClick={() => handleNavigate(booking)}
+                  className="text-base sm:text-lg font-semibold text-white cursor-pointer"
+                >
                   {booking.type === "Movie"
                     ? booking.movieTitle
                     : booking.details?.showTitle}{" "}
@@ -470,6 +516,21 @@ const Booking = () => {
                     ? `${new Date(booking.showDate).toDateString()} | ${booking.showTime}`
                     : `${new Date(booking.details?.date).toDateString()} | ${booking.details?.startTime}`}
                 </p>
+
+                {booking.type === "Show" && (
+                  <div>
+                    {" "}
+                    <p className="text-xs sm:text-sm text-gray-400 mt-1">
+                      Ticket Amount: ₹{booking.details?.ticketPrice}
+                    </p>
+                    <p className="text-xs sm:text-sm text-gray-400 mt-1">
+                      Seat Count: {booking.details?.seatCount}
+                    </p>
+                    <p className="text-xs sm:text-sm text-gray-400 mt-1">
+                      Seat Amount: ₹{booking.details?.seatAmount}
+                    </p>
+                  </div>
+                )}
 
                 {/* SEATS */}
                 {booking.type === "Movie" && (
@@ -590,6 +651,12 @@ const Booking = () => {
                 >
                   Payment: {booking.paymentStatus}
                 </p>
+
+                {booking.refundAmount > 0 && (
+                  <p className="text-xs mt-1">
+                    Refund Amount: ₹{booking.refundAmount.toFixed(2)}
+                  </p>
+                )}
                 <p
                   className={`text-xs mt-1 ${
                     booking.bookingStatus === "Cancelled"
@@ -880,7 +947,16 @@ const Booking = () => {
                 </p>
 
                 <p>
-                  <b>Price per Ticket:</b> ₹{selectedBooking.details?.price}
+                  <b>Price per Ticket:</b> ₹
+                  {selectedBooking.details?.ticketPrice}
+                </p>
+                <p>
+                  <b>Seat Count:</b> ₹
+                  {selectedBooking.details?.seatCount}
+                </p>
+                <p>
+                  <b>Total:</b> ₹
+                  {selectedBooking.details?.seatAmount}
                 </p>
               </div>
             )}

@@ -50,7 +50,6 @@ const [showFilters, setShowFilters] = useState(false);
   today.setHours(0, 0, 0, 0);
 
   return shows.filter((show) => {
-    // ✅ GENRE FILTER
     if (
       selectedFilters.genre.length > 0 &&
       !selectedFilters.genre.some((g) =>
@@ -60,7 +59,6 @@ const [showFilters, setShowFilters] = useState(false);
       return false;
     }
 
-    // ✅ MULTIPLE LOCATION CASE
     if (show.isMultipleLocation) {
       if (!show.locations || show.locations.length === 0) return false;
 
@@ -78,7 +76,6 @@ const [showFilters, setShowFilters] = useState(false);
       return latestDate >= today;
     }
 
-    // ✅ SINGLE LOCATION CASE (use startDate/endDate)
     if (show.startDate && show.endDate) {
       const end = new Date(show.endDate);
       end.setHours(0, 0, 0, 0);

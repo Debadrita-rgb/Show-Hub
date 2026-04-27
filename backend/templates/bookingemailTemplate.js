@@ -59,7 +59,7 @@ const buildEmailTemplate = (booking, user, theater, movie, type) => {
       movieImage: "https://via.placeholder.com/100", 
       seatsHTML: "", 
       seatsCount: 1,
-      ticketPrice: booking.price,
+      ticketPrice: booking.details?.price,
     };
   }
   // SEATS HTML
@@ -141,7 +141,7 @@ const buildEmailTemplate = (booking, user, theater, movie, type) => {
       email: process.env.EMAIL_USER,
       name: "ShowHub",
     },
-    subject: `🎬 Booking Confirmed - ${data.title}`,
+    subject: `🎬 Booking Confirmed - ${data.title} ${type}`,
     html,
   };
 };;

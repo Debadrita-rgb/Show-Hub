@@ -26,7 +26,7 @@ const sendBookingEmail = async (booking, user, theater, movie, type) => {
   try {
     const msg = buildEmailTemplate(booking, user, theater, movie, type);
 
-    const pdfBuffer = await generateInvoice(booking, user);
+    const pdfBuffer = await generateInvoice(booking, user, theater);
 
     msg.attachments = [
       {

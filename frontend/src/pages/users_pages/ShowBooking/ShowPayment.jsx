@@ -8,16 +8,17 @@ const ShowPayment = () => {
   const { state } = useLocation();
 const navigate = useNavigate();
   const booking = location.state;
-  // console.log("Booking Data:", booking);
+  console.log("Booking Data:", booking);
   const [showFeeDetails, setShowFeeDetails] = useState(false);
 
-  const showPrice = booking.price;
+  const showPrice = booking.seatAmount;
   const convenienceFee = showPrice * 0.18;
 
   const cgst = convenienceFee / 2;
   const sgst = convenienceFee / 2; 
 
   const totalcgstsgst = cgst + sgst;
+  const finalAmount = showPrice + totalcgstsgst;
 
   const handlePayment = async () => {
     try {
@@ -78,6 +79,7 @@ const navigate = useNavigate();
               sgst: Number(sgst.toFixed(2)),
               Price: Number((showPrice || 0).toFixed(2)),
               bookingStatus: "Confirmed",
+              // seatCount: seatCount,
             }),
           });
 
@@ -94,7 +96,6 @@ const navigate = useNavigate();
     }
   };
 
-  const finalAmount = showPrice + totalcgstsgst;
 
   return (
     <div className="max-w-7xl mx-auto p-6 grid grid-cols-1 md:grid-cols-3 gap-6 text-black">

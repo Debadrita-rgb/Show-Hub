@@ -15,7 +15,7 @@ const formatShowDateTime = (date, time) => {
 
 const today = formatDate(new Date());
 
-const generateInvoice = (booking, user) => {
+const generateInvoice = (booking, user, theater) => {
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({ margin: 40 });
 
@@ -34,12 +34,18 @@ const generateInvoice = (booking, user) => {
     let description = "";
     let ticketTotal = 0;
 
+    let theaterName = "";
+    let theaterLocation = "";
+
     if (booking.type === "Movie") {
       title = booking.movieTitle;
-
       dateTime = formatShowDateTime(booking.showDate, booking.showTime);
 
       location = booking.theaterName;
+      theaterName = booking.theaterName || theater?.name || "";
+
+      theaterLocation =
+        theater?.city || theater?.locationName || theater?.address || "";
 
       qty = booking.seats?.length || 0;
 
@@ -47,7 +53,7 @@ const generateInvoice = (booking, user) => {
       description += `${dateTime}\n\n`;
 
       booking.seats?.forEach((seat, index) => {
-        description += `${index + 1}. ${seat.seatId} (${seat.category}) - ₹${seat.price}\n`;
+        description += `${index + 1}. ${seat.seatId} (${seat.category}) - ${seat.price}\n`;
       });
 
       ticketTotal = booking.ticketPrice;
@@ -66,7 +72,7 @@ const generateInvoice = (booking, user) => {
       description += `${dateTime}\n`;
       description += `${booking.details?.locationName}\n`;
 
-      ticketTotal = booking.price;
+      ticketTotal = booking.details?.price;
     }
 
     // TAX
@@ -105,8 +111,14 @@ const generateInvoice = (booking, user) => {
     doc.text("Title:", 350, 130);
     doc.text(title, 350, 145);
 
+    doc.text("Theater:", 350, 170);
+    doc.text(theaterName, 350, 185);
+
+    doc.text("Location:", 350, 200);
+    doc.text(theaterLocation, 350, 215);
+
     // ---------------- TABLE ----------------
-    let y = 200;
+    let y = 240;
 
     const drawRow = (y, item, qty, price, total) => {
       const rowHeight = doc.heightOfString(item, { width: 300 }) + 10;
@@ -126,16 +138,16 @@ const generateInvoice = (booking, user) => {
     y += 25;
 
     // MAIN ITEM
-    y = drawRow(y, description, qty, `₹${ticketTotal}`, `₹${totalBeforeTax}`);
+    y = drawRow(y, description, qty, `${ticketTotal}`, `${totalBeforeTax}`);
 
     y += 40;
 
     // ---------------- TAX ----------------
-    doc.text(`CGST: ₹${cgst}`, rightX - 150, y);
+    doc.text(`CGST: ${cgst}`, rightX - 150, y);
     y += 15;
-    doc.text(`SGST: ₹${sgst}`, rightX - 150, y);
+    doc.text(`SGST: ${sgst}`, rightX - 150, y);
     y += 15;
-    doc.text(`Convenience Fee: ₹${convenienceFee}`, rightX - 150, y);
+    doc.text(`Convenience Fee: ${convenienceFee}`, rightX - 150, y);
 
     y += 30;
 
@@ -153,19 +165,13 @@ const generateInvoice = (booking, user) => {
       booking.foodItems.forEach((item) => {
         foodTotal += item.total;
 
-        drawRow(
-          y,
-          item.name,
-          item.quantity,
-          `₹${item.price}`,
-          `₹${item.total}`,
-        );
+        drawRow(y, item.name, item.quantity, `${item.price}`, `${item.total}`);
 
         y += 25;
       });
 
       y += 10;
-      doc.text(`Food Total: ₹${foodTotal}`, rightX - 150, y);
+      doc.text(`Food Total: ${foodTotal}`, rightX - 150, y);
       y += 30;
 
       grandTotal += foodTotal;
@@ -177,9 +183,9 @@ const generateInvoice = (booking, user) => {
 
     doc.font("Helvetica-Bold");
 
-    doc.text(`Net Amount: ₹${totalBeforeTax}`, leftX, y);
-    doc.text(`Tax: ₹${taxAmount}`, 250, y);
-    doc.text(`Grand Total: ₹${grandTotal}`, 400, y);
+    doc.text(`Net Amount: ${totalBeforeTax}`, leftX, y);
+    doc.text(`Tax: ${taxAmount}`, 250, y);
+    doc.text(`Grand Total: ${grandTotal}`, 400, y);
 
     doc.font("Helvetica");
 

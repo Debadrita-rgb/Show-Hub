@@ -15,13 +15,34 @@ const ShowCard = ({ show }) => {
         navigate(`/single-show/${show._id}`);
       };
 
-  return (  
+      const getShowImage = () => {
+        if (!show.media || show.media.length === 0) return null;
+
+        const activeImage = show.media.find(
+          (item) => item.type === "image" && item.isActive,
+        );
+
+        if (activeImage) return activeImage.url;
+
+        const youtube = show.media.find(
+          (item) => item.type === "youtube" && item.isActive,
+        );
+
+        if (youtube) {
+          return `https://img.youtube.com/vi/${youtube.url}/hqdefault.jpg`;
+        }
+
+        return null;
+      };
+
+      const imageUrl = getShowImage() || "/no-image.png";
+  return (
     <div
       onClick={handleClick}
       className="bg-white rounded-xl shadow-md overflow-hidden hover:scale-105 transition duration-300 cursor-pointer"
     >
       <img
-        src={show.showImage}
+        src={imageUrl}
         alt={show.showName}
         className="w-full h-80 object-cover"
       />

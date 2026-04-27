@@ -895,9 +895,9 @@ router.get(`/get-fullfeedback-details`, jwtAuthMiddleware, async (req, res) => {
 //Add Show
 router.post("/add-show", async (req, res) => {
   try {
-    const {
+    let {
       showName,
-      showImage,
+      media,
       category,
       subCategory,
       isMultipleLocation,
@@ -908,7 +908,6 @@ router.post("/add-show", async (req, res) => {
       artists,
       startDate,
       endDate,
-      showVideoEmbedURL,
     } = req.body;
     
      if (isMultipleLocation) {
@@ -938,8 +937,8 @@ router.post("/add-show", async (req, res) => {
 
     const show = new Show({
       showName,
-      showImage,
-      showVideoEmbedURL,
+media,
+      // showImage,
       category,
       subCategory,
       isMultipleLocation,
@@ -951,7 +950,8 @@ router.post("/add-show", async (req, res) => {
       startDate,
       endDate,
     });
-    await show.save();
+    console.log(show);
+    // await show.save();
 
     res.status(201).json({
       success: true,

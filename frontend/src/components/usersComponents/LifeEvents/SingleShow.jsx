@@ -15,6 +15,8 @@ const SingleShow = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [show, setShow] = useState(null);
   const navigate = useNavigate();
+  const [seatCount, setSeatCount] = useState(1);
+  const [selectedLocation, setSelectedLocation] = useState(null);
   const [ratingSummary, setRatingSummary] = useState({
     averageRating: 0,
     totalVotes: 0,
@@ -67,21 +69,25 @@ const SingleShow = () => {
       .catch((err) => console.log(err));
   }, [id]);
 
-  let slides = [];
+let slides = [];
 
-  if (show?.showImage) {
-    slides.push({
-      type: "image",
-      url: show.showImage,
-    });
-  }
+if (show?.media?.length > 0) {
+  slides = show.media
+    .filter((item) => item.isActive === true) 
+    .map((item) => {
+      if (item.type === "youtube") {
+        return {
+          type: "video",
+          videoId: item.url,
+        };
+      }
 
-  if (show?.showVideoEmbedURL) {
-    slides.push({
-      type: "video",
-      videoId: show.showVideoEmbedURL, 
+      return {
+        type: "image",
+        url: item.url,
+      };
     });
-  }
+}
 
   const settings_image = {
     dots: true,
@@ -173,7 +179,6 @@ const SingleShow = () => {
       .replace(/\s+/g, "-");
   };
 
-  //limit of show 10 words in the review text
   const limitWords = (text, wordLimit = 10) => {
     if (!text) return "";
 
@@ -192,6 +197,10 @@ const SingleShow = () => {
     return `${year}-${month}-${day}`;
   };
 
+  useEffect(() => {
+    setSeatCount(1);
+  }, [selectedDate]);
+
   const handleSubmit = (location) => {
     const bookingData = {
       showId: show?._id,
@@ -200,7 +209,10 @@ const SingleShow = () => {
       locationName: location?.locationName,
       startTime: location?.startTime,
       duration: location?.duration,
-      price: location?.price,
+      seatCount: seatCount,
+      seatAmount: location?.price * seatCount,
+
+      ticketPrice: location?.price,
       date: selectedDate
         ? formatDateOnly(selectedDate)
         : location?.date
@@ -208,10 +220,9 @@ const SingleShow = () => {
           : null,
     };
 
-    // console.log("Booking Data:", bookingData);
+    console.log("Booking Data:", bookingData);
 
     navigate("/show-payment", { state: bookingData });
-    // }
   };
 
   const canBookShow = (show) => {
@@ -248,6 +259,14 @@ const SingleShow = () => {
     return showDate >= today;
   };
   if (!show) return <div className="p-20 text-center">Loading...</div>;
+
+  const stripHTML = (html) => {
+    if (!html) return "";
+    return html.replace(/<[^>]*>?/gm, "");
+  };
+
+  const basePrice = show.locations[0].price || 0;
+  const totalPrice = basePrice * seatCount;
 
   return (
     <div className=" min-h-screen overflow-x-hidden">
@@ -343,7 +362,15 @@ const SingleShow = () => {
               {show.locations[0].price && (
                 <div className="flex items-center justify-between mt-3">
                   <span className="text-lg font-semibold text-gray-900">
-                    ₹{show.locations[0].price}
+                    {/* ₹{show.locations[0].price} */}
+                    <div className="flex justify-between mt-3">
+                      <span className="text-lg font-semibold">
+                        ₹{basePrice} × {seatCount}
+                      </span>
+                      <span className="text-lg font-bold text-green-600 ms-4">
+                        ₹{totalPrice}
+                      </span>
+                    </div>
                   </span>
 
                   {canBookShow(show) && (
@@ -411,6 +438,32 @@ const SingleShow = () => {
                 })()}
 
               {selectedDate && (
+                <div className="mt-3">
+                  <p className="mb-2 font-medium">Select Seats Count</p>
+
+                  <div className="flex items-center gap-4">
+                    <button
+                      onClick={() =>
+                        setSeatCount((prev) => Math.max(1, prev - 1))
+                      }
+                      className="px-3 py-1 bg-gray-300 rounded"
+                    >
+                      -
+                    </button>
+
+                    <span className="text-lg font-semibold">{seatCount}</span>
+
+                    <button
+                      onClick={() => setSeatCount((prev) => prev + 1)}
+                      className="px-3 py-1 bg-gray-300 rounded"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {selectedDate && (
                 <button
                   onClick={() =>
                     handleSubmit({
@@ -456,7 +509,7 @@ const SingleShow = () => {
 
           <p className="text-white leading-relaxed text-sm sm:text-base max-w-4xl px-4 sm:px-6">
             {" "}
-            {show.description}
+            {stripHTML(show.description)}
           </p>
         </div>
       )}
@@ -533,14 +586,14 @@ const SingleShow = () => {
                     >
                       View On Maps
                     </a>
-                    <button
-                      // onClick={() => handleSubmit(loc)}
-                      onClick={() =>
-                        handleSubmit({
-                          ...loc,
-                          date: loc.date,
-                        })
-                      }
+                    {/* <button
+                      // onClick={() =>
+                      //   handleSubmit({
+                      //     ...loc,
+                      //     date: loc.date,
+                      //   })
+                      // }
+                      onClick={() => setSelectedLocation(loc)}
                       disabled={!isBookingAvailable(loc.date)}
                       className={`px-5 py-2 rounded-md text-sm font-semibold transition
     ${
@@ -549,10 +602,76 @@ const SingleShow = () => {
         : "bg-gray-400 text-gray-200 cursor-not-allowed"
     }`}
                     >
-                      Book Now
+                      Select Seats Count
+                    </button> */}
+                    <button
+                      onClick={() => {
+                        setSelectedLocation(loc);
+                        setSeatCount(1); 
+                      }}
+                      disabled={!isBookingAvailable(loc.date)}
+                      className={`px-5 py-2 rounded-md text-sm font-semibold transition
+  ${
+    isBookingAvailable(loc.date)
+      ? "cursor-pointer bg-red-500 text-white hover:bg-red-600"
+      : "bg-gray-400 text-gray-200 cursor-not-allowed"
+  }`}
+                    >
+                      Book Now{" "}
                     </button>
+
                     {/* {new Date(loc.date).toDateString()} | {loc.startTime} */}
                   </div>
+                  {selectedLocation?._id === loc._id && (
+                    <div className="mt-3 p-3 border rounded-lg bg-gray-100">
+                      <p className="mb-2 font-medium">Select Seats</p>
+
+                      <div className="flex items-center gap-4 mb-3">
+                        <button
+                          onClick={() =>
+                            setSeatCount((prev) => Math.max(1, prev - 1))
+                          }
+                          className="px-3 py-1 bg-gray-300 rounded"
+                        >
+                          -
+                        </button>
+
+                        <span className="text-lg font-semibold">
+                          {seatCount}
+                        </span>
+
+                        <button
+                          onClick={() => setSeatCount((prev) => prev + 1)}
+                          className="px-3 py-1 bg-gray-300 rounded"
+                        >
+                          +
+                        </button>
+                      </div>
+
+                      {/* Price */}
+                      <div className="flex justify-between mb-3">
+                        <span>
+                          ₹{loc.price} × {seatCount}
+                        </span>
+                        <span className="font-bold text-green-600">
+                          ₹{loc.price * seatCount}
+                        </span>
+                      </div>
+
+                      {/* Confirm */}
+                      <button
+                        onClick={() =>
+                          handleSubmit({
+                            ...loc,
+                            date: loc.date,
+                          })
+                        }
+                        className="w-full bg-green-500 text-white py-2 rounded-md"
+                      >
+                        Confirm Booking
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -601,8 +720,6 @@ const SingleShow = () => {
                           {review.userId?.name
                             ? `${review.userId?.name.slice(0, 10)}${review.userId?.name.length > 10 ? "..." : ""}`
                             : "User"}
-
-                          {/* {review.userId?.name || "User"} */}
                         </p>
                       </div>
                     </div>

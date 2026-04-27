@@ -24,8 +24,14 @@ const showSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    showImage: String,
-    showVideoEmbedURL: String,
+    media: [
+      {
+        type: { type: String, required: true },
+        url: { type: String, required: true },
+        isActive: { type: Boolean, default: true },
+      },
+    ],
+    // showVideoEmbedURL: String,
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",

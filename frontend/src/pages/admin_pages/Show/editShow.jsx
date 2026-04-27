@@ -19,16 +19,15 @@ const EditShow = () => {
 
   const [locations, setLocations] = useState([]);
   const [artists, setArtists] = useState([]);
+const [media, setMedia] = useState([{ type: "image", url: "" }]);
 
   const [formData, setFormData] = useState({
     showName: "",
-    showImage: "",
     category: "",
     subCategory: "",
     isMultipleLocation: false,
     languages: [],
     ageLimit: "",
-    showVideoEmbedURL: "",
     description: "",
     startDate: "",
     endDate: "",
@@ -139,17 +138,26 @@ const EditShow = () => {
         const data = res.data;
         setFormData({
           showName: data.showName || "",
-          showImage: data.showImage || "",
           category: data.category || "",
           isMultipleLocation: data.isMultipleLocation || false,
           ageLimit: data.ageLimit || "",
-          showVideoEmbedURL: data.showVideoEmbedURL
-            ? `https://www.youtube.com/watch?v=${data.showVideoEmbedURL}`
-            : "",
           description: data.description || "",
           startDate: data.startDate?.slice(0, 10) || "",
           endDate: data.endDate?.slice(0, 10) || "",
         });
+
+        setMedia(
+          data.media?.length
+            ? data.media.map((item) => ({
+                type: item.type,
+                url:
+                  item.type === "youtube"
+                    ? `https://www.youtube.com/watch?v=${item.url}`
+                    : item.url,
+                isActive: item.isActive ?? true,
+              }))
+            : [{ type: "image", url: "", isActive: true }],
+        );
 
         //   subcategory
         setSelectedSubCategories(data.subCategory || []);
@@ -174,12 +182,12 @@ const EditShow = () => {
         );
 
         //   artists
-        setArtists(data.artists || []);
-        // setArtists(
-        //   data.artists?.length
-        //     ? data.artists
-        //     : [{ artist_name: "", designation: "", artist_image: "" }],
-        // );
+        // setArtists(data.artists || []);
+        setArtists(
+          data.artists?.length
+            ? data.artists
+            : [{ artist_name: "", designation: "", artist_image: "" }],
+        );
 
         //   load subcategories of selected category
         const selectedCategory = categories.find(
@@ -197,6 +205,41 @@ const EditShow = () => {
 
     fetchShow();
   }, [id, categories]);
+
+  const addMedia = () => {
+    setMedia([...media, { type: "image", url: "", isActive: true }]);
+  };
+
+  const handleMediaChange = (index, field, value) => {
+     const updated = [...media];
+     updated[index][field] = value;
+  
+     if (field === "url") {
+       const type = updated[index].type;
+  
+       if (type === "youtube") {
+         const id = getYouTubeVideoId(value);
+         if (!id && value !== "") {
+           toast.warn("Enter valid YouTube link");
+         }
+       }
+  
+       if (type === "image") {
+         const isYT = getYouTubeVideoId(value);
+         if (isYT) {
+           toast.warn("This looks like YouTube link, change type");
+         }
+       }
+     }
+  
+     setMedia(updated);
+   };
+
+  const removeMedia = (index) => {
+    const updated = [...media];
+    updated.splice(index, 1);
+    setMedia(updated);
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -271,7 +314,35 @@ const EditShow = () => {
 
     try {
       const token = localStorage.getItem("token");
-    const videoId = getYouTubeVideoId(formData.showVideoEmbedURL);const filteredArtists = artists.filter(
+
+      const formattedMedia = media.map((item, index) => {
+        if (!item.url.trim()) {
+          toast.error(`Media ${index + 1} URL required`);
+          throw new Error("Empty media");
+        }
+
+        if (item.type === "youtube") {
+          const videoId = getYouTubeVideoId(item.url);
+
+          if (!videoId) {
+            toast.error(`Invalid YouTube URL`);
+            throw new Error("Invalid YouTube");
+          }
+
+          return {
+            type: "youtube",
+            url: videoId,
+            isActive: item.isActive ?? true, 
+          };
+        }
+
+        return {
+          ...item,
+          isActive: item.isActive ?? true, 
+        };
+      });
+
+    const filteredArtists = artists.filter(
       (a) =>
         a.artist_name?.trim() !== "" ||
         a.designation?.trim() !== "" ||
@@ -279,11 +350,12 @@ const EditShow = () => {
     );
       const payload = {
         ...formData,
+        media: formattedMedia, 
+
         locations,
         subCategory: selectedSubCategories,
         languages: selectedLanguages,
         artists: filteredArtists.length > 0 ? filteredArtists : [],
-        showVideoEmbedURL: videoId,
       };
 
       await axios.put(
@@ -319,18 +391,6 @@ const EditShow = () => {
             <input
               name="showName"
               value={formData.showName}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring text-black"
-            />
-          </div>
-
-          <div>
-            <label className="mb-1 text-sm font-semibold text-gray-700">
-              Show Image
-            </label>
-            <input
-              name="showImage"
-              value={formData.showImage}
               onChange={handleChange}
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring text-black"
             />
@@ -394,6 +454,62 @@ const EditShow = () => {
               ))}
             </select>
           </div>
+        </div>
+        <div className="mt-8">
+          <label className="font-semibold">Images / YouTube Links</label>
+
+          {media.map((item, index) => (
+            <div key={index} className="flex gap-2 mb-2">
+              <select
+                value={item.type}
+                onChange={(e) =>
+                  handleMediaChange(index, "type", e.target.value)
+                }
+                className="border p-2 rounded"
+              >
+                <option value="image">Image</option>
+                <option value="youtube">YouTube</option>
+              </select>
+
+              <input
+                type="text"
+                value={item.url}
+                onChange={(e) =>
+                  handleMediaChange(index, "url", e.target.value)
+                }
+                className="flex-1 border p-2 rounded"
+              />
+
+              <label className="flex items-center gap-1 text-sm">
+                <input
+                  type="checkbox"
+                  checked={item.isActive}
+                  onChange={(e) =>
+                    handleMediaChange(index, "isActive", e.target.checked)
+                  }
+                />
+                Active
+              </label>
+
+              {media.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => removeMedia(index)}
+                  className="bg-red-500 text-white px-3 rounded"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+          ))}
+
+          <button
+            type="button"
+            onClick={addMedia}
+            className="bg-green-600 text-white px-4 py-2 mt-2 rounded"
+          >
+            + Add Media
+          </button>
         </div>
         {/* MULTIPLE LOCATION */}
         <div className="mt-8">
@@ -544,41 +660,58 @@ const EditShow = () => {
           )}
         </div>
         {/* LANGUAGES */}
-        <div className="mt-6">
-          <label className="mb-1 text-sm font-semibold text-gray-700">
-            Movie Language
-          </label>
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="mb-1 text-sm font-semibold text-gray-700">
+              Movie Language
+            </label>
 
-          {/* Selected Languages */}
-          <div className="flex flex-wrap gap-2 mb-3 text-black">
-            {selectedLanguages.map((lang) => (
-              <div
-                key={lang}
-                className="bg-blue-500 text-white px-3 py-1 rounded-full flex items-center gap-2"
-              >
-                {lang}
+            {/* Selected Languages */}
+            <div className="flex flex-wrap gap-2 mb-3 text-black">
+              {selectedLanguages.map((lang) => (
+                <div
+                  key={lang}
+                  className="bg-blue-500 text-white px-3 py-1 rounded-full flex items-center gap-2"
+                >
+                  {lang}
 
-                <button type="button" onClick={() => removeLanguage(lang)}>
-                  ✕
-                </button>
-              </div>
-            ))}
+                  <button type="button" onClick={() => removeLanguage(lang)}>
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            {/* Dropdown */}
+
+            <select
+              onChange={addLanguage}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring text-black"
+            >
+              <option>Select Movie Language</option>
+
+              {languages.map((lang) => (
+                <option key={lang._id} value={lang.title}>
+                  {lang.title}
+                </option>
+              ))}
+            </select>
           </div>
 
-          {/* Dropdown */}
+          {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6"> */}
+          <div className="mt-6">
+            <label className="mb-1 text-sm font-semibold text-gray-700">
+              Age Limit
+            </label>
 
-          <select
-            onChange={addLanguage}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring text-black"
-          >
-            <option>Select Movie Language</option>
-
-            {languages.map((lang) => (
-              <option key={lang._id} value={lang.title}>
-                {lang.title}
-              </option>
-            ))}
-          </select>
+            <input
+              name="ageLimit"
+              value={formData.ageLimit}
+              onChange={handleChange}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring text-black"
+            />
+          </div>
+          {/* </div> */}
         </div>
         {/* ARTISTS */}
         <div className="mt-8 rounded-xl">
@@ -636,32 +769,6 @@ const EditShow = () => {
           ))}
         </div>
         {/* AGE + DESCRIPTION */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-          <div className="mt-6">
-            <label className="mb-1 text-sm font-semibold text-gray-700">
-              Age Limit
-            </label>
-
-            <input
-              name="ageLimit"
-              value={formData.ageLimit}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring text-black"
-            />
-          </div>
-          <div className="mt-6">
-            <label className="mb-1 text-sm font-semibold text-gray-700">
-              Video Embed URL
-            </label>
-
-            <input
-              name="showVideoEmbedURL"
-              value={formData.showVideoEmbedURL}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring text-black"
-            />
-          </div>
-        </div>
         <div className="mt-6">
           <label className="mb-1 text-sm font-semibold text-gray-700">
             Description
@@ -676,7 +783,6 @@ const EditShow = () => {
           />
         </div>
         {/* DATES */}
-        
         <button
           type="submit"
           className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 mt-6"

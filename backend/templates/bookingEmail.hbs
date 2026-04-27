@@ -46,22 +46,24 @@
         </div>
       </div>
 
-{{#if seatsHTML}}
+      {{#if seatsHTML}}
 
-      <!-- SEATS -->
-      <div style="margin-top:15px;">
-        <h4>💺 Seats</h4>
-        {{{seatsHTML}}}
-      </div>
-{{/if}}
+        <!-- SEATS -->
+        <div style="margin-top:15px;">
+          <h4>💺 Seats</h4>
+          {{{seatsHTML}}}
+        </div>
+      {{/if}}
 
-{{#if foodHTML}}
-      <!-- FOOD -->
-      {{{foodHTML}}}
-{{/if}}
+      {{#if foodHTML}}
+        <!-- FOOD -->
+        {{{foodHTML}}}
+      {{/if}}
       <!-- SUMMARY -->
       <div style="margin-top:15px;">
-        <p>Total Tickets: {{seatsCount}}</p>
+        {{#if seatsHTML}}
+          <p>Total Tickets: {{seatsCount}}</p>
+        {{/if}}
         <p>Ticket Price: ₹{{ticketPrice}}</p>
       </div>
     </div>
