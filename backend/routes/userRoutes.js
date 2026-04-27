@@ -1346,8 +1346,8 @@ const booking = new Booking({
   paymentStatus: "Success",
   bookingStatus: "Confirmed",
 });
-console.log(booking);
-    // await booking.save();
+// console.log(booking);
+    await booking.save();
    const user = await User.findById(req.user.id);
 
    // Extract details from booking.details
@@ -1359,7 +1359,7 @@ console.log(booking);
    };
 
    const fakeMovie = {
-     movieimage: "https://via.placeholder.com/300x450", // or store show image
+     movieimage: "https://via.placeholder.com/300x450",
    };
 
    const normalizedBooking = {

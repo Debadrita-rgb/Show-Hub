@@ -17,9 +17,11 @@ const Payment = () => {
   const ticketPrice = booking.totalPrice;
 
   const foodTotal =
-    booking.foodItems?.reduce((sum, item) => sum + item.price * item.qty, 0) ||
-    0;
-
+    booking.foodItems?.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0,
+    ) || 0;
+// console.log("foodTotal", foodTotal);
   const subtotal = ticketPrice + foodTotal;
 
   const convenienceFee = subtotal * 0.18;
