@@ -43,6 +43,7 @@ const feedback = () => {
         showAddButton={false}
         showActionColumn={true}
         showActiveColumn={false}
+        showRecommendedeColumn={false}
       />
     </div>
   );

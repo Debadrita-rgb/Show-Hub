@@ -42,6 +42,7 @@ const contact = () => {
         data={filteredItems}
         showAddButton={false}
         showActionColumn={true}
+        showRecommendedeColumn={false}
         showActiveColumn={false}
       />
     </div>

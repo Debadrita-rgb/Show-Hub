@@ -29,8 +29,8 @@ const [showFilters, setShowFilters] = useState(false);
         const categoryData = await categoryRes.json();
         const showsData = await showsRes.json();
 
-        setShows(showsData);
-        setCategory(categoryData);
+        setShows(showsData.filter((s) => s.isActive));
+        setCategory(categoryData.filter((c) => c.isActive));
         const subCats =
           categoryData.subCategories?.map((sub) => sub.title) || [];
 

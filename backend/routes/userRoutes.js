@@ -13,7 +13,6 @@ const Movie = require("../models/Movie");
 const Gallery = require("../models/Gallery");
 const Contact = require("../models/Contact");
 const Notification = require("../models/Notification");
-const Testimonial = require("../models/Testimonial");
 const Review = require("../models/Review");
 const Banner = require("../models/Banner");
 const Language = require("../models/Language");
@@ -257,7 +256,6 @@ const generateCRUDRoutes = (path, Model) => {
 };
 
 generateCRUDRoutes("movie", Movie);
-generateCRUDRoutes("testimonial", Testimonial);
 generateCRUDRoutes("banner", Banner);
 generateCRUDRoutes("language", Language);
 generateCRUDRoutes("review", Review);
@@ -532,33 +530,6 @@ router.post("/submit-contact", async (req, res) => {
     }
 
     res.status(200).json({ success: true, message: responseMessage });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-//Person want to testimonial
-router.post("/submit-testimonial", async (req, res) => {
-  try {
-    const { name, designation, message, profileimage } = req.body;
-    if (!name || !designation || !message || !profileimage) {
-      return res.status(400).json({ error: "All fields are required" });
-    }
-
-    const newTestimonial = new Testimonial({
-      name,
-      designation,
-      message,
-      profileimage,
-    });
-    await newTestimonial.save();
-
-    res.status(200).json({
-      success: true,
-      message:
-        "Testimonial saved successfully but after admin approval it is showing",
-    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });

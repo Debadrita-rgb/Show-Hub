@@ -98,16 +98,10 @@ import AdminViewContactDetails from "./pages/admin_pages/common/Contact/ViewCont
 import AdminFeedback from "./pages/admin_pages/common/Feedback/Feedback.jsx";
 import AdminViewFeedbackDetails from "./pages/admin_pages/common/Feedback/Viewfeedbackdetails.jsx";
 
-// Admin conatct
-import AdminTestimonial from "./pages/admin_pages/common/Testimonial/Testimonial.jsx";
-import AdminViewTestimonialDetails from "./pages/admin_pages/common/Testimonial/Viewtestimonialdetails.jsx";
-
 //admin view booking
 import AdminviewBooking from "./pages/admin_pages/Booking/viewBooking.jsx";
 import AdminviewCancelBooking from "./pages/admin_pages/Booking/viewCancelBooking.jsx";
 
-//user testimonial
-import UserTestimonial from "./pages/users_pages/Testimonial/Testimonial.jsx";
 // user feedback
 import UserFeedback from "./pages/users_pages/Feedback/Feedback.jsx";
 
@@ -137,7 +131,6 @@ const App = () => {
               <Route path="/signin" element={<SignIn />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
-              <Route path="/testimonial" element={<UserTestimonial />} />
               <Route path="/feedback" element={<UserFeedback />} />
               <Route path="/faq" element={<Faq />} />
               <Route path="/user-profile" element={<MyProfile />} />
@@ -256,12 +249,7 @@ const App = () => {
                   path="view-feedback-details/:id"
                   element={<AdminViewFeedbackDetails />}
                 />
-                {/* AdminTestimonial */}
-                <Route path="view-testimonial" element={<AdminTestimonial />} />
-                <Route
-                  path="view-testimonial-details/:id"
-                  element={<AdminViewTestimonialDetails />}
-                />
+                
               </Route>
             )}
 

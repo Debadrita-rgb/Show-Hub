@@ -47,7 +47,9 @@ const AddLocationWiseMovie = () => {
         },
       })
       .then((res) => {
-        const movieList = res.data.map((m) => ({
+        const activeMovies = res.data.filter((m) => m.isActive);
+
+        const movieList = activeMovies.map((m) => ({
           label: m.title,
           value: m._id,
           duration: m.totalTiming,
@@ -89,10 +91,11 @@ const AddLocationWiseMovie = () => {
         },
       })
       .then((res) => {
-        setAllTheaters(res.data);
+        const activeTheaters = res.data.filter((t) => t.isActive);
+        setAllTheaters(activeTheaters);
 
         const uniqueLocations = [
-          ...new Set(res.data.map((t) => t.location_name)),
+          ...new Set(activeTheaters.map((t) => t.location_name)),
         ];
 
         setLocations(uniqueLocations);

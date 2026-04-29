@@ -15,9 +15,9 @@ const ShowAllMovieWithFilter = () => {
   });
 
   const [currentPage, setCurrentPage] = useState(1);
-  const moviesPerPage = 4;
-const [searchTerm, setSearchTerm] = useState("");
-const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const moviesPerPage = 12;
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,7 +35,7 @@ const [isSearchOpen, setIsSearchOpen] = useState(false);
         const genreData = await genreRes.json();
         const languageData = await languageRes.json();
 
-        setMovies(moviesData);
+        setMovies(moviesData.filter((m) => m.isActive));
         setGenres(genreData.filter((g) => g.isActive));
         setLanguages(languageData.filter((l) => l.isActive));
       } catch (err) {
@@ -59,6 +59,8 @@ const [isSearchOpen, setIsSearchOpen] = useState(false);
   // Filtered movies
   const filteredMovies = useMemo(() => {
     return movies.filter((movie) => {
+      if (!movie.isActive) return false;
+
       const movieLanguages = Array.isArray(movie.language)
         ? movie.language
         : [movie.language];
@@ -116,7 +118,6 @@ const [isSearchOpen, setIsSearchOpen] = useState(false);
     const startIndex = (currentPage - 1) * moviesPerPage;
     return filteredMovies.slice(startIndex, startIndex + moviesPerPage);
   }, [filteredMovies, currentPage]);
-
 
   return (
     <div className="min-h-screen px-6 md:px-16 py-16">
@@ -237,5 +238,5 @@ const [isSearchOpen, setIsSearchOpen] = useState(false);
       </div>
     </div>
   );
-}
+};
 export default ShowAllMovieWithFilter;

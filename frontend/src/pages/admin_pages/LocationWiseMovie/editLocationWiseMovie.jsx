@@ -38,7 +38,9 @@ const EditLocationWiseMovie = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
-        const movieList = res.data.map((m) => ({
+        const activeMovies = res.data.filter((m) => m.isActive);
+
+        const movieList = activeMovies.map((m) => ({
           label: m.title,
           value: m._id,
           duration: m.totalTiming,
@@ -57,10 +59,10 @@ const EditLocationWiseMovie = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
-        setAllTheaters(res.data);
-
+const activeTheaters = res.data.filter((t) => t.isActive);
+setAllTheaters(activeTheaters);
         const uniqueLocations = [
-          ...new Set(res.data.map((t) => t.location_name)),
+          ...new Set(activeTheaters.map((t) => t.location_name)),
         ];
         setLocations(uniqueLocations);
       });
@@ -160,66 +162,63 @@ const EditLocationWiseMovie = () => {
     setShows(shows.filter((_, i) => i !== index));
   };
 
-  // Get selectedMovie 
+  // Get selectedMovie
   const selectedMovie = movies.find((m) => m.value === formData.movie);
 
-  // Add and Remove Language Handlers 
-const handleAddLanguage = (lang) => {
-  if (!formData.language.includes(lang)) {
+  // Add and Remove Language Handlers
+  const handleAddLanguage = (lang) => {
+    if (!formData.language.includes(lang)) {
+      setFormData((prev) => ({
+        ...prev,
+        language: [...prev.language, lang],
+      }));
+    }
+  };
+
+  const handleRemoveLanguage = (lang) => {
     setFormData((prev) => ({
       ...prev,
-      language: [...prev.language, lang],
+      language: prev.language.filter((l) => l !== lang),
     }));
-  }
-};
-
-const handleRemoveLanguage = (lang) => {
-  setFormData((prev) => ({
-    ...prev,
-    language: prev.language.filter((l) => l !== lang),
-  }));
-};
+  };
 
   /* ================= LOCATION ================= */
   const handleLocationChange = (e) => {
-  const location = e.target.value;
+    const location = e.target.value;
 
-  const filtered = allTheaters.filter(
-    (t) =>
-      t.location_name.toLowerCase().trim() ===
-      location.toLowerCase().trim()
-  );
+    const filtered = allTheaters.filter(
+      (t) =>
+        t.location_name.toLowerCase().trim() === location.toLowerCase().trim(),
+    );
 
-  // check if previous theater exists in new location
-  const isValidTheater = filtered.some(
-    (t) => t._id === formData.theater
-  );
+    // check if previous theater exists in new location
+    const isValidTheater = filtered.some((t) => t._id === formData.theater);
 
-  setFormData((prev) => ({
-    ...prev,
-    location,
-    theater: isValidTheater ? prev.theater : "", // ✅ keep or reset
-    hall_name: "",
-  }));
+    setFormData((prev) => ({
+      ...prev,
+      location,
+      theater: isValidTheater ? prev.theater : "", // ✅ keep or reset
+      hall_name: "",
+    }));
 
-  setTheaters(filtered);
+    setTheaters(filtered);
 
-  // handle halls if still valid
-  if (isValidTheater) {
-    const selected = filtered.find((t) => t._id === formData.theater);
+    // handle halls if still valid
+    if (isValidTheater) {
+      const selected = filtered.find((t) => t._id === formData.theater);
 
-    if (selected?.isMultiple) {
-      setIsMultipleHall(true);
-      setHalls(selected.halls || []);
+      if (selected?.isMultiple) {
+        setIsMultipleHall(true);
+        setHalls(selected.halls || []);
+      } else {
+        setIsMultipleHall(false);
+        setHalls([]);
+      }
     } else {
       setIsMultipleHall(false);
       setHalls([]);
     }
-  } else {
-    setIsMultipleHall(false);
-    setHalls([]);
-  }
-};
+  };
 
   /* ================= THEATER ================= */
   const handleTheaterChange = (e) => {
@@ -275,7 +274,6 @@ const handleRemoveLanguage = (lang) => {
         onSubmit={handleSubmit}
         className="w-full h-full bg-white p-10 border border-gray-200 rounded-xl shadow text-black"
       >
-        <h2 className="text-2xl font-bold mb-6">Edit Show</h2>
         <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-6">
           {/* Movie */}
           <div>
@@ -481,7 +479,7 @@ const handleRemoveLanguage = (lang) => {
         <br />
 
         <button className="bg-blue-600 text-white px-6 py-3">
-          Update Show
+          Update
         </button>
       </form>
     </div>

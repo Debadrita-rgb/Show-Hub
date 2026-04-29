@@ -149,7 +149,8 @@ const viewShow = () => {
           showAddButton={true}
           addPath="/admin/add-show"
           showRecommendedeColumn={true}
-          handleToggleRecommended={handleToggleRecommended}
+          showRecommendedeColumn={false}
+          // handleToggleRecommended={handleToggleRecommended}
         />
       </div>
     </div>

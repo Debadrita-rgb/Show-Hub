@@ -56,9 +56,7 @@ const AdminNavbar = ({ toggleSidebar, isSidebarOpen }) => {
     if (location.pathname.startsWith("/admin/view-contact-details/")) {
       return "View Contact Details";
     }
-    if (location.pathname.startsWith("/admin/view-testimonial/")) {
-      return "View Testimonial Details"; 
-    }
+
     if (location.pathname.startsWith("/admin/view-feedback-details/")) {
       return "View Feedback Details";
     }
@@ -101,9 +99,6 @@ const AdminNavbar = ({ toggleSidebar, isSidebarOpen }) => {
         return "View Contact";
       case "/admin/view-feedback":
         return "View Feedback";
-      case "/admin/view-testimonial":
-        return "View Testimonial";
-
       case "/admin/view-gallery":
         return "View Gallery";
       case "/admin/add-gallery":

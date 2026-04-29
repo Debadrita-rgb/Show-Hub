@@ -157,7 +157,7 @@ const ViewMovie = () => {
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
             handleToggleActive={handleToggleActive}
-            handleToggleRecommended={handleToggleRecommended}
+            showRecommendedeColumn={false}
             handleDelete={handleDelete}
             // showEdit={true}
             // editPath="editLink"

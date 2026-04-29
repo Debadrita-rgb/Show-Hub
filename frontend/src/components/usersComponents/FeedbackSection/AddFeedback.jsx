@@ -93,7 +93,7 @@ const AddFeedback = () => {
     }
 
     try {
-      const res = await fetch(`${BASE_URL}/voyager/submit-contact`, {
+      const res = await fetch(`${BASE_URL}/user/submit-contact`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

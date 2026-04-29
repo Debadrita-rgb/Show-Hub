@@ -521,7 +521,7 @@ const handleSubmit = async (e) => {
           )}
         </div>
         <button type="submit" className="bg-blue-600 text-white px-6 py-3 mt-3">
-          Update Show
+          Update Theater
         </button>
       </form>
     </div>

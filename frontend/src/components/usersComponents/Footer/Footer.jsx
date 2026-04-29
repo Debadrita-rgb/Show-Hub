@@ -24,11 +24,7 @@ const Footer = () => {
                   Feedback
                 </Link>
               </li>
-              <li>
-                <Link to="/testimonial" className="hover:none">
-                  Testimonial
-                </Link>
-              </li>
+              
             </ul>
           </div>
 

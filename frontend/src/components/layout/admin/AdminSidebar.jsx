@@ -215,13 +215,7 @@ export default function AdminSidebar({ isOpen, toggleSidebar }) {
                   <MdFeedback size={10} className="inline-block mr-2" />
                   View Feedback
                 </Link>
-                <Link
-                  to="/admin/view-testimonial"
-                  className="block items-center p-2 ps-3 rounded transition duration-200 text-white hover:text-[#1b4c6d] hover:bg-gray-100 hover:rounded-2xl"
-                >
-                  <FaQuoteRight className="inline-block mr-2" />
-                  View Testimonial
-                </Link>
+                
               </div>
             )}
           </div>
