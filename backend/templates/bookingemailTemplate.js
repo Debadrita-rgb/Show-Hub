@@ -20,48 +20,6 @@ const buildEmailTemplate = (booking, user, theater, movie, type) => {
     year: "numeric",
   });
 
-  if (type === "Movie") {
-    const d = new Date(booking.showDate);
-
-    data = {
-      title: booking.movieTitle,
-      theaterName: theater.theater_name,
-      location: theater.location_name,
-      date: d.toLocaleDateString("en-IN", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      }),
-      time: booking.showTime,
-      movieImage: movie.movieimage,
-      seatsHTML: booking.seats
-        ?.map(
-          (seat) => `
-          <div style="display:flex; justify-content:space-between;">
-            <span>${seat.seatId} (${seat.category})</span>
-            <span>₹${seat.price}</span>
-          </div>
-        `,
-        )
-        .join(""),
-      seatsCount: booking.seats?.length || 0,
-      ticketPrice: booking.ticketPrice,
-    };
-  }
-
-  if (type === "Show") {
-    data = {
-      title: booking.details?.showTitle,
-      theaterName: booking.details?.theaterName,
-      location: booking.details?.locationName,
-      date: booking.details?.date,
-      time: booking.details?.startTime,
-      movieImage: "https://via.placeholder.com/100", 
-      seatsHTML: "", 
-      seatsCount: 1,
-      ticketPrice: booking.details?.price,
-    };
-  }
   // SEATS HTML
   const seatsHTML = booking.seats
     ?.map(
@@ -115,24 +73,48 @@ const buildEmailTemplate = (booking, user, theater, movie, type) => {
   `
       : "";
 
+  if (type === "Movie") {
+    const d = new Date(booking.showDate);
+
+    data = {
+      title: booking.movieTitle,
+      theaterName: theater.theater_name,
+      location: theater.location_name,
+      date: formattedDate,
+      time: booking.showTime,
+      movieImage: movie.movieimage,
+      seatsHTML,
+      seatsCount: booking.seats?.length || 0,
+      ticketPrice: booking.ticketPrice,
+      foodHTML,
+      foodTotal,
+    };
+  }
+
+  if (type === "Show") {
+    data = {
+      title: booking.details?.showTitle,
+      theaterName: booking.details?.theaterName,
+      location: booking.details?.locationName,
+      date: booking.details?.date,
+      time: booking.details?.startTime,
+      movieImage: "https://via.placeholder.com/100",
+      seatsHTML: "",
+      seatsCount: booking.details?.seatCount,
+      ticketPrice: booking.details?.ticketPrice,
+    };
+  }
+
   // PASS DATA
   const html = template({
     name: user.name,
     bookingId: booking.bookingId || booking._id,
     ...data,
-    // movieTitle: booking.movieTitle,
-    // theaterName: theater.theater_name,
-    // location: theater.location_name,
-    // date: formattedDate,
-    // time: booking.showTime,
     totalAmount: booking.totalAmount,
-    // ticketPrice: booking.ticketPrice,
     convenienceFee: booking.convenienceFee,
-    // seatsCount: booking.seats?.length || 1,
-    // movieImage: movie.movieimage,
-    seatsHTML,
-    foodHTML,
-    foodTotal,
+    // seatsHTML,
+    // foodHTML,
+    // foodTotal,
   });
 
   return {
@@ -144,6 +126,6 @@ const buildEmailTemplate = (booking, user, theater, movie, type) => {
     subject: `🎬 Booking Confirmed - ${data.title} ${type}`,
     html,
   };
-};;
+};;;
 
 module.exports = { buildEmailTemplate };

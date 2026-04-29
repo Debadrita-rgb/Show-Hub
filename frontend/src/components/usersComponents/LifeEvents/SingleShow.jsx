@@ -338,12 +338,6 @@ if (show?.media?.length > 0) {
                 </p>
               </div>
 
-              {/* Date */}
-              {/* <div className="flex items-center gap-2 text-gray-600 text-sm mb-1">
-                <span>📅</span>
-                <span>{new Date(show.locations[0].date).toDateString()}</span>
-              </div> */}
-
               {/* Time */}
               <div className="flex items-center gap-2 text-gray-600 text-sm mb-1">
                 <span>⏰</span>
@@ -388,8 +382,15 @@ if (show?.media?.length > 0) {
                 show?.startDate &&
                 show?.endDate &&
                 (() => {
-                  const allDates = getDateRange(show.startDate, show.endDate);
-                  const visibleDates = showAllDates
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const allDates = getDateRange(show.startDate, show.endDate).filter((date) => {
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    return d >= today;
+  });
+                    const visibleDates = showAllDates
                     ? allDates
                     : allDates.slice(0, 10);
 
@@ -586,24 +587,6 @@ if (show?.media?.length > 0) {
                     >
                       View On Maps
                     </a>
-                    {/* <button
-                      // onClick={() =>
-                      //   handleSubmit({
-                      //     ...loc,
-                      //     date: loc.date,
-                      //   })
-                      // }
-                      onClick={() => setSelectedLocation(loc)}
-                      disabled={!isBookingAvailable(loc.date)}
-                      className={`px-5 py-2 rounded-md text-sm font-semibold transition
-    ${
-      isBookingAvailable(loc.date)
-        ? "cursor-pointer bg-red-500 text-white hover:bg-red-600"
-        : "bg-gray-400 text-gray-200 cursor-not-allowed"
-    }`}
-                    >
-                      Select Seats Count
-                    </button> */}
                     <button
                       onClick={() => {
                         setSelectedLocation(loc);

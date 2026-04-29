@@ -550,10 +550,9 @@ router.get("/get-categorized-show/:categoryId", async (req, res) => {
   try {
     const { categoryId } = req.params;
 
-    const shows = await Show.find({ category: categoryId }).populate(
-      "category",
-      "name",
-    );
+    const shows = await Show.find({ category: categoryId })
+      .populate("category", "name")
+      .sort({ createdAt: -1 });
 
     res.status(200).json(shows);
   } catch (error) {
@@ -1339,7 +1338,8 @@ const booking = new Booking({
      movieTitle: details.showTitle,
      showDate: details.date,
      showTime: details.startTime,
-     ticketPrice: details.price,
+     ticketPrice: details.ticketPrice,
+     seatCount: details.seatCount,
    };
 
    const type = "Show";
