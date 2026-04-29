@@ -11,7 +11,7 @@ const ShowAllShows = () => {
   const [category, setCategory] = useState([]);
 
   const [subCategories, setSubCategories] = useState([]);
-const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState({
     genre: [],
   });
@@ -21,16 +21,15 @@ const [showFilters, setShowFilters] = useState(false);
       try {
         const [categoryRes, showsRes] = await Promise.all([
           fetch(`${BASE_URL}/user/get-maincategory/${categoryId}`),
-          fetch(
-            `${BASE_URL}/user/get-categorized-show/${categoryId}`,
-          ),
+          fetch(`${BASE_URL}/user/get-categorized-show/${categoryId}`),
         ]);
 
         const categoryData = await categoryRes.json();
         const showsData = await showsRes.json();
 
         setShows(showsData.filter((s) => s.isActive));
-        setCategory(categoryData.filter((c) => c.isActive));
+        setCategory(categoryData?.isActive ? categoryData : null);
+
         const subCats =
           categoryData.subCategories?.map((sub) => sub.title) || [];
 
@@ -42,50 +41,48 @@ const [showFilters, setShowFilters] = useState(false);
 
     fetchData();
   }, [categoryId]);
-// console.log(shows)
+  // console.log(shows)
 
   // FILTER LOGIC
   const filteredShows = useMemo(() => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-  return shows.filter((show) => {
-    if (
-      selectedFilters.genre.length > 0 &&
-      !selectedFilters.genre.some((g) =>
-        show.subCategory?.includes(g)
-      )
-    ) {
+    return shows.filter((show) => {
+      if (
+        selectedFilters.genre.length > 0 &&
+        !selectedFilters.genre.some((g) => show.subCategory?.includes(g))
+      ) {
+        return false;
+      }
+
+      if (show.isMultipleLocation) {
+        if (!show.locations || show.locations.length === 0) return false;
+
+        const validLocations = show.locations.filter((loc) => loc.date);
+
+        if (validLocations.length === 0) return false;
+
+        const latestDate = validLocations.reduce((latest, loc) => {
+          const d = new Date(loc.date);
+          return d > latest ? d : latest;
+        }, new Date(validLocations[0].date));
+
+        latestDate.setHours(0, 0, 0, 0);
+
+        return latestDate >= today;
+      }
+
+      if (show.startDate && show.endDate) {
+        const end = new Date(show.endDate);
+        end.setHours(0, 0, 0, 0);
+
+        return end >= today;
+      }
+
       return false;
-    }
-
-    if (show.isMultipleLocation) {
-      if (!show.locations || show.locations.length === 0) return false;
-
-      const validLocations = show.locations.filter((loc) => loc.date);
-
-      if (validLocations.length === 0) return false;
-
-      const latestDate = validLocations.reduce((latest, loc) => {
-        const d = new Date(loc.date);
-        return d > latest ? d : latest;
-      }, new Date(validLocations[0].date));
-
-      latestDate.setHours(0, 0, 0, 0);
-
-      return latestDate >= today;
-    }
-
-    if (show.startDate && show.endDate) {
-      const end = new Date(show.endDate);
-      end.setHours(0, 0, 0, 0);
-
-      return end >= today;
-    }
-
-    return false;
-  });
-}, [shows, selectedFilters]);
+    });
+  }, [shows, selectedFilters]);
 
   return (
     <div className="min-h-screen px-6 md:px-16 py-16">
