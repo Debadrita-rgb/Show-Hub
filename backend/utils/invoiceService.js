@@ -41,11 +41,9 @@ const generateInvoice = (booking, user, theater) => {
       title = booking.movieTitle;
       dateTime = formatShowDateTime(booking.showDate, booking.showTime);
 
-      location = booking.theaterName;
-      theaterName = booking.theaterName || theater?.name || "";
+      theaterName = theater?.theater_name || "";
 
-      theaterLocation =
-        theater?.city || theater?.locationName || theater?.address || "";
+      theaterLocation = theater?.location_name || "";
 
       qty = booking.seats?.length || 0;
 
@@ -64,7 +62,9 @@ const generateInvoice = (booking, user, theater) => {
 
       dateTime = `${booking.details?.date} ${booking.details?.startTime}`;
 
-      location = booking.details?.theaterName;
+      theaterLocation = booking.details?.locationName;
+      theaterName = booking.details?.theaterName || "";
+
 
       qty = booking.details?.seatCount?.length || 1;
 

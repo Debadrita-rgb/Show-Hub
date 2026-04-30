@@ -408,7 +408,7 @@ if (show?.media?.length > 0) {
               ${
                 selectedDate?.toDateString() === date.toDateString()
                   ? "bg-red-500 text-white"
-                  : "bg-white text-black"
+                  : "bg-white text-white"
               }
               ${
                 isDisabled
