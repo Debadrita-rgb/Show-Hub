@@ -408,12 +408,12 @@ if (show?.media?.length > 0) {
               ${
                 selectedDate?.toDateString() === date.toDateString()
                   ? "bg-red-500 text-white"
-                  : "bg-white text-white"
+                  : "bg-white text-black"
               }
               ${
                 isDisabled
                   ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-red-700"
+                  : "hover:bg-red-700 text-white"
               }
             `}
                           >
