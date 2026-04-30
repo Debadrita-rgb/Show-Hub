@@ -13,6 +13,7 @@ const SingleShow = () => {
   const [showDateSelector, setShowDateSelector] = useState(false);
   const [showAllDates, setShowAllDates] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [visibleCount, setVisibleCount] = useState(10);
   const [show, setShow] = useState(null);
   const navigate = useNavigate();
   const [seatCount, setSeatCount] = useState(1);
@@ -220,9 +221,16 @@ if (show?.media?.length > 0) {
           : null,
     };
 
-    console.log("Booking Data:", bookingData);
+    // console.log("Booking Data:", bookingData);
 
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/signin");
+      return;
+    }else{
     navigate("/show-payment", { state: bookingData });
+
+    }
   };
 
   const canBookShow = (show) => {
@@ -390,10 +398,11 @@ if (show?.media?.length > 0) {
     d.setHours(0, 0, 0, 0);
     return d >= today;
   });
-                    const visibleDates = showAllDates
-                    ? allDates
-                    : allDates.slice(0, 10);
+                    // const visibleDates = showAllDates
+                    // ? allDates
+                    // : allDates.slice(0, 10);
 
+                    const visibleDates = allDates.slice(0, visibleCount);
                   return (
                     <div className="mt-3 flex flex-wrap gap-2 items-center">
                       {visibleDates.map((date, index) => {
@@ -404,18 +413,18 @@ if (show?.media?.length > 0) {
                             key={index}
                             disabled={isDisabled}
                             onClick={() => setSelectedDate(date)}
-                            className={`px-3 py-1 rounded-md text-sm border
-              ${
-                selectedDate?.toDateString() === date.toDateString()
-                  ? "bg-red-500 text-white"
-                  : "bg-white text-black"
-              }
-              ${
-                isDisabled
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-red-700 text-white"
-              }
-            `}
+                            className={`px-3 py-1 rounded-md text-sm border transition-colors duration-200
+  ${
+    selectedDate?.toDateString() === date.toDateString()
+      ? "bg-red-500 text-white"
+      : "bg-white text-black hover:bg-red-600 hover:text-white"
+  }
+  ${
+    isDisabled
+      ? "opacity-50 cursor-not-allowed hover:bg-white hover:text-black"
+      : ""
+  }
+`}
                           >
                             {date.toLocaleDateString("en-IN", {
                               day: "numeric",
@@ -426,12 +435,29 @@ if (show?.media?.length > 0) {
                       })}
 
                       {/* Show More / Less Button */}
-                      {allDates.length > 10 && (
+                      {/* {allDates.length > 10 && (
                         <button
                           onClick={() => setShowAllDates(!showAllDates)}
                           className="px-3 py-1 text-sm text-blue-600 underline"
                         >
                           {showAllDates ? "Show Less" : "Show More"}
+                        </button>
+                      )} */}
+                      {visibleCount < allDates.length && (
+                        <button
+                          onClick={() => setVisibleCount((prev) => prev + 10)}
+                          className="px-3 py-1 text-sm text-blue-600 underline"
+                        >
+                          Show More
+                        </button>
+                      )}
+
+                      {visibleCount > 10 && (
+                        <button
+                          onClick={() => setVisibleCount(10)}
+                          className="px-3 py-1 text-sm text-gray-500 underline"
+                        >
+                          Show Less
                         </button>
                       )}
                     </div>

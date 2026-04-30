@@ -72,7 +72,7 @@ const generateInvoice = (booking, user, theater) => {
       description += `${dateTime}\n`;
       description += `${booking.details?.locationName}\n`;
       seatCount = booking.details?.seatCount;
-      ticketTotal = booking.details?.ticketPrice;
+      ticketTotal = booking.details?.seatAmount;
     }
 
     // TAX
