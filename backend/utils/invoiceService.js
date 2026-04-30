@@ -66,13 +66,13 @@ const generateInvoice = (booking, user, theater) => {
       theaterName = booking.details?.theaterName || "";
 
 
-      qty = booking.details?.seatCount?.length || 1;
+      qty = booking.details?.seatCount || 1;
 
       description += `${booking.details?.showTitle}\n`;
       description += `${dateTime}\n`;
       description += `${booking.details?.locationName}\n`;
       seatCount = booking.details?.seatCount;
-      ticketTotal = booking.details?.seatAmount;
+      ticketTotal = booking.details?.ticketPrice;
     }
 
     // TAX
@@ -134,7 +134,7 @@ const generateInvoice = (booking, user, theater) => {
     };
 
     // HEADER ROW
-    drawRow(y, "Item Description", "Qty", "Price", "Total");
+    drawRow(y, "Item Description", "Qty", "Ticket Price", "Total");
     y += 25;
 
     // MAIN ITEM
