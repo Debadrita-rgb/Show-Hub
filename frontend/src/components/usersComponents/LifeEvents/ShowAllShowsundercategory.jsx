@@ -9,13 +9,14 @@ const ShowAllShows = () => {
   const categoryId = id;
   const [shows, setShows] = useState([]);
   const [category, setCategory] = useState([]);
-
+const [currentPage, setCurrentPage] = useState(1);
+const showsPerPage = 5;
   const [subCategories, setSubCategories] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState({
     genre: [],
   });
-
+ 
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -42,6 +43,10 @@ const ShowAllShows = () => {
     fetchData();
   }, [categoryId]);
   // console.log(shows)
+  
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedFilters, shows]);
 
   // FILTER LOGIC
   const filteredShows = useMemo(() => {
@@ -83,6 +88,13 @@ const ShowAllShows = () => {
       return false;
     });
   }, [shows, selectedFilters]);
+
+  const totalPages = Math.ceil(filteredShows.length / showsPerPage);
+
+  const paginatedShows = useMemo(() => {
+    const startIndex = (currentPage - 1) * showsPerPage;
+    return filteredShows.slice(startIndex, startIndex + showsPerPage);
+  }, [filteredShows, currentPage]);
 
   return (
     <div className="min-h-screen px-6 md:px-16 py-16">
@@ -138,7 +150,7 @@ const ShowAllShows = () => {
         <div className="lg:w-3/4">
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
             {" "}
-            {filteredShows.map((show) => (
+            {paginatedShows.map((show) => (
               <ShowCard key={show._id} show={show} />
             ))}
           </div>
@@ -146,6 +158,46 @@ const ShowAllShows = () => {
           {filteredShows.length === 0 && (
             <p className="text-center text-gray-500 mt-20">No shows found</p>
           )}
+
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-10 gap-2 flex-wrap">
+              {/* Prev */}
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 bg-purple-900 hover:bg-purple-800 text-white rounded disabled:opacity-50"
+              >
+                Prev
+              </button>
+
+              {/* Page Numbers */}
+              {[...Array(totalPages)].map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentPage(index + 1)}
+                  className={`px-4 py-2 rounded ${
+                    currentPage === index + 1
+                      ? "bg-blue-600 text-white"
+                      : "bg-purple-900 hover:bg-purple-800 text-white"
+                  }`}
+                >
+                  {index + 1}
+                </button>
+              ))}
+
+              {/* Next */}
+              <button
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 bg-purple-900 hover:bg-purple-800 text-white rounded disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+          )}
+
         </div>
       </div>
     </div>

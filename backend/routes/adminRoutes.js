@@ -17,7 +17,7 @@ const Language = require("../models/Language");
 const LocationWiseMovie = require("../models/LocationWIseMovieSelection");
 const Show = require("../models/Show");
 const Booking = require("../models/Booking");
-
+const shouldBeActive = require("../utils/shouldBeActive");
 
 const { calculateEndTime } = require("../utils/timeHelper");
 
@@ -678,6 +678,33 @@ router.post(`/add-type-category`, jwtAuthMiddleware, async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
+//Get show name with cayegory name
+  router.get(`/get-show-and-category`, async (req, res) => {
+    try {
+      const shows = await Show.find()
+        .populate("category", "name")
+        .sort({
+          createdAt: -1,
+        });
+        const updatedShows = [];
+
+        for (const show of shows) {
+          const isActiveNow = shouldBeActive(show);
+
+          if (show.isActive !== isActiveNow) {
+            show.isActive = isActiveNow;
+            await show.save();
+          }
+
+          updatedShows.push(show);
+        }
+      res.json(updatedShows);
+    } catch (error) {
+      console.error("Server Error:", error);
+      res.status(500).json({ error: "Failed to fetch items" });
+    }
+  });
 
 //Get type wise full category
 router.get("/get-typewise-category/:type", async (req, res) => {

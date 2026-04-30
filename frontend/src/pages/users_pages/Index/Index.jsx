@@ -3,7 +3,7 @@ import BannerSection from "../../../components/usersComponents/Banner/BannerSect
 import MovieGallery from "../../../components/usersComponents/MovieGallery/MovieGallery";
 import LifeEvents from "../../../components/usersComponents/LifeEvents/LifeEvents";
 
-const VoyageHomePage = () => {
+const HomePage = () => {
   return (
     <>
       <BannerSection />
@@ -13,4 +13,4 @@ const VoyageHomePage = () => {
   );
 };
 
-export default VoyageHomePage;
+export default HomePage;

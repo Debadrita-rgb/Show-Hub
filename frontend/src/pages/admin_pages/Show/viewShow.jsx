@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
 import BASE_URL from "../../../../config";
+import shouldBeActive from "../../../helper/autoDeactivehelper";
 
 const viewShow = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -12,14 +13,22 @@ const viewShow = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    fetch(`${BASE_URL}/admin/get-show`, {
+    fetch(`${BASE_URL}/admin/get-show-and-category`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     })
       .then((res) => res.json())
       .then((data) => {
-        setShow(data);
+        const updatedShows = data.map((item) => {
+          const isStillActive = shouldBeActive(item);
+
+          return {
+            ...item,
+            isActive: isStillActive,
+          };
+        });
+        setShow(updatedShows);
       })
       .catch((err) => console.error("Fetch error:", err));
   }, []);
@@ -32,6 +41,7 @@ const viewShow = () => {
       return {
         Id: index + 1,
         Showname: item.showName,
+        Category: item.category?.name || "N/A", 
         id: item._id,
         isActive: item.isActive,
         isRecommended: item.isRecommended,
@@ -140,7 +150,7 @@ const viewShow = () => {
       <div>
         <TableComponent
           title="Show"
-          columns={["Id", "Showname"]}
+          columns={["Id", "Showname", "Category"]}
           data={filteredItems}
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
@@ -148,7 +158,6 @@ const viewShow = () => {
           handleDelete={handleDelete}
           showAddButton={true}
           addPath="/admin/add-show"
-          showRecommendedeColumn={true}
           showRecommendedeColumn={false}
           // handleToggleRecommended={handleToggleRecommended}
         />

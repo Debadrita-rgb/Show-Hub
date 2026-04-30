@@ -1,5 +1,5 @@
 import React from "react";
-import ShowAllShows from "../../../components/usersComponents/LifeEvents/ShowAllShows";
+import ShowAllShows from "../../../components/usersComponents/LifeEvents/ShowAllShowsundercategory";
 
 const AllEvents = () => {
   return (

@@ -84,7 +84,7 @@ const buildEmailTemplate = (booking, user, theater, movie, type) => {
       time: booking.showTime,
       movieImage: movie.movieimage,
       seatsHTML,
-      seatsCount: booking.seats?.length || 0,
+      seatsCount: booking.seats?.length || 1,
       ticketPrice: booking.ticketPrice,
       foodHTML,
       foodTotal,
@@ -100,7 +100,7 @@ const buildEmailTemplate = (booking, user, theater, movie, type) => {
       time: booking.details?.startTime,
       movieImage: "https://via.placeholder.com/100",
       seatsHTML: "",
-      seatsCount: booking.details?.seatCount,
+      seatsCount: booking.details?.seatCount?.length || 1,
       ticketPrice: booking.details?.ticketPrice,
     };
   }

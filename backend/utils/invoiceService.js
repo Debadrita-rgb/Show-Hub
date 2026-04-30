@@ -66,13 +66,13 @@ const generateInvoice = (booking, user, theater) => {
 
       location = booking.details?.theaterName;
 
-      qty = 1;
+      qty = booking.details?.seatCount?.length || 1;
 
       description += `${booking.details?.showTitle}\n`;
       description += `${dateTime}\n`;
       description += `${booking.details?.locationName}\n`;
       seatCount = booking.details?.seatCount;
-      ticketTotal = booking.details?.ticketPrice;
+      ticketTotal = booking.details?.seatAmount;
     }
 
     // TAX

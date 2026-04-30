@@ -15,7 +15,7 @@ const ShowAllMovieWithFilter = () => {
   });
 
   const [currentPage, setCurrentPage] = useState(1);
-  const moviesPerPage = 12;
+  const moviesPerPage = 8;
   const [searchTerm, setSearchTerm] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 

@@ -38,8 +38,7 @@ const sendBookingEmail = async (booking, user, theater, movie, type) => {
     ];
 
     await sendWithRetry(msg);
-        console.log("✅ Booking email sent");
-
+    console.log("✅ Booking email sent");
   } catch (err) {
     console.error("❌ Background email error:", err.message);
   }

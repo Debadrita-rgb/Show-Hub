@@ -36,7 +36,7 @@
       <div style="display:flex; gap:15px; align-items:center;">
         <img src="{{movieImage}}" style="width:100px; border-radius:8px;" />
 
-        <div>
+        <div style="margin-left: 5px;">
           <h3 style="margin:0;">{{title}}</h3>
           <p style="color:#666; margin:5px 0;">
             {{theaterName}}<br />{{location}}
@@ -47,7 +47,6 @@
       </div>
 
       {{#if seatsHTML}}
-
         <!-- SEATS -->
         <div style="margin-top:15px;">
           <h4>💺 Seats</h4>
@@ -61,7 +60,7 @@
       {{/if}}
       <!-- SUMMARY -->
       <div style="margin-top:15px;">
-        {{#if seatsHTML}}
+        {{#if seatsCount}}
           <p>Total Tickets: {{seatsCount}}</p>
         {{/if}}
         <p>Ticket Price: ₹{{ticketPrice}}</p>
@@ -83,7 +82,7 @@
 
       <p style="color:#777;">
         Ticket Price
-        <span style="float:right;">₹{{ticketPrice}}</span>
+        <span style="float:right;">₹{{ticketPrice * seatsCount}}</span>
       </p>
 
       {{#if foodTotal}}
