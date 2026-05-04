@@ -139,7 +139,6 @@ const ViewMovie = () => {
     <div className="p-6">
       <ToastContainer position="top-right" autoClose={2000} />
 
-      {/* Show Table When Category Clicked */}
       {loading ? (
         <div className="flex justify-center items-center py-10">
           <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-500"></div>
@@ -150,7 +149,6 @@ const ViewMovie = () => {
       ) : (
         <div>
           <TableComponent
-            // title={selectedCategory}
             title="Movie"
             columns={["Id", "MovieName"]}
             data={filteredItems}
@@ -159,8 +157,6 @@ const ViewMovie = () => {
             handleToggleActive={handleToggleActive}
             showRecommendedeColumn={false}
             handleDelete={handleDelete}
-            // showEdit={true}
-            // editPath="editLink"
             showAddButton={true}
             addPath="/admin/addMovie"
           />

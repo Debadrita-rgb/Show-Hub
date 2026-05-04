@@ -3,7 +3,7 @@ import { FiHome } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import { GrUserManager } from "react-icons/gr";
 import { BiCategory } from "react-icons/bi";
-import { BsChevronDown, BsChevronUp } from "react-icons/bs"; // Dropdown icons
+import { BsChevronDown, BsChevronUp } from "react-icons/bs";
 import { RiGalleryView } from "react-icons/ri";
 import { BsFillPersonLinesFill } from "react-icons/bs";
 import { BiCommentDetail } from "react-icons/bi";
@@ -34,7 +34,6 @@ export default function AdminSidebar({ isOpen, toggleSidebar }) {
   md:translate-x-0 md:w-64 lg:w-64 z-50`}
       >
         <nav className="mt-5 space-y-4">
-          {/* Regular Links */}
           <Link
             to="/admin/dashboard"
             className="flex items-center space-x-2 p-4 rounded transition duration-200 text-white hover:text-[#1b4c6d] hover:bg-gray-100 hover:rounded-2xl"
@@ -49,7 +48,6 @@ export default function AdminSidebar({ isOpen, toggleSidebar }) {
             Category
           </Link>
 
-          {/* Dropdown for Movie section  */}
           <div>
             <button
               onClick={() => setMovieOpen(!movieOpen)}
@@ -90,7 +88,6 @@ export default function AdminSidebar({ isOpen, toggleSidebar }) {
             )}
           </div>
 
-          {/* Dropdown for Show Section  */}
           <div>
             <button
               onClick={() => setShowOpen(!showOpen)}
@@ -116,7 +113,6 @@ export default function AdminSidebar({ isOpen, toggleSidebar }) {
             )}
           </div>
 
-          {/* Dropdown for Movie section  */}
           <div>
             <button
               onClick={() => setBookingOpen(!bookingOpen)}
@@ -149,15 +145,7 @@ export default function AdminSidebar({ isOpen, toggleSidebar }) {
               </div>
             )}
           </div>
-          {/* <Link
-            to="/admin/view-all-booking"
-            className="block items-center p-2 ps-3 rounded transition duration-200 text-white hover:text-[#1b4c6d] hover:bg-gray-100 hover:rounded-2xl"
-          >
-            <FaCalendarCheck size={10} className="inline-block mr-2" />
-            Booking
-          </Link> */}
 
-          {/* Dropdown for Miscellaneous */}
           <div>
             <button
               onClick={() => setMiscOpen(!miscOpen)}
@@ -187,13 +175,6 @@ export default function AdminSidebar({ isOpen, toggleSidebar }) {
                   View Language
                 </Link>
 
-                {/* <Link
-                  to="/admin/view-gallery"
-                  className="block items-center p-2 ps-3 rounded transition duration-200 text-white hover:text-[#1b4c6d] hover:bg-gray-100 hover:rounded-2xl"
-                >
-                  <MdCollections size={10} className="inline-block mr-2" />
-                  View Gallery
-                </Link> */}
                 <Link
                   to="/admin/view-contact"
                   className="block items-center p-2 ps-3 rounded transition duration-200 text-white hover:text-[#1b4c6d] hover:bg-gray-100 hover:rounded-2xl"
@@ -222,7 +203,6 @@ export default function AdminSidebar({ isOpen, toggleSidebar }) {
         </nav>
       </aside>
 
-      {/* Mobile Overlay */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black opacity-50 md:hidden"

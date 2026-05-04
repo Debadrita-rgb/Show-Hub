@@ -81,12 +81,10 @@ const TheaterList = ({ date, language, preferredTime, selectedDate }) => {
   useEffect(() => {
     let filtered = [...allTheaters];
 
-    /* LANGUAGE FILTER */
     if (language) {
       filtered = filtered.filter((t) => t.language?.includes(language));
     }
 
-    /* TIME FILTER */
     if (preferredTime) {
       filtered = filtered
         .map((theater) => {
@@ -116,8 +114,6 @@ const TheaterList = ({ date, language, preferredTime, selectedDate }) => {
           key={theater._id}
           className="border p-4 rounded-lg flex items-center justify-between"
         >
-          {/* Left Side - Theater Info */}
-
           <div className="w-1/3">
             <div
               className="font-semibold text-lg cursor-pointer"
@@ -131,21 +127,9 @@ const TheaterList = ({ date, language, preferredTime, selectedDate }) => {
             )}
           </div>
 
-          {/* Right Side - Show Times */}
           <div className="flex gap-3 flex-wrap justify-start w-2/3">
             {theater.shows.map((show, i) => {
-              // const now = new Date();
 
-              // // create datetime using selected date
-              // const showDateTime = new Date(selectedDate);
-
-              // const [hours, minutes] = show.startTime.split(":");
-
-              // showDateTime.setHours(parseInt(hours));
-              // showDateTime.setMinutes(parseInt(minutes));
-              // showDateTime.setSeconds(0);
-
-              // const isPast = showDateTime < now;
               const isPast = isShowPast(show.startTime);
 
               return (
@@ -175,7 +159,6 @@ const TheaterList = ({ date, language, preferredTime, selectedDate }) => {
       {selectedTheater && (
         <div className="fixed inset-0 bg-opacity-40 flex justify-center items-center z-50">
           <div className="bg-white rounded-lg w-[420px] shadow-lg">
-            {/* Header */}
             <div className="flex justify-between items-center p-4 border-b">
               <h2 className="font-semibold text-lg text-black">
                 {selectedTheater.theaterName}
@@ -189,7 +172,6 @@ const TheaterList = ({ date, language, preferredTime, selectedDate }) => {
               </button>
             </div>
 
-            {/* Map */}
             <div className="p-4">
               <iframe
                 title="map"
@@ -201,12 +183,10 @@ const TheaterList = ({ date, language, preferredTime, selectedDate }) => {
               ></iframe>
             </div>
 
-            {/* Address */}
             <div className="px-4 text-sm text-gray-600 flex items-start gap-2">
               📍 {selectedTheater.address || "Address not available"}
             </div>
 
-            {/* Facilities */}
             <div className="p-4 border-t">
               <p className="font-semibold mb-2">Available Facilities</p>
               <div className="grid grid-cols-3 gap-3 text-sm text-gray-600">
@@ -228,13 +208,6 @@ const TheaterList = ({ date, language, preferredTime, selectedDate }) => {
                   <div>♿ Wheelchair Facility</div>
                 )}
               </div>
-
-              {/* <div className="grid grid-cols-3 gap-3 text-sm text-gray-600">
-                <div>🍿 Food & Beverages</div>
-                <div>📱 M-Ticket</div>
-                <div>🚗 Parking</div>
-                <div>🍴 Food Court</div>
-              </div> */}
             </div>
           </div>
         </div>
@@ -290,7 +263,6 @@ const TheaterList = ({ date, language, preferredTime, selectedDate }) => {
 
             <hr className="my-4" />
 
-            {/* <h6 className="text-xl font-bold text-black">Seat Price: ₹100</h6> */}
           </div>
         </div>
       )}

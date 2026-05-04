@@ -1,4 +1,3 @@
-// import Razorpay from "razorpay";
 const Razorpay = require("razorpay");
 
 const razorpay = new Razorpay({

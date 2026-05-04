@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 
 const BannerSchema = new mongoose.Schema({
-  // page_name: { type: String, required: true },
   type: {
     type: String,
     enum: ["home", "show-all-movies", "testimonial", "contact", "feedback"],

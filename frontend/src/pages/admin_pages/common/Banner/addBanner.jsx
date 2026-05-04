@@ -10,11 +10,9 @@ const AddBanner = () => {
   const navigate = useNavigate();
   const [image, setImage] = useState([{ imageURL: "", isActive: true }]);
 const [formData, setFormData] = useState({
-  // page_name: "",
   type: "",
 }); 
   const fields = [
-    // { name: "page_name", label: "Page Name", type: "text", required: true },
     {
       name: "type",
       label: "Page Type",
@@ -30,7 +28,6 @@ const [formData, setFormData] = useState({
     },
   ];
   
-  //Image Segment
   const handleImageChange = (index, field, value) => {
     const updatedItems = [...image];
     updatedItems[index][field] = value;
@@ -57,7 +54,6 @@ const [formData, setFormData] = useState({
       ...formData,
       page_banner_image: image,
     };
-    // console.log(payload);
     try {
       const res = await fetch(`${BASE_URL}/admin/add-banner`, {
         method: "POST",

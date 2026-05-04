@@ -16,7 +16,7 @@ const MenuBar = ({ editor }) => {
     const url = window.prompt("Enter link URL", previousUrl);
 
     if (url === null) {
-      return; // cancelled
+      return;
     }
 
     if (url === "") {
@@ -108,13 +108,6 @@ const DynamicForm = ({
       return acc;
     }, {}),
   );
-  //   const [formData, setFormData] = useState(() => {
-  //   const initial = {};
-  //   fields.forEach((field) => {
-  //     initial[field.name] = field.multiple ? [] : "";
-  //   });
-  //   return initial;
-  // });
 
   const editorsRef = React.useRef({});
 
@@ -130,7 +123,6 @@ const DynamicForm = ({
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Collect TipTap editor content
     Object.keys(editorsRef.current).forEach((name) => {
       const editorInstance = editorsRef.current[name];
       if (editorInstance) {
@@ -155,7 +147,6 @@ const DynamicForm = ({
               extensions: [StarterKit, Underline, Image, Heading, Link],
               content: formData[field.name],
               onUpdate: ({ editor }) => {
-                // live preview (optional)
                 setFormData((prev) => ({
                   ...prev,
                   [field.name]: editor.getHTML(),

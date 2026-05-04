@@ -38,7 +38,6 @@ const viewGallery = () => {
     editPath: false,
   }));
 
-  //change the active and inactive section
   const handleToggleActive = async (id, isActive) => {
     const token = localStorage.getItem("token");
     try {
@@ -55,7 +54,6 @@ const viewGallery = () => {
       );
       const updatedItem = await res.json();
 
-      // Optionally update the UI without refetching:
       setGalleryItems((prev) =>
         prev.map((item) =>
           item._id === updatedItem.updated._id ? updatedItem.updated : item

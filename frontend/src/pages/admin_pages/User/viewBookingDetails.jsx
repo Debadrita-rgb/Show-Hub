@@ -33,7 +33,6 @@ const viewBookingDetails = () => {
     fetch(`${BASE_URL}/admin/get-single-user/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
-      // .then((res) => res.json())
       .then((res) => {
         if (!res.ok) throw new Error("Network response was not OK");
         return res.json();
@@ -50,12 +49,10 @@ const viewBookingDetails = () => {
   return (
     <div className="p-6 min-h-screen">
       <div className="w-full bg-gradient-to-r from-black/80 via-purple-900/70 to-black/80 backdrop-blur-md text-white shadow-md px-6 py-4 flex items-center gap-4">
-        {/* Avatar */}
         <div className="w-14 h-14 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center text-xl font-bold">
           {userData?.name?.charAt(0)?.toUpperCase()}
         </div>
 
-        {/* Name + Email */}
         <div className="flex flex-col">
           <h2 className="text-lg font-semibold">{userData?.name}</h2>
           <p className="text-sm text-gray-400">{userData?.email}</p>
@@ -74,7 +71,6 @@ const viewBookingDetails = () => {
                     {" "}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                       {" "}
-                      {/* LEFT */}
                       <div className="space-y-2">
                         {" "}
                         <h2 className="text-base sm:text-lg font-semibold text-[#1b4c6d] break-words">
@@ -88,7 +84,6 @@ const viewBookingDetails = () => {
                           Booking ID: {order._id}
                         </p>
                       </div>
-                      {/* RIGHT */}
                       <div className="space-y-3">
                         {" "}
                         <div className="flex flex-col sm:flex-row sm:justify-between text-sm gap-1">
@@ -114,7 +109,6 @@ const viewBookingDetails = () => {
                               : `${order.theaterName}, ${order.locationName}`
                             : `${order.details?.theaterName}, ${order.details?.locationName}`}
                         </p>
-                        {/* PRICE BOX */}
                         <div className="max-w-4xl mx-auto">
                           <div className="bg-gray-100 p-3 rounded-lg text-sm space-y-1">
                             {" "}
@@ -149,7 +143,6 @@ const viewBookingDetails = () => {
                             )}
                           </div>
                         </div>
-                        {/* SEATS (chips style) */}
                         {order.type === "Movie" && (
                           <div className="mt-3">
                             <p className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1">
@@ -193,9 +186,7 @@ const viewBookingDetails = () => {
                             </div>
                           </div>
                         )}
-                        {/* STATUS BADGE */}
                         <div className="flex flex-wrap gap-2 mt-2">
-                          {/* Payment Status */}
                           <span
                             className={`px-3 py-1 text-xs rounded-full font-semibold ${
                               order.paymentStatus === "Success"
@@ -206,7 +197,6 @@ const viewBookingDetails = () => {
                             💳 Payment Status: {order.paymentStatus}
                           </span>
 
-                          {/* Booking Status */}
                           <span
                             className={`px-3 py-1 text-xs rounded-full font-semibold ${
                               order.bookingStatus === "CONFIRMED"
@@ -221,7 +211,6 @@ const viewBookingDetails = () => {
                         </div>
                       </div>
                     </div>
-                    {/* ICON */}
                     {hasFood && order.type === "Movie" && (
                       <FaChevronUp
                         className={`${open ? "rotate-180 transform" : ""} w-5 h-5 transition`}
@@ -254,20 +243,17 @@ const viewBookingDetails = () => {
                                 key={idx}
                                 className="bg-white p-2 rounded-lg shadow-sm text-sm text-black"
                               >
-                                {/* FOOD NAME + AMOUNT */}
                                 <div className="flex justify-between font-medium">
                                   <span>{item.name}</span>
                                   <span>₹{displayAmount}</span>
                                 </div>
 
-                                {/* BOOKED */}
                                 {item.foodStatus === "Booked" && (
                                   <div className="text-green-600 text-xs mt-1">
                                     Qty: {item.quantity}
                                   </div>
                                 )}
 
-                                {/* PARTIAL CANCEL */}
                                 {item.foodStatus === "Partially Cancelled" && (
                                   <div className="text-xs mt-1">
                                     <p className="text-green-600">
@@ -288,7 +274,6 @@ const viewBookingDetails = () => {
                                   </div>
                                 )}
 
-                                {/* FULL CANCEL */}
                                 {item.foodStatus === "Cancelled" && (
                                   <div className="text-red-600 text-xs mt-1">
                                     Fully Cancelled ({item.cancelledQty}) - ₹

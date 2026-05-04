@@ -29,7 +29,6 @@ const EditLocationWiseMovie = () => {
     language: [],
   });
 
-  /* ================= FETCH MOVIES ================= */
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -50,7 +49,6 @@ const EditLocationWiseMovie = () => {
       });
   }, []);
 
-  /* ================= FETCH THEATERS ================= */
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -68,7 +66,6 @@ setAllTheaters(activeTheaters);
       });
   }, []);
 
-  /* ================= FETCH EXISTING DATA ================= */
   useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem("token");
@@ -95,7 +92,6 @@ setAllTheaters(activeTheaters);
 
         setShows(data.shows || []);
 
-        // Set theater list
         const filtered = allTheaters.filter(
           (t) =>
             t.location_name.toLowerCase().trim() ===
@@ -130,7 +126,6 @@ setAllTheaters(activeTheaters);
     setShows(updatedShows);
   }, [movies]);
 
-  /* ================= CALCULATE END TIME ================= */
   const calculateEndTime = (startTime) => {
     const selectedMovie = movies.find((m) => m.value === formData.movie);
     if (!selectedMovie) return "";
@@ -140,7 +135,6 @@ setAllTheaters(activeTheaters);
       .format("HH:mm");
   };
 
-  /* ================= HANDLE SHOW ================= */
   const handleShowChange = (index, value) => {
     const updated = [...shows];
 
@@ -162,10 +156,8 @@ setAllTheaters(activeTheaters);
     setShows(shows.filter((_, i) => i !== index));
   };
 
-  // Get selectedMovie
   const selectedMovie = movies.find((m) => m.value === formData.movie);
 
-  // Add and Remove Language Handlers
   const handleAddLanguage = (lang) => {
     if (!formData.language.includes(lang)) {
       setFormData((prev) => ({
@@ -182,7 +174,6 @@ setAllTheaters(activeTheaters);
     }));
   };
 
-  /* ================= LOCATION ================= */
   const handleLocationChange = (e) => {
     const location = e.target.value;
 
@@ -191,19 +182,17 @@ setAllTheaters(activeTheaters);
         t.location_name.toLowerCase().trim() === location.toLowerCase().trim(),
     );
 
-    // check if previous theater exists in new location
     const isValidTheater = filtered.some((t) => t._id === formData.theater);
 
     setFormData((prev) => ({
       ...prev,
       location,
-      theater: isValidTheater ? prev.theater : "", // ✅ keep or reset
+      theater: isValidTheater ? prev.theater : "", 
       hall_name: "",
     }));
 
     setTheaters(filtered);
 
-    // handle halls if still valid
     if (isValidTheater) {
       const selected = filtered.find((t) => t._id === formData.theater);
 
@@ -220,11 +209,10 @@ setAllTheaters(activeTheaters);
     }
   };
 
-  /* ================= THEATER ================= */
   const handleTheaterChange = (e) => {
     const theaterId = e.target.value;
 
-    const selected = theaters.find((t) => t._id === theaterId); // ✅ correct
+    const selected = theaters.find((t) => t._id === theaterId); 
 
     setFormData((prev) => ({
       ...prev,
@@ -241,7 +229,6 @@ setAllTheaters(activeTheaters);
     }
   };
 
-  /* ================= SUBMIT ================= */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -275,7 +262,6 @@ setAllTheaters(activeTheaters);
         className="w-full h-full bg-white p-10 border border-gray-200 rounded-xl shadow text-black"
       >
         <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Movie */}
           <div>
             <label className="block mb-1 text-sm font-semibold text-gray-700">
               Select Movie
@@ -300,8 +286,6 @@ setAllTheaters(activeTheaters);
               ))}
             </select>
           </div>
-
-          {/* language  */}
 
           <div>
             <label className="block mb-1 text-sm font-semibold text-gray-700">
@@ -342,7 +326,6 @@ setAllTheaters(activeTheaters);
             </select>
           </div>
 
-          {/* Location */}
           <div>
             <label className="block mb-1 text-sm font-semibold text-gray-700">
               Select Location
@@ -360,7 +343,6 @@ setAllTheaters(activeTheaters);
               ))}
             </select>
           </div>
-          {/* Theater */}
           <div>
             <label className="block mb-1 text-sm font-semibold text-gray-700">
               Select Theater
@@ -378,7 +360,6 @@ setAllTheaters(activeTheaters);
               ))}
             </select>
           </div>
-          {/* Hall */}
           {isMultipleHall && (
             <div>
               <label className="block mb-1 text-sm font-semibold text-gray-700">
@@ -399,8 +380,6 @@ setAllTheaters(activeTheaters);
             </div>
           )}
 
-          {/* Dates */}
-          {/* Start Date */}
           <div>
             <label className="block mb-1 text-sm font-semibold text-gray-700">
               Start Date
@@ -429,13 +408,11 @@ setAllTheaters(activeTheaters);
             />
           </div>
         </div>
-        {/* Shows */}
         {shows.map((show, index) => (
           <div
             key={index}
             className="grid grid-cols-1 md:grid-cols-14 gap-4 items-end mt-4 p-4 rounded-lg"
           >
-            {/* Start Time */}
             <div className="md:col-span-5">
               <label className="block mb-1 text-sm font-semibold text-gray-700">
                 Start Time

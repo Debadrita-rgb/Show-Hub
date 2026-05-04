@@ -9,10 +9,8 @@ export default function AdminLayout({ children }) {
 
   return (
     <div className="flex">
-      {/* Sidebar */}
       <AdminSidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
 
-      {/* Main Content (Takes full screen when sidebar is closed) */}
       <div
         className={`flex-1 min-h-screen transition-all duration-300 
         ${sidebarOpen ? "ml-0 md:ml-64 lg:ml-64" : "ml-0 md:ml-64"}`}

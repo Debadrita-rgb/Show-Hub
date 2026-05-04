@@ -44,9 +44,7 @@ const ViewCancelBooking = () => {
                   <Disclosure key={booking._id}>
                     {({ open }) => (
                       <div className="bg-white text-black rounded-2xl shadow-md bbooking-l-4 bbooking-red-500">
-                        {/* ===== HEADER (CLICKABLE) ===== */}
                         <Disclosure.Button className="w-full p-4 text-left">
-                          {/* TOP */}
                           <div className="flex justify-between items-start">
                             <div>
                               <h3 className="font-semibold text-lg">
@@ -57,7 +55,6 @@ const ViewCancelBooking = () => {
                               </p>
                             </div>
 
-                            {/* ICON */}
                             {hasFood && (
                               <FaChevronUp
                                 className={`w-5 h-5 transition ${
@@ -67,25 +64,21 @@ const ViewCancelBooking = () => {
                             )}
                           </div>
 
-                          {/* USER */}
                           <div className="mt-2 text-sm">
                             👤 {booking.userId?.name} <br />
                             📧 {booking.userId?.email}
                           </div>
 
-                          {/* DATE */}
                           <div className="mt-2 text-sm">
                             📅 {new Date(booking.showDate).toLocaleDateString()} |
                             ⏰ {booking.showTime}
                           </div>
 
-                          {/* THEATER */}
                           <div className="mt-2 text-sm">
                             🏢 {booking.theaterId?.theater_name},{" "}
                             {booking.theaterId?.location_name}
                           </div>
 
-                          {/* CANCELLED SEATS */}
                           {cancelledSeats.length > 0 && (
                             <div className="mt-3">
                               <p className="text-sm font-semibold text-red-600">
@@ -105,7 +98,6 @@ const ViewCancelBooking = () => {
                             </div>
                           )}
 
-                          {/* PRICE */}
                           <div className="mt-3 bg-gray-100 p-3 rounded-lg text-sm space-y-1">
                             <p>Total Paid: ₹{booking.totalAmount}</p>
 
@@ -119,7 +111,6 @@ const ViewCancelBooking = () => {
                           </div>
                         </Disclosure.Button>
 
-                        {/* ===== FOOD PANEL (EXPAND) ===== */}
                         {hasFood && (
                           <Disclosure.Panel className="px-4 pb-4">
                             <div className="bg-gray-50 rounded-xl p-4 mt-2">

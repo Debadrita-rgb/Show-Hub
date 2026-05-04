@@ -35,7 +35,6 @@ const AddLocationWiseMovie = () => {
     language: [],
   });
 
-  /* ================= FETCH MOVIES ================= */
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -63,7 +62,6 @@ const AddLocationWiseMovie = () => {
 
   const selectedMovie = movies.find((m) => m.value === formData.movie);
 
-  // Handle Add and remove Language
   const handleAddLanguage = (lang) => {
     if (!formData.language.includes(lang)) {
       setFormData((prev) => ({
@@ -79,7 +77,6 @@ const AddLocationWiseMovie = () => {
       language: prev.language.filter((l) => l !== lang),
     }));
   };
-  /* ================= FETCH THEATERS ================= */
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -103,7 +100,6 @@ const AddLocationWiseMovie = () => {
       .catch(() => toast.error("Failed to fetch theaters"));
   }, []);
 
-  /* ================= HANDLE CHANGE ================= */
   const calculateEndTime = (startTime) => {
     const selectedMovie = movies.find((m) => m.value === formData.movie);
 
@@ -126,7 +122,6 @@ const AddLocationWiseMovie = () => {
       newEnd = newEnd.add(1, "day");
     }
 
-    // Check previous show gap (20 minutes)
     if (index > 0) {
       const prevShow = shows[index - 1];
 
@@ -146,7 +141,6 @@ const AddLocationWiseMovie = () => {
       }
     }
 
-    //   Overlap validation
     for (let i = 0; i < shows.length; i++) {
       if (i === index) continue;
 
@@ -196,7 +190,6 @@ const AddLocationWiseMovie = () => {
       },
     ]);
   };
-  // Remove Show Function
 
   const removeShow = (index) => {
     const updated = shows.filter((_, i) => i !== index);
@@ -209,12 +202,9 @@ const AddLocationWiseMovie = () => {
     setFormData((prev) => {
       const updated = { ...prev, [name]: value };
 
-      /* CLEAR LANGUAGE WHEN MOVIE CHANGES */
       if (name === "movie") {
         updated.language = [];
       }
-
-      /* Calculate End Time */
 
       if (
         (name === "movie" || name === "startTime") &&
@@ -238,8 +228,6 @@ const AddLocationWiseMovie = () => {
     });
   };
 
-  /* ================= LOCATION CHANGE ================= */
-
   const handleLocationChange = (e) => {
     const location = e.target.value;
 
@@ -258,7 +246,6 @@ const AddLocationWiseMovie = () => {
     setTheaters(filtered);
   };
 
-  /* ================= THEATER CHANGE ================= */
 
   const handleTheaterChange = (e) => {
     const theaterId = e.target.value;
@@ -281,7 +268,6 @@ const AddLocationWiseMovie = () => {
     }
   };
 
-  /* ================= SUBMIT ================= */
 
   const hasOverlap = (shows) => {
     for (let i = 0; i < shows.length; i++) {
@@ -306,7 +292,6 @@ const AddLocationWiseMovie = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // check overlap before sending
     if (hasOverlap(shows)) {
       return;
     }
@@ -348,7 +333,6 @@ const AddLocationWiseMovie = () => {
       >
         <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-6">
           {" "}
-          {/* Movie */}
           <div>
             <label className="block mb-1 text-sm font-semibold text-gray-700">
               Select Movie
@@ -371,7 +355,6 @@ const AddLocationWiseMovie = () => {
               ))}
             </select>
           </div>
-          {/* Language  */}
           <div>
             <label className="block mb-1 text-sm font-semibold text-gray-700">
               Select Language
@@ -407,7 +390,6 @@ const AddLocationWiseMovie = () => {
               ))}
             </select>
           </div>
-          {/* Location */}
           <div>
             <label className="block mb-1 text-sm font-semibold text-gray-700">
               Select Location
@@ -428,7 +410,6 @@ const AddLocationWiseMovie = () => {
               ))}
             </select>
           </div>
-          {/* Theater */}
           <div>
             <label className="block mb-1 text-sm font-semibold text-gray-700">
               Select Theater
@@ -449,7 +430,6 @@ const AddLocationWiseMovie = () => {
               ))}
             </select>
           </div>
-          {/* Hall */}
           {isMultipleHall && (
             <div>
               <label className="block mb-1 text-sm font-semibold text-gray-700">
@@ -472,7 +452,6 @@ const AddLocationWiseMovie = () => {
               </select>
             </div>
           )}
-          {/* Start Date */}
           <div>
             <label className="block mb-1 text-sm font-semibold text-gray-700">
               Start Date
@@ -486,7 +465,6 @@ const AddLocationWiseMovie = () => {
               required
             />
           </div>
-          {/* End Date */}
           <div>
             <label className="block mb-1 text-sm font-semibold text-gray-700">
               End Date
@@ -507,7 +485,6 @@ const AddLocationWiseMovie = () => {
             key={index}
             className="grid grid-cols-1 md:grid-cols-14 gap-4 items-end mt-4 border p-4 rounded-lg"
           >
-            {/* Start Time */}
             <div className="md:col-span-5">
               <label className="block mb-1 text-sm font-semibold text-gray-700">
                 Start Time
@@ -521,7 +498,6 @@ const AddLocationWiseMovie = () => {
               />
             </div>
 
-            {/* End Time */}
             <div className="md:col-span-5">
               <label className="block mb-1 text-sm font-semibold text-gray-700">
                 End Time
@@ -534,7 +510,6 @@ const AddLocationWiseMovie = () => {
               />
             </div>
 
-            {/* Add Button */}
             <div className="md:col-span-2">
               <button
                 type="button"
@@ -545,7 +520,6 @@ const AddLocationWiseMovie = () => {
               </button>
             </div>
 
-            {/* Remove Button (only from 2nd row) */}
             <div className="md:col-span-2">
               {shows.length > 1 && (
                 <button
@@ -559,7 +533,6 @@ const AddLocationWiseMovie = () => {
             </div>
           </div>
         ))}
-        {/* Button */}
         <button
           type="submit"
           className="col-span-1 md:col-span-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 cursor-pointer"

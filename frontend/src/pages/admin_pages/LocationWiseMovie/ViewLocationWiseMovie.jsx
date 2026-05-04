@@ -38,15 +38,13 @@ const ViewdLocationWiseMovie = () => {
      const today = dayjs().startOf("day");
      const endDate = dayjs(item.endDate).startOf("day");
 
-     const isActive = today.isBefore(endDate); // today < endDate
+     const isActive = today.isBefore(endDate);
 
      return {
        Id: index + 1,
        MovieName: item.movie?.title,
        Theater: item.theater?.theater_name,
        Hall: item.hall_name || "Single Hall",
-      //  StartTime: item.startTime,
-      //  EndTime: item.endTime,
        StartDate: dayjs(item.startDate).format("DD.MM.YYYY"),
        EndDate: dayjs(item.endDate).format("DD.MM.YYYY"),
        isActive: isActive,
@@ -75,16 +73,12 @@ const ViewdLocationWiseMovie = () => {
               "MovieName",
               "Theater",
               "Hall",
-              // "StartTime",
-              // "EndTime",
               "StartDate",
               "EndDate",
             ]}
             data={filteredItems}
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
-            // handleToggleActive={handleToggleActive}
-            // handleDelete={handleDelete}
             showAddButton={true}
             showRecommendedeColumn={false}
             addPath="/admin/add-movie-selection"

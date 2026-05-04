@@ -285,7 +285,6 @@ const AdminDashboard = () => {
 
   return (
     <main className="p-6 min-h-screen">
-      {/*  TOP STATS  */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {cardsValue.map((card, index) => (
           <div
@@ -300,16 +299,13 @@ const AdminDashboard = () => {
         ))}
       </div>
 
-      {/*  CHARTS SECTION  */}
       <div className="mt-8 grid grid-cols-1 gap-6">
         <div className="bg-white p-5 rounded-2xl shadow">
-          {/* HEADER + TABS */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
             <h2 className="text-lg font-semibold text-black">
               📈 Revenue Trend
             </h2>
 
-            {/* Tabs */}
             <div className="relative flex bg-gray-800 rounded-full p-1 w-full sm:w-auto sm:min-w-[260px]">
               <div
                 className={`absolute top-1 bottom-1 w-1/3 rounded-full transition-all duration-300
@@ -339,9 +335,7 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          {/* FILTERS */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-            {/* Single Date */}
             <div className="flex flex-col relative">
               <label className="text-xs font-semibold text-gray-600 mb-1">
                 Select Date
@@ -403,7 +397,6 @@ const AdminDashboard = () => {
               )}
             </div>
 
-            {/* Date Range */}
             <div className="flex flex-col relative">
               <label className="text-xs font-semibold text-gray-600 mb-1">
                 Date Range
@@ -427,10 +420,8 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          {/* CHART */}
           {revenueData.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
-              {/* DAILY OR SINGLE DATE → BAR CHART */}
               {activeTab === "Daily" ||
               (activeTab === "Daily" && selectedDate) ? (
                 <BarChart data={revenueData} barSize={25} barCategoryGap="40%">
@@ -472,7 +463,6 @@ const AdminDashboard = () => {
       </div>
 
       <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Popular Movies */}
         <div className="bg-white p-5 rounded-2xl shadow">
           <h2 className="text-lg font-semibold mb-4 text-black">
             🎬 Popular Movies
@@ -492,7 +482,6 @@ const AdminDashboard = () => {
           )}
         </div>
 
-        {/* Peak Hours */}
         <div className="bg-white p-5 rounded-2xl shadow">
           <h2 className="text-lg font-semibold mb-4 text-black">
             ⏰ Peak Booking Hours
@@ -513,9 +502,7 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {/*  SECOND ROW  */}
       <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Busiest theater  */}
         <div className="bg-white p-5 rounded-2xl shadow">
           <h2 className="text-lg font-semibold mb-4 text-black">
             🎬 Busiest Theaters
@@ -541,7 +528,6 @@ const AdminDashboard = () => {
           )}
         </div>
 
-        {/* Cancellation Rate */}
         <div className="bg-white p-5 rounded-2xl shadow flex flex-col justify-center items-center relative">
           <h2 className="text-lg font-semibold mb-4 text-black">
             ❌ Cancellation Rate

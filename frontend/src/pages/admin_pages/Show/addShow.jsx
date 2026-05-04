@@ -5,7 +5,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import BASE_URL from "../../../../config";
 import { getYouTubeVideoId } from "../../../utils/youtube";
 
-
 const AddShow = () => {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
@@ -28,32 +27,30 @@ const AddShow = () => {
     setMedia([...media, { type: "image", url: "" }]);
   };
 
-  
+  const handleMediaChange = (index, field, value) => {
+    const updated = [...media];
+    updated[index][field] = value;
 
- const handleMediaChange = (index, field, value) => {
-   const updated = [...media];
-   updated[index][field] = value;
+    if (field === "url") {
+      const type = updated[index].type;
 
-   if (field === "url") {
-     const type = updated[index].type;
+      if (type === "youtube") {
+        const id = getYouTubeVideoId(value);
+        if (!id && value !== "") {
+          toast.warn("Enter valid YouTube link");
+        }
+      }
 
-     if (type === "youtube") {
-       const id = getYouTubeVideoId(value);
-       if (!id && value !== "") {
-         toast.warn("Enter valid YouTube link");
-       }
-     }
+      if (type === "image") {
+        const isYT = getYouTubeVideoId(value);
+        if (isYT) {
+          toast.warn("This looks like YouTube link, change type");
+        }
+      }
+    }
 
-     if (type === "image") {
-       const isYT = getYouTubeVideoId(value);
-       if (isYT) {
-         toast.warn("This looks like YouTube link, change type");
-       }
-     }
-   }
-
-   setMedia(updated);
- };
+    setMedia(updated);
+  };
 
   const removeMedia = (index) => {
     const updated = [...media];
@@ -67,7 +64,6 @@ const AddShow = () => {
   const [selectedLanguages, setSelectedLanguages] = useState([]);
   const [formData, setFormData] = useState({
     showName: "",
-    // showImage: "",
     category: "",
     subCategory: "",
     isMultipleLocation: false,
@@ -108,12 +104,9 @@ const AddShow = () => {
       try {
         const token = localStorage.getItem("token");
 
-        const res = await axios.get(
-          `${BASE_URL}/admin/get-language`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
+        const res = await axios.get(`${BASE_URL}/admin/get-language`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setLanguages(res.data);
       } catch (err) {
         console.log(err);
@@ -125,27 +118,27 @@ const AddShow = () => {
 
   /* HANDLE INPUT  */
 
-const handleChange = (e) => {
-  const { name, value, type, checked } = e.target;
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
 
-  setFormData({
-    ...formData,
-    [name]: type === "checkbox" ? checked : value,
-  });
+    setFormData({
+      ...formData,
+      [name]: type === "checkbox" ? checked : value,
+    });
 
-  //  CATEGORY CHANGE LOGIC
-  if (name === "category") {
-    const selectedCategory = categories.find((cat) => cat._id === value);
+    //  CATEGORY CHANGE LOGIC
+    if (name === "category") {
+      const selectedCategory = categories.find((cat) => cat._id === value);
 
-    if (selectedCategory?.subCategories) {
-      setSubCategories(selectedCategory.subCategories);
-    } else {
-      setSubCategories([]);
+      if (selectedCategory?.subCategories) {
+        setSubCategories(selectedCategory.subCategories);
+      } else {
+        setSubCategories([]);
+      }
+
+      setSelectedSubCategories([]);
     }
-
-    setSelectedSubCategories([]);
-  }
-};
+  };
 
   /* LOCATION FUNCTIONS */
 
@@ -201,13 +194,6 @@ const handleChange = (e) => {
 
   /* LANGUAGE SELECT */
 
-  // const handleLanguageChange = (e) => {
-  //   const selected = Array.from(e.target.selectedOptions).map(
-  //     (option) => option.value,
-  //   );
-
-  //   setFormData({ ...formData, languages: selected });
-  // };
   const addLanguage = (e) => {
     const value = e.target.value;
 
@@ -246,35 +232,33 @@ const handleChange = (e) => {
 
     try {
       const token = localStorage.getItem("token");
-// const videoId = getYouTubeVideoId(formData.showVideoEmbedURL);
 
-const formattedMedia = media.map((item, index) => {
-  if (!item.url.trim()) {
-    toast.error(`Media ${index + 1} URL is required`);
-    throw new Error("Empty media");
-  }
+      const formattedMedia = media.map((item, index) => {
+        if (!item.url.trim()) {
+          toast.error(`Media ${index + 1} URL is required`);
+          throw new Error("Empty media");
+        }
 
-  if (item.type === "youtube") {
-    const videoId = getYouTubeVideoId(item.url);
+        if (item.type === "youtube") {
+          const videoId = getYouTubeVideoId(item.url);
 
-    if (!videoId) {
-      toast.error(`Media ${index + 1}: Invalid YouTube URL`);
-      throw new Error("Invalid YouTube");
-    }
+          if (!videoId) {
+            toast.error(`Media ${index + 1}: Invalid YouTube URL`);
+            throw new Error("Invalid YouTube");
+          }
 
-    return { type: "youtube", url: videoId };
-  }
+          return { type: "youtube", url: videoId };
+        }
 
-  return item;
-});
+        return item;
+      });
 
-
-const filteredArtists = artists.filter(
-  (a) =>
-    a.artist_name.trim() !== "" ||
-    a.designation.trim() !== "" ||
-    a.artist_image.trim() !== "",
-);
+      const filteredArtists = artists.filter(
+        (a) =>
+          a.artist_name.trim() !== "" ||
+          a.designation.trim() !== "" ||
+          a.artist_image.trim() !== "",
+      );
 
       const payload = {
         ...formData,
@@ -282,7 +266,7 @@ const filteredArtists = artists.filter(
         subCategory: selectedSubCategories,
         artists: filteredArtists.length > 0 ? filteredArtists : [],
         media: formattedMedia,
-      }; 
+      };
 
       if (formData.isMultipleLocation) {
         payload.locations = locations;
@@ -315,8 +299,6 @@ const filteredArtists = artists.filter(
         onSubmit={handleSubmit}
         className="md:p-10 text-black w-full h-full bg-white p-10 border border-gray-200 rounded-xl shadow"
       >
-        {/* SHOW INFO */}
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="mb-1 text-sm font-semibold text-gray-700">
@@ -349,8 +331,6 @@ const filteredArtists = artists.filter(
               ))}
             </select>
           </div>
-
-          {/* SUBCATEGORY */}
 
           <div className="mt-6">
             <label className="mb-1 text-sm font-semibold text-gray-700">
@@ -392,7 +372,6 @@ const filteredArtists = artists.filter(
 
           {media.map((item, index) => (
             <div key={index} className="flex gap-2 mb-2">
-              {/* TYPE SELECT */}
               <select
                 value={item.type}
                 onChange={(e) =>
@@ -404,7 +383,6 @@ const filteredArtists = artists.filter(
                 <option value="youtube">YouTube</option>
               </select>
 
-              {/* URL INPUT */}
               <input
                 type="text"
                 placeholder="Enter URL"
@@ -415,7 +393,6 @@ const filteredArtists = artists.filter(
                 className="flex-1 border p-2 rounded"
               />
 
-              {/* REMOVE */}
               {media.length > 1 && (
                 <button
                   type="button"
@@ -436,7 +413,6 @@ const filteredArtists = artists.filter(
             + Add Media
           </button>
         </div>
-        {/* MULTIPLE LOCATION */}
 
         <div className="mt-8">
           <label className="flex items-center gap-2 font-medium">
@@ -450,8 +426,6 @@ const filteredArtists = artists.filter(
             Multiple Location
           </label>
         </div>
-
-        {/* LOCATION SECTION */}
 
         <div className="mt-6 bg-gray-50 border rounded-xl p-4 sm:p-6">
           {" "}
@@ -537,8 +511,6 @@ const filteredArtists = artists.filter(
                 />
               </div>
 
-              {/* REMOVE BUTTON */}
-
               {formData.isMultipleLocation && locations.length > 1 && (
                 <button
                   type="button"
@@ -581,7 +553,6 @@ const filteredArtists = artists.filter(
               </div>
             </div>
           )}
-          {/* ADD BUTTON */}
           {formData.isMultipleLocation && (
             <button
               type="button"
@@ -592,15 +563,12 @@ const filteredArtists = artists.filter(
             </button>
           )}
         </div>
-        {/* LANGUAGES */}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
           <div className="mt-6">
             <label className="mb-1 text-sm font-semibold text-gray-700">
               Show Language
             </label>
-
-            {/* Selected Languages */}
             <div className="flex flex-wrap gap-2 mb-3 text-black">
               {selectedLanguages.map((lang) => (
                 <div
@@ -615,9 +583,6 @@ const filteredArtists = artists.filter(
                 </div>
               ))}
             </div>
-
-            {/* Dropdown */}
-
             <select
               onChange={addLanguage}
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring text-black"
@@ -644,8 +609,6 @@ const filteredArtists = artists.filter(
             />
           </div>
         </div>
-
-        {/* ARTISTS */}
 
         <div className="mt-8 rounded-xl">
           <h3 className="font-semibold mb-4">Add Artist Members</h3>
@@ -702,13 +665,11 @@ const filteredArtists = artists.filter(
           ))}
         </div>
 
-        {/* AGE + DESCRIPTION */}
-
         <div className="mt-6">
           <label className="mb-1 text-sm font-semibold text-gray-700">
             Description
           </label>
-          
+
           <textarea
             name="description"
             value={formData.description}
@@ -717,8 +678,6 @@ const filteredArtists = artists.filter(
             rows="4"
           />
         </div>
-
-        {/* DATES */}
 
         <button
           type="submit"

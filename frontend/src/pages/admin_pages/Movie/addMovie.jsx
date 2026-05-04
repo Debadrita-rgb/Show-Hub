@@ -215,12 +215,6 @@ const AddMovie = () => {
       options: categories.map((cat) => cat.name),
     },
     { name: "backgroundUrl", label: "Background Url", type: "text" },
-    // {
-    //   name: "isRecommended",
-    //   label: "Recommended",
-    //   type: "checkbox",
-    //   value: true,
-    // },
     {
       name: "trailerlink",
       label: "Trailer Link",
@@ -232,7 +226,6 @@ const AddMovie = () => {
   return (
     <div className="p-8">
       <ToastContainer position="top-right" autoClose={2000} />
-      {/* Casting Segment */}
       <div className="mb-6 bg-white p-6 border rounded-xl shadow w-full">
         <h2 className="text-sm font-semibold mb-4 text-gray-700">
           Add Casting
@@ -289,7 +282,6 @@ const AddMovie = () => {
         ))}
       </div>
 
-      {/* Crew Segment  */}
 
       <div className="mb-6 bg-white p-6 border rounded-xl shadow w-full">
         <h2 className="text-sm font-semibold mb-4 text-gray-700">
@@ -345,7 +337,6 @@ const AddMovie = () => {
         ))}
       </div>
 
-      {/* Dynamic Form */}
       <DynamicForm
         fields={fields}
         formData={formData}

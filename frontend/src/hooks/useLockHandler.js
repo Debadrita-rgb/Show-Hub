@@ -14,7 +14,6 @@ export default function useLockHandler() {
     );
   };
 
-  // Handle tab close / refresh
   useEffect(() => {
     const handleLeave = () => {
       const lockId = localStorage.getItem("lockId");
@@ -34,7 +33,6 @@ export default function useLockHandler() {
     };
   }, []);
 
-  // Handle route change (MAIN FIX)
 useEffect(() => {
   const prevPath = prevPathRef.current;
   const currentPath = location.pathname;
@@ -42,7 +40,6 @@ useEffect(() => {
   const wasInBooking = isBookingFlow(prevPath);
   const nowInBooking = isBookingFlow(currentPath);
 
-  // Leaving booking flow → release lock
   if (wasInBooking && !nowInBooking) {
     const lockId = localStorage.getItem("lockId");
 

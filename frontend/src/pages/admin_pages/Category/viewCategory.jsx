@@ -71,7 +71,6 @@ const ViewCategory = () => {
     }
   };
 
-  // delete
   const handleDelete = async (id) => {
     const token = localStorage.getItem("token");
 

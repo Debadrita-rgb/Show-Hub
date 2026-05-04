@@ -79,7 +79,6 @@ const navigate = useNavigate();
               sgst: Number(sgst.toFixed(2)),
               Price: Number((showPrice || 0).toFixed(2)),
               bookingStatus: "Confirmed",
-              // seatCount: seatCount,
             }),
           });
 
@@ -99,7 +98,6 @@ const navigate = useNavigate();
 
   return (
     <div className="max-w-7xl mx-auto p-6 grid grid-cols-1 md:grid-cols-3 gap-6 text-black">
-      {/* PAYMENT OPTIONS */}
       <div className="md:col-span-2 bg-white rounded shadow p-5">
         <h2 className="text-lg font-semibold mb-4">Payment Options</h2>
 
@@ -118,7 +116,6 @@ const navigate = useNavigate();
         </div>
       </div>
 
-      {/* ORDER SUMMARY */}
       <div className="bg-white rounded shadow p-5">
         <h3 className="font-semibold text-lg mb-3">{booking.showName}</h3>
 
@@ -129,13 +126,11 @@ const navigate = useNavigate();
         <p className="text-sm text-gray-500 mb-3">{booking.theaterName}</p>
 
         <div className="border-t pt-3">
-          {/* Ticket price */}
           <div className="flex justify-between mb-2">
             <span>Ticket(s) price</span>
             <span>₹{showPrice}</span>
           </div>
 
-          {/* Convenience fee */}
           <div
             className="flex justify-between cursor-pointer"
             onClick={() => setShowFeeDetails(!showFeeDetails)}
@@ -162,7 +157,6 @@ const navigate = useNavigate();
             </div>
           )}
 
-          {/* Total */}
           <div className="border-t mt-3 pt-3 flex justify-between font-bold text-lg">
             <span>Amount Payable</span>
 

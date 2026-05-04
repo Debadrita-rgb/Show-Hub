@@ -33,9 +33,6 @@ const [media, setMedia] = useState([{ type: "image", url: "" }]);
     endDate: "",
   });
 
-  // =============================
-  // FETCH CATEGORY + LANGUAGE
-  // =============================
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -181,15 +178,12 @@ const [media, setMedia] = useState([{ type: "image", url: "" }]);
               ],
         );
 
-        //   artists
-        // setArtists(data.artists || []);
         setArtists(
           data.artists?.length
             ? data.artists
             : [{ artist_name: "", designation: "", artist_image: "" }],
         );
 
-        //   load subcategories of selected category
         const selectedCategory = categories.find(
           (cat) => cat._id === data.category,
         );
@@ -382,8 +376,7 @@ const [media, setMedia] = useState([{ type: "image", url: "" }]);
         onSubmit={handleSubmit}
         className="bg-white p-10 rounded-xl shadow text-black"
       >
-        {/* SHOW INFO */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+*        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="mb-1 text-sm font-semibold text-gray-700">
               Show Name
@@ -395,8 +388,6 @@ const [media, setMedia] = useState([{ type: "image", url: "" }]);
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring text-black"
             />
           </div>
-
-          {/* CATEGORY */}
 
           <div>
             <label className="mb-1 text-sm font-semibold text-gray-700">
@@ -418,8 +409,6 @@ const [media, setMedia] = useState([{ type: "image", url: "" }]);
               ))}
             </select>
           </div>
-
-          {/* SUBCATEGORY */}
 
           <div className="mt-6">
             <label className="mb-1 text-sm font-semibold text-gray-700">
@@ -511,7 +500,6 @@ const [media, setMedia] = useState([{ type: "image", url: "" }]);
             + Add Media
           </button>
         </div>
-        {/* MULTIPLE LOCATION */}
         <div className="mt-8">
           <label className="flex items-center gap-2 font-medium">
             <input
@@ -524,7 +512,6 @@ const [media, setMedia] = useState([{ type: "image", url: "" }]);
             Multiple Location
           </label>
         </div>
-        {/* LOCATION SECTION */}
         <div className="mt-6 bg-gray-50 border rounded-xl p-3">
           <h3 className="text-lg font-semibold mb-4">Show Locations</h3>
 
@@ -607,7 +594,6 @@ const [media, setMedia] = useState([{ type: "image", url: "" }]);
                   className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring text-black"
                 />
               </div>
-              {/* REMOVE BUTTON */}
 
               {formData.isMultipleLocation && locations.length > 1 && (
                 <button
@@ -647,7 +633,6 @@ const [media, setMedia] = useState([{ type: "image", url: "" }]);
             </div>
           )}
 
-          {/* ADD BUTTON */}
 
           {formData.isMultipleLocation && (
             <button
@@ -659,14 +644,12 @@ const [media, setMedia] = useState([{ type: "image", url: "" }]);
             </button>
           )}
         </div>
-        {/* LANGUAGES */}
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="mb-1 text-sm font-semibold text-gray-700">
               Movie Language
             </label>
 
-            {/* Selected Languages */}
             <div className="flex flex-wrap gap-2 mb-3 text-black">
               {selectedLanguages.map((lang) => (
                 <div
@@ -682,8 +665,6 @@ const [media, setMedia] = useState([{ type: "image", url: "" }]);
               ))}
             </div>
 
-            {/* Dropdown */}
-
             <select
               onChange={addLanguage}
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring text-black"
@@ -698,7 +679,6 @@ const [media, setMedia] = useState([{ type: "image", url: "" }]);
             </select>
           </div>
 
-          {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6"> */}
           <div className="mt-6">
             <label className="mb-1 text-sm font-semibold text-gray-700">
               Age Limit
@@ -711,7 +691,6 @@ const [media, setMedia] = useState([{ type: "image", url: "" }]);
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring text-black"
             />
           </div>
-          {/* </div> */}
         </div>
         {/* ARTISTS */}
         <div className="mt-8 rounded-xl">
@@ -768,7 +747,6 @@ const [media, setMedia] = useState([{ type: "image", url: "" }]);
             </div>
           ))}
         </div>
-        {/* AGE + DESCRIPTION */}
         <div className="mt-6">
           <label className="mb-1 text-sm font-semibold text-gray-700">
             Description
@@ -782,7 +760,6 @@ const [media, setMedia] = useState([{ type: "image", url: "" }]);
             rows="4"
           />
         </div>
-        {/* DATES */}
         <button
           type="submit"
           className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 mt-6"

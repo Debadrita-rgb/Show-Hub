@@ -50,11 +50,9 @@ const formatDuration = (minutes) => {
 };
   return (
     <div className="max-w-6xl mx-auto p-4">
-      {/* Movie Title */}
       <h1 className="text-2xl md:text-3xl font-semibold mb-3 text-white">
         {movie.title}
       </h1>
-      {/* Runtime + Category */}
       <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-6">
         <span className="text-xs md:text-sm text-white border border-gray-300 px-2 py-1 rounded-md">
           Movie runtime: {formatDuration(movie.totalTiming)}
@@ -69,9 +67,7 @@ const formatDuration = (minutes) => {
           </span>
         ))}
       </div>
-      {/* Date + Filters */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-center border-y py-4 mb-6 gap-4">
-        {/* Date selector */}
         <div className="flex gap-3 overflow-x-auto pb-2">
           {dates.map((date, index) => (
             <div
@@ -97,7 +93,6 @@ const formatDuration = (minutes) => {
           ))}
         </div>
 
-        {/* Filters */}
         <div className="flex flex-wrap gap-2 md:gap-3">
           <select
             value={language}
@@ -135,7 +130,6 @@ const formatDuration = (minutes) => {
           </select>
         </div>
       </div>
-      {/* Theatre List */}
       <TheatreList
         selectedDate={selectedDate}
         language={language}

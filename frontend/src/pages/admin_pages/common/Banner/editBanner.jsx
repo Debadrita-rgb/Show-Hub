@@ -22,11 +22,9 @@ const EditBanner = () => {
       .then((res) => res.json())
       .then((data) => {
         setInitialData({
-          // page_name: data.page_name || "",
           type: data.type || "",
         });
 
-        // Load existing images
         if (data.page_banner_image?.length > 0) {
           setImage(
             data.page_banner_image.map((img) => ({
@@ -39,7 +37,6 @@ const EditBanner = () => {
       .catch((err) => console.error("Error fetching Banner:", err));
   }, [id]);
 
-  // Image Handlers
   const handleImageChange = (index, field, value) => {
     const updated = [...image];
     updated[index][field] = value;
@@ -56,7 +53,6 @@ const EditBanner = () => {
     setImage(updated);
   };
 
-  // Submit Update
   const handleSubmit = async (formData) => {
     const token = localStorage.getItem("token");
 
@@ -96,12 +92,6 @@ const EditBanner = () => {
   if (!initialData) return <div>Loading...</div>;
 
   const fields = [
-    // {
-    //   name: "page_name",
-    //   label: "Page Name",
-    //   type: "text",
-    //   required: true,
-    // },
     {
       name: "type",
       label: "Type",
@@ -114,7 +104,6 @@ const EditBanner = () => {
     <div className="p-6">
       <ToastContainer position="top-right" autoClose={2000} />
 
-      {/* Image Section */}
       <div className="mb-6 bg-white p-6 border rounded-xl shadow w-full">
         <h2 className="text-sm font-semibold mb-4 text-gray-700">
           Edit Images
@@ -172,10 +161,8 @@ const EditBanner = () => {
         ))}
       </div>
 
-      {/* Dynamic Form */}
       {initialData ? (
         <DynamicForm
-          // key={Id}
           fields={fields.map((f) => ({
             ...f,
             value: initialData[f.name],

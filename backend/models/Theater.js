@@ -24,7 +24,6 @@ const hallSchema = new mongoose.Schema({
     type: String,
     required: function () {
       return this.parent().isMultiple;
-      // Required only if theater has multiple halls
     },
   },
   seatCategories: {

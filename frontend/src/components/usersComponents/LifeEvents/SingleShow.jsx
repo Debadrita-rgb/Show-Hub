@@ -6,7 +6,6 @@ import "slick-carousel/slick/slick-theme.css";
 import { Link } from "react-router-dom";
 import BASE_URL from "../../../../config";
 import YouTubePlayer from "./youTubePlayerComponent";
-// import generateCalendar from "../../../helper/generateCalendar";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./singleShow.css";
@@ -15,7 +14,6 @@ const SingleShow = () => {
   const { id } = useParams();
   const [openVenueModal, setOpenVenueModal] = useState(false);
   const [showDateSelector, setShowDateSelector] = useState(false);
-  // const [showAllDates, setShowAllDates] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [visibleCount, setVisibleCount] = useState(10);
   const [show, setShow] = useState(null);
@@ -27,11 +25,6 @@ const SingleShow = () => {
     totalVotes: 0,
   });
 
-{/* <DatePicker
-  selected={selectedDate}
-  onChange={(date) => setSelectedDate(date)}
-  inline
-/>; */}
   const [reviews, setReviews] = useState([]);
   
   const getDateRange = (start, end) => {
@@ -272,12 +265,10 @@ if (show?.media?.length > 0) {
     if (startDate) startDate.setHours(0, 0, 0, 0);
     if (endDate) endDate.setHours(0, 0, 0, 0);
 
-    // If end date exists
     if (endDate) {
       return endDate >= today;
     }
 
-    // If only start date exists
     if (startDate) {
       return startDate >= today;
     }
@@ -289,7 +280,6 @@ if (show?.media?.length > 0) {
     const showDate = new Date(date);
     const today = new Date();
 
-    // remove time
     showDate.setHours(0, 0, 0, 0);
     today.setHours(0, 0, 0, 0);
 
@@ -308,10 +298,8 @@ const basePrice = show?.locations?.[0]?.price || 0;
 
   return (
     <div className=" min-h-screen overflow-x-hidden">
-      {/* TOP SECTION */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
         {" "}
-        {/* BANNER CAROUSEL */}
         <div className="lg:col-span-2">
           <Slider {...settings_image}>
             {slides.map((media, index) => (
@@ -329,7 +317,6 @@ const basePrice = show?.locations?.[0]?.price || 0;
             ))}
           </Slider>
 
-          {/* Sub Category */}
           {show.subCategory?.length > 0 && (
             <div className="flex gap-3 mt-4 flex-wrap">
               {show.subCategory.map((subcat, i) => (
@@ -343,10 +330,8 @@ const basePrice = show?.locations?.[0]?.price || 0;
             </div>
           )}
         </div>
-        {/* BOOKING CARD */}
         <div className="bg-white shadow-lg rounded-xl p-4 sm:p-6 h-fit text-black">
           {" "}
-          {/* {show?.locations?.length === 1 && ( */}
           <>
             {show?.startDate && (
               <p className="mb-3">
@@ -358,7 +343,6 @@ const basePrice = show?.locations?.[0]?.price || 0;
               </p>
             )}
           </>
-          {/* )} */}
           {show.ageLimit && (
             <p className="mb-3">👥 Age Limit - {show?.ageLimit}</p>
           )}
@@ -379,13 +363,11 @@ const basePrice = show?.locations?.[0]?.price || 0;
                 </p>
               </div>
 
-              {/* Time */}
               <div className="flex items-center gap-2 text-gray-600 text-sm mb-1">
                 <span>⏰</span>
                 <span>{show.locations[0].startTime}</span>
               </div>
 
-              {/* Duration */}
               {show.locations[0].duration && (
                 <div className="flex items-center gap-2 text-gray-600 text-sm mb-1">
                   <span>⌛</span>
@@ -393,11 +375,9 @@ const basePrice = show?.locations?.[0]?.price || 0;
                 </div>
               )}
 
-              {/* Price */}
               {show.locations[0].price && (
                 <div className="flex items-center justify-between mt-3">
                   <span className="text-lg font-semibold text-gray-900">
-                    {/* ₹{show.locations[0].price} */}
                     <div className="flex justify-between mt-3">
                       <span className="text-lg font-semibold">
                         ₹{basePrice} × {seatCount}
@@ -498,11 +478,9 @@ const basePrice = show?.locations?.[0]?.price || 0;
           )}
         </div>
       </div>
-      {/* Show name  */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <h3 className="text-2xl font-bold mb-4 text-white">{show?.showName}</h3>
       </div>
-      {/* ABOUT SECTION */}
       {show.description && (
         <div className="max-w-7xl mx-auto py-10">
           <h2 className="text-2xl font-bold mb-4 text-white px-4 sm:px-6">
@@ -546,7 +524,6 @@ const basePrice = show?.locations?.[0]?.price || 0;
       {openVenueModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl w-[95%] sm:w-[85%] md:w-[650px] max-h-[80vh] overflow-hidden shadow-xl">
-            {/* Header */}
             <div className="flex justify-between items-center p-6 border-b">
               <h2 className="text-2xl font-bold text-black">Venues</h2>
 
@@ -558,7 +535,6 @@ const basePrice = show?.locations?.[0]?.price || 0;
               </button>
             </div>
 
-            {/* Scrollable Content */}
             <div className="p-4 sm:p-6 overflow-y-auto max-h-[65vh] space-y-6 text-black">
               {" "}
               {show.locations.map((loc, index) => (
@@ -604,7 +580,6 @@ const basePrice = show?.locations?.[0]?.price || 0;
                       Book Now{" "}
                     </button>
 
-                    {/* {new Date(loc.date).toDateString()} | {loc.startTime} */}
                   </div>
                   {selectedLocation?._id === loc._id && (
                     <div className="mt-3 p-3 border rounded-lg bg-gray-100">
@@ -632,7 +607,6 @@ const basePrice = show?.locations?.[0]?.price || 0;
                         </button>
                       </div>
 
-                      {/* Price */}
                       <div className="flex justify-between mb-3">
                         <span>
                           ₹{loc.price} × {seatCount}
@@ -642,7 +616,6 @@ const basePrice = show?.locations?.[0]?.price || 0;
                         </span>
                       </div>
 
-                      {/* Confirm */}
                       <button
                         onClick={() =>
                           handleSubmit({
@@ -670,7 +643,6 @@ const basePrice = show?.locations?.[0]?.price || 0;
           className="px-4 sm:px-10 md:px-20 py-10 sm:py-14 text-white"
         >
           {" "}
-          {/*  Header */}
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-3xl font-bold">Top reviews</h2>
 
@@ -685,12 +657,10 @@ const basePrice = show?.locations?.[0]?.price || 0;
           <p className="text-white mb-6">
             Summary of {formatVotes(ratingSummary.totalVotes)} reviews.
           </p>
-          {/*  Review Slider */}
           <Slider {...review_settings}>
             {reviews.map((review) => (
               <div key={review._id} className="px-3">
                 <div className="bg-purple-300 hover:bg-purple-400 rounded-xl p-5 shadow-md h-[250px] flex flex-col justify-between">
-                  {/* Top */}
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-3">
                       <img
@@ -713,7 +683,6 @@ const basePrice = show?.locations?.[0]?.price || 0;
                     </div>
                   </div>
 
-                  {/* Review */}
                   <Link
                     to={`/Show/${createSlug(show?.showName)}/${show._id}/user-reviews`}
                   >
@@ -722,7 +691,6 @@ const basePrice = show?.locations?.[0]?.price || 0;
                     </p>
                   </Link>
 
-                  {/* Time */}
                   <div className="flex justify-end mt-4 text-gray-500 text-sm">
                     <p className="text-black">{getTimeAgo(review.createdAt)}</p>
                   </div>

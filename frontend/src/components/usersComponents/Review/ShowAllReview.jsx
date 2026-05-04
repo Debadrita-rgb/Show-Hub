@@ -97,7 +97,6 @@ const [show, setShow] = useState(null);
   return (
     <div className="min-h-screen text-white px-4 sm:px-6 md:px-8 lg:px-16">
       {" "}
-      {/* CENTER RATING SECTION */}
       <div className="flex flex-col items-center justify-center text-center">
         <h3 className="text-2xl font-bold mb-6 text-center">
           Rating of {type === "Movie" ? movie?.title : show?.showName}
@@ -111,7 +110,6 @@ const [show, setShow] = useState(null);
             ({formatVotes(ratingSummary.totalVotes)} Votes)
           </p>
         </div>
-        {/* Book Ticket Button */}
         {type === "Movie" && movie && (
           <Link
             to={`/movie/${createSlug(movie.title)}/${movie._id}/book-movie`}
@@ -123,7 +121,6 @@ const [show, setShow] = useState(null);
           </Link>
         )}
       </div>
-      {/*  REVIEWS SECTION */}
       {reviews.length > 0 && (
         <div id="reviews-section" className="py-8 sm:py-10">
           {" "}
@@ -132,7 +129,6 @@ const [show, setShow] = useState(null);
           </h5>
           {reviews.map((review) => (
             <div key={review._id} className="bg-gray-900 p-4 rounded-lg mb-4">
-              {/* Top */}
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-3">
                   <img
@@ -151,10 +147,8 @@ const [show, setShow] = useState(null);
                 </div>
               </div>
 
-              {/* Review */}
               <p className="mt-4 text-gray-300">{review.reviewText}</p>
 
-              {/* Time */}
               <div className="flex justify-end mt-4 text-gray-500 text-sm">
                 {getTimeAgo(review.createdAt)}
               </div>

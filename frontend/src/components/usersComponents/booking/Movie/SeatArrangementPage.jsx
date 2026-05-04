@@ -209,9 +209,7 @@ const SeatArrangementPage = () => {
   return (
     <div className="min-h-screen flex justify-center px-3 pt-6">
       <div className="w-full max-w-5xl  p-4 sm:p-6">
-        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-          {/* Left Section */}
           <div>
             <h1 className="text-xl font-bold text-white"> {movie?.title}</h1>
 
@@ -224,7 +222,6 @@ const SeatArrangementPage = () => {
             </div>
           </div>
 
-          {/* Right Section */}
           <div className="mt-4 sm:mt-0">
             <div className="border border-gray-400 px-4 py-2 rounded text-white text-sm text-center">
               {seatCount} Seats
@@ -234,7 +231,6 @@ const SeatArrangementPage = () => {
 
         <div className="overflow-x-auto lg:overflow-x-visible w-full">
           <div className="min-w-[600px] lg:min-w-full">
-            {/* Seat Categories */}
             {layout.map((category, catIndex) => (
               <div key={catIndex} className="mb-8">
                 <h2 className="text-center text-white mb-4 text-sm sm:text-base">
@@ -249,12 +245,10 @@ const SeatArrangementPage = () => {
                       key={rowIndex}
                       className="flex items-center justify-center gap-2 sm:gap-4 mb-2"
                     >
-                      {/* Row Label */}
                       <div className="w-5 sm:w-6 text-white text-xs sm:text-sm">
                         {rowLetter}
                       </div>
 
-                      {/* Seats */}
                       <div className="flex gap-1 sm:gap-2 pb-1 whitespace-nowrap">
                         {[...Array(category.seatsPerRow)].map(
                           (_, seatIndex) => {
@@ -301,13 +295,11 @@ const SeatArrangementPage = () => {
           </div>
         </div>
 
-        {/* Screen */}
         <div className="mt-10 text-center">
           <div className="bg-gray-300 h-2 w-3/4 sm:w-2/3 mx-auto rounded"></div>
           <p className=" mt-2 text-sm text-white">SCREEN</p>
         </div>
 
-        {/* Legend */}
         <div className="flex justify-center flex-wrap gap-4 sm:gap-6 mt-6 text-xs sm:text-sm">
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 border border-green-500"></div>
@@ -328,7 +320,6 @@ const SeatArrangementPage = () => {
       {selectedSeats.length === seatCount && (
         <div className="fixed bottom-0 left-0 w-full bg-white shadow-lg border-t p-4">
           <div className="max-w-5xl mx-auto flex justify-between items-center">
-            {/* Seat Info */}
             <div>
               <p className="text-sm text-gray-500">
                 {selectedSeats.length} Seat{selectedSeats.length > 1 ? "s" : ""}{" "}
@@ -337,7 +328,6 @@ const SeatArrangementPage = () => {
               <p className="font-semibold text-lg text-black">₹{totalPrice}</p>
             </div>
 
-            {/* Pay Button */}
             <button
               className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 cursor-pointer"
               onClick={handleSubmit}

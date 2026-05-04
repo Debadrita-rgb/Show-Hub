@@ -1,11 +1,10 @@
 const jwt = require('jsonwebtoken');
 require("dotenv").config();
 
-// Use the correct secret key
-const JWT_SECRET = process.env.JWT_SECRET || "qwertyuiuytrewq";
+const JWT_SECRET = process.env.JWT_SECRET ;
 
 const generateToken = (userData) => {
-  return jwt.sign(userData, JWT_SECRET, { expiresIn: "1d" });  // Use JWT_SECRET
+  return jwt.sign(userData, JWT_SECRET, { expiresIn: "1d" });  
 }
 const jwtAuthMiddleware = (req, res, next) => {
   const authorization = req.headers.authorization;
@@ -17,8 +16,7 @@ const jwtAuthMiddleware = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    // req.jwtPayload = decoded;
-    // console.log("Decoded token:", decoded);
+
     req.user = decoded;
     next();
   } catch (err) {

@@ -8,7 +8,6 @@ import BASE_URL from "../../../../../config";
 const contact = () => {
   const [contactItems, setContactItems] = useState([]);
 
-  //show all data
   useEffect(() => {
     const token = localStorage.getItem("token");
 

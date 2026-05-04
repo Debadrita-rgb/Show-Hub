@@ -26,7 +26,6 @@ const generateInvoice = (booking, user, theater) => {
     const leftX = 40;
     const rightX = 550;
 
-    // ---------------- NORMALIZE DATA ----------------
     let title = "";
     let dateTime = "";
     let location = "";
@@ -75,7 +74,6 @@ const generateInvoice = (booking, user, theater) => {
       ticketTotal = booking.details?.seatAmount;
     }
 
-    // TAX
     const cgst = booking.cgst || 0;
     const sgst = booking.sgst || 0;
     const convenienceFee = booking.convenienceFee || 0;
@@ -85,7 +83,6 @@ const generateInvoice = (booking, user, theater) => {
 
     let grandTotal = totalBeforeTax + taxAmount;
 
-    // ---------------- HEADER ----------------
     try {
       doc.image(
         "https://show-hub-frontend.onrender.com/assets/logo-CWqOHdnZ.png",
@@ -117,7 +114,6 @@ const generateInvoice = (booking, user, theater) => {
     doc.text("Location:", 350, 200);
     doc.text(theaterLocation, 350, 215);
 
-    // ---------------- TABLE ----------------
     let y = 240;
 
     const drawRow = (y, item, qty, price, total) => {
@@ -133,16 +129,13 @@ const generateInvoice = (booking, user, theater) => {
       return y + rowHeight;
     };
 
-    // HEADER ROW
     drawRow(y, "Item Description", "Qty", "Price", "Total");
     y += 25;
 
-    // MAIN ITEM
     y = drawRow(y, description, qty, `${ticketTotal}`, `${totalBeforeTax}`);
 
     y += 40;
 
-    // ---------------- TAX ----------------
     doc.text(`CGST: ${cgst}`, rightX - 150, y);
     y += 15;
     doc.text(`SGST: ${sgst}`, rightX - 150, y);
@@ -151,7 +144,6 @@ const generateInvoice = (booking, user, theater) => {
 
     y += 30;
 
-    // ---------------- FOOD ----------------
     if (booking.foodItems?.length > 0) {
       doc.font("Helvetica-Bold").text("Food & Beverages", leftX, y);
       doc.font("Helvetica");
@@ -177,7 +169,6 @@ const generateInvoice = (booking, user, theater) => {
       grandTotal += foodTotal;
     }
 
-    // ---------------- FINAL ----------------
     doc.moveTo(leftX, y).lineTo(rightX, y).stroke();
     y += 10;
 
@@ -189,7 +180,6 @@ const generateInvoice = (booking, user, theater) => {
 
     doc.font("Helvetica");
 
-    // ---------------- FOOTER ----------------
     y += 40;
 
     doc

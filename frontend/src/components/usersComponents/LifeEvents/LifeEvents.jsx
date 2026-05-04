@@ -20,7 +20,6 @@ const LifeEvents = () => {
         return res.json();
       })
       .then((result) => {
-        // result.data is array of banners
 
         setCategorizedShow(result);
       })

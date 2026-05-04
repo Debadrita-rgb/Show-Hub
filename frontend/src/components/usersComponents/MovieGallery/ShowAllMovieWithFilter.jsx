@@ -122,10 +122,8 @@ const ShowAllMovieWithFilter = () => {
   return (
     <div className="min-h-screen px-6 md:px-16 py-16">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-10 gap-4">
-        {/* Title */}
         <h1 className="text-3xl md:text-4xl font-bold">All Movies</h1>
 
-        {/* Search */}
         <div className="relative flex items-center justify-end">
           <input
             type="text"
@@ -137,7 +135,6 @@ const ShowAllMovieWithFilter = () => {
           <span className="absolute left-3 top-2.5 text-gray-400 ">🔍</span>
         </div>
       </div>
-      {/* Mobile Filter Button */}
       <button
         onClick={() => setShowFilters(true)}
         className="lg:hidden fixed bottom-4 right-4 bg-blue-600 text-white px-5 py-3 rounded-full shadow-lg"
@@ -146,7 +143,6 @@ const ShowAllMovieWithFilter = () => {
       </button>
 
       <div className="flex flex-col lg:flex-row gap-10">
-        {/* Sidebar */}
         <div className="hidden lg:block lg:w-1/4">
           <FilterSidebar
             filters={filters}
@@ -155,7 +151,6 @@ const ShowAllMovieWithFilter = () => {
           />
         </div>
 
-        {/* Mobile Drawer */}
         {showFilters && (
           <div className="fixed inset-0 z-50 flex">
             <div
@@ -183,7 +178,6 @@ const ShowAllMovieWithFilter = () => {
           </div>
         )}
 
-        {/* Movies */}
         <div className="lg:w-3/4">
           <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8">
             {paginatedMovies.map((movie) => (
@@ -195,10 +189,8 @@ const ShowAllMovieWithFilter = () => {
             <p className="text-center text-gray-500 mt-20">No movies found.</p>
           )}
 
-          {/* ✅ Pagination UI */}
           {totalPages > 1 && (
             <div className="flex justify-center mt-10 gap-2 flex-wrap">
-              {/* Prev */}
               <button
                 onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
@@ -207,7 +199,6 @@ const ShowAllMovieWithFilter = () => {
                 Prev
               </button>
 
-              {/* Page Numbers */}
               {[...Array(totalPages)].map((_, index) => (
                 <button
                   key={index}
@@ -222,7 +213,6 @@ const ShowAllMovieWithFilter = () => {
                 </button>
               ))}
 
-              {/* Next */}
               <button
                 onClick={() =>
                   setCurrentPage((prev) => Math.min(prev + 1, totalPages))

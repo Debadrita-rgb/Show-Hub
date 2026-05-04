@@ -57,13 +57,6 @@ const ShowCard = ({ show }) => {
             ? show.subCategory.join(", ")
             : show.subCategory}
         </p>
-
-        {/* <div className="flex items-center justify-between text-sm">
-          <span className="text-red-600 font-semibold">
-            ⭐ {movie.averageRating ? movie.averageRating.toFixed(1) : 0}
-          </span>
-          <span className="text-gray-500"> {movie?.totalVotes || 0} Votes</span>
-        </div> */}
       </div>
     </div>
   );

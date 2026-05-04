@@ -82,7 +82,6 @@ const foodCategories = ["Popcorn", "Snacks", "Combos", "Beverages"];
   };
 
   // Food Handlers
-  // handle food change
   const handleFoodChange = (index, field, value) => {
     const updated = [...foodItems];
     updated[index][field] = value;
@@ -134,8 +133,6 @@ const foodCategories = ["Popcorn", "Snacks", "Combos", "Beverages"];
     }
   };
 
-  // DynamicForm Fields
-
   const fields = [
     {
       name: "location_name",
@@ -183,7 +180,6 @@ const foodCategories = ["Popcorn", "Snacks", "Combos", "Beverages"];
           />
           Multiple Halls
         </label>
-        {/* Pre Meal */}
         <label className="flex items-center gap-2 text-gray-700 font-medium">
           <input
             type="checkbox"
@@ -232,7 +228,6 @@ const foodCategories = ["Popcorn", "Snacks", "Combos", "Beverages"];
           Wheel Chair Facility{" "}
         </label>
       </div>
-      {/* Seat Arrangement Section */}
       <div className="mt-8 bg-white p-6 rounded-xl shadow">
         <h2 className="text-lg font-semibold mb-4 text-gray-700">
           {isMultiple ? "Add Multiple Halls" : "Single Hall Seat Arrangement"}
@@ -242,7 +237,6 @@ const foodCategories = ["Popcorn", "Snacks", "Combos", "Beverages"];
           .slice(0, isMultiple ? halls.length : 1)
           .map((hall, hallIndex) => (
             <div key={hallIndex} className="border p-5 mb-6 rounded-lg">
-              {/* Hall Name only if multiple */}
               {isMultiple && (
                 <input
                   type="text"
@@ -255,10 +249,8 @@ const foodCategories = ["Popcorn", "Snacks", "Combos", "Beverages"];
                 />
               )}
 
-              {/* Seat Categories */}
               {hall.seatCategories.map((seat, seatIndex) => (
                 <div key={seatIndex} className="grid md:grid-cols-4 gap-4 mb-4">
-                  {/* ✅ Seat Name Dropdown */}
                   <select
                     value={seat.seat_name}
                     onChange={(e) =>
@@ -381,7 +373,6 @@ const foodCategories = ["Popcorn", "Snacks", "Combos", "Beverages"];
                 key={index}
                 className="grid grid-cols-12 gap-3 items-center mb-3"
               >
-                {/* Category */}
                 <select
                   onChange={(e) =>
                     handleFoodChange(index, "foodCategory", e.target.value)
@@ -396,7 +387,6 @@ const foodCategories = ["Popcorn", "Snacks", "Combos", "Beverages"];
                   ))}
                 </select>
 
-                {/* Title */}
                 <input
                   type="text"
                   placeholder="Food Title"
@@ -407,7 +397,6 @@ const foodCategories = ["Popcorn", "Snacks", "Combos", "Beverages"];
                   className="col-span-3 border p-2 rounded text-black"
                 />
 
-                {/* Image */}
                 <input
                   type="text"
                   placeholder="Image URL"
@@ -418,7 +407,6 @@ const foodCategories = ["Popcorn", "Snacks", "Combos", "Beverages"];
                   className="col-span-3 border p-2 rounded text-black"
                 />
 
-                {/* Price */}
                 <input
                   type="number"
                   placeholder="Price"
@@ -429,7 +417,6 @@ const foodCategories = ["Popcorn", "Snacks", "Combos", "Beverages"];
                   className="col-span-1 border p-2 rounded text-black"
                 />
 
-                {/* Buttons */}
                 <div className="col-span-2 flex gap-2">
                   <button
                     type="button"

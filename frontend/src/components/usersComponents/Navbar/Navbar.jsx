@@ -26,7 +26,6 @@ export default function Navbar() {
   const navigate = useNavigate();
   const { role } = useAuth();
 
-  // const [city, setCity] = useState("Detecting...");
   const { city, setCity } = useLocationcity();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLocationOpen, setIsLocationOpen] = useState(false);
@@ -151,7 +150,6 @@ export default function Navbar() {
     localStorage.removeItem("showWelcomeToast");
     localStorage.removeItem("userName");
 
-    // Update local state
     setIsLoggedIn(false);
     setUserName("Guest");
 
@@ -163,10 +161,7 @@ export default function Navbar() {
     navigate("/signin");
   };
 
-  // Fetch movies once on mount
-
   useEffect(() => {
-    // Movies
     fetch(`${BASE_URL}/user/get-recommended-movies`)
       .then((res) => res.json())
       .then((data) => {
@@ -175,7 +170,6 @@ export default function Navbar() {
       })
       .catch((err) => console.error(err));
 
-    // Shows
     fetch(`${BASE_URL}/user/get-recommended-shows`)
       .then((res) => res.json())
       .then((data) => {
@@ -185,7 +179,6 @@ export default function Navbar() {
       .catch((err) => console.error(err));
   }, []);
 
-  // Filter whenever query changes
   useEffect(() => {
     const movieResults = movies.filter((movie) =>
       movie.title.toLowerCase().includes(query.toLowerCase()),
@@ -199,7 +192,6 @@ export default function Navbar() {
     setFilteredShows(showResults);
   }, [query, movies, shows]);
 
-  // Click handler: close modal and navigate
   const handleMovieClick = (movie) => {
     setIsSearchOpen(false);
     navigate(`/movie/${movie.slug}/${movie._id}`);
@@ -220,16 +212,13 @@ export default function Navbar() {
     <div className="sticky top-0 z-50 w-full bg-gradient-to-r from-black/80 via-purple-900/70 to-black/80 backdrop-blur-md text-white shadow-lg">
       <ToastContainer position="top-right" autoClose={2000} />
 
-      {/* TOP NAVBAR */}
       <div className="flex items-center justify-between px-6 py-3">
-        {/* LEFT (LOGO) */}
         <div className="flex items-center flex-shrink-0">
           {" "}
           <Link to="/">
             <img
               src={logo}
               alt="logo"
-              // className="h-10 cursor-pointer hover:scale-105 transition"
               className="cursor-pointer hover:scale-105 transition 
                  h-10 sm:h-11 md:h-12 lg:h-16
                  w-auto object-contain ml-2 sm:ml-5"
@@ -237,7 +226,6 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* Search Bar   */}
 
         <div className="hidden md:flex justify-center w-full">
           <div className="w-full max-w-[520px]">
@@ -255,10 +243,8 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* RIGHT SECTION */}
         <div className="flex items-center justify-end gap-4 flex-1">
           {" "}
-          {/* LOCATION */}
           <div
             className="flex items-center gap-2 font-medium transition cursor-pointer"
             onClick={() => setIsLocationOpen(true)}
@@ -266,11 +252,9 @@ export default function Navbar() {
             <MapPinIcon className="h-5 text-red-500" />
             {city}
           </div>
-          {/* SMALL SIGN IN */}
           <div className="relative z-50" ref={dropdownRef}>
             {isLoggedIn ? (
               <div>
-                {/* Username */}
                 <button
                   onClick={() => setShowNameDropdown(!showNameDropdown)}
                   className="bg-purple-900 hover:bg-purple-800 text-white px-4 py-1.5 rounded-md text-sm"
@@ -281,7 +265,6 @@ export default function Navbar() {
                     : "Guest"}
                 </button>
 
-                {/* Dropdown */}
                 {showNameDropdown && (
                   <div className="absolute right-0 mt-2 w-40 bg-black/80 backdrop-blur-md border border-purple-800 rounded-md shadow-lg z-[100]">
                     <Link to="/user-profile">
@@ -312,7 +295,6 @@ export default function Navbar() {
               </Link>
             )}
           </div>
-          {/* MOBILE MENU */}
           <button
             className="md:hidden"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -326,7 +308,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* DESKTOP SECOND NAVBAR */}
       <div className="hidden md:flex justify-between px-10 py-2 border-t bg-white/60 backdrop-blur">
         <div className="flex gap-8 text-gray-700 text-sm font-medium">
           <Link
@@ -338,7 +319,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* MOBILE SEARCH */}
       <div className="px-4 pb-3 md:hidden">
         <div className="flex items-center bg-gray-100 rounded-full px-4 py-2">
           <MagnifyingGlassIcon className="h-5 text-gray-500" />
@@ -353,7 +333,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* MOBILE MENU */}
       {mobileMenuOpen && (
         <div className="md:hidden border-t bg-white px-6 py-4 space-y-4 shadow-lg">
           <Link
@@ -363,21 +342,6 @@ export default function Navbar() {
           >
             Movies
           </Link>
-          {/* <Link className="block hover:text-purple-950 cursor-pointer text-black">
-            Stream
-          </Link>
-          <Link className="block hover:text-purple-950 cursor-pointer text-black">
-            Events
-          </Link>
-          <Link className="block hover:text-purple-950 cursor-pointer text-black">
-            Plays
-          </Link>
-          <Link className="block hover:text-purple-950 cursor-pointer text-black">
-            Sports
-          </Link>
-          <Link className="block hover:text-purple-950 cursor-pointer text-black">
-            Activities
-          </Link> */}
 
           <button className="bg-purple-950 text-white w-full py-2 rounded-md mt-4">
             Sign In
@@ -390,11 +354,8 @@ export default function Navbar() {
           className="fixed inset-0 bg-black/50 flex justify-center items-start pt-24 z-50 px-4"
           ref={dropdownRef}
         >
-          {/* <div className="fixed inset-0 bg-black/40 flex justify-center items-start pt-24 z-50"> */}
 
-          {/* MODAL */}
           <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl animate-fadeIn relative">
-            {/* HEADER */}
             <div className="flex items-center justify-between border-b px-6 py-4">
               <h2 className="text-lg font-semibold text-gray-800">
                 Select Your City
@@ -408,7 +369,6 @@ export default function Navbar() {
               </button>
             </div>
 
-            {/* SEARCH */}
             <div className="px-6 pt-4">
               <div className="flex items-center border rounded-lg px-3 py-2 focus-within:ring-2 focus-within:ring-red-400 border-gray-500">
                 <MagnifyingGlassIcon className="h-5 text-black" />
@@ -423,7 +383,6 @@ export default function Navbar() {
               </div>
             </div>
 
-            {/* POPULAR CITIES */}
             <div className="px-6 mt-6">
               <p className="text-sm text-gray-500 mb-4">Popular Cities</p>
 
@@ -437,9 +396,6 @@ export default function Navbar() {
                     }}
                     className="cursor-pointer group"
                   >
-                    {/* <div className="text-3xl transition-transform group-hover:scale-110">
-                      🏙️
-                    </div> */}
                     <img
                       src={c.img}
                       alt={c.name}
@@ -454,13 +410,11 @@ export default function Navbar() {
               </div>
             </div>
 
-            {/* FOOTER */}
             <div className="border-t mt-6 px-6 py-3 text-center"></div>
           </div>
         </div>
       )}
 
-      {/* Search Modal Open  */}
 
       {isSearchOpen && (
         <div
@@ -469,7 +423,6 @@ export default function Navbar() {
         >
           {" "}
           <div className="bg-white w-full max-w-2xl rounded-lg shadow-lg p-4 relative">
-            {/* Close Button */}
             <button
               onClick={() => setIsSearchOpen(false)}
               className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 font-bold text-xl"
@@ -477,7 +430,6 @@ export default function Navbar() {
               ×
             </button>
 
-            {/* Search Results */}
             <div className="max-h-96 overflow-y-auto">
               <div>
                 <h3 className="text-lg font-semibold mb-2 text-black">

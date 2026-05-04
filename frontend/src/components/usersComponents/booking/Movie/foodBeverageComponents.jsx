@@ -84,7 +84,6 @@ useEffect(() => {
       const lockStatus = data?.lockStatus;
 
       if (lockStatus === "InActive") {
-        // clear localStorage
         localStorage.removeItem("lockId");
         localStorage.removeItem("lockExpiry");
 
@@ -110,10 +109,8 @@ useEffect(() => {
       });
   }, []);
 
-//   Category List (Dynamic)
 const foodCategories = ["All", "Popcorn", "Snacks", "Combos", "Beverages"];
 
-//   Filter by Category + Search
 const filteredFoods = foodItems.filter((item) => {
   const matchCategory = category === "All" || item.foodCategory === category;
 
@@ -136,10 +133,6 @@ const filteredFoods = foodItems.filter((item) => {
     }
   };
 
-
-
-//   Increase / Decrease Quantity
-
 const increaseQty = (id) => {
   setCart(cart.map((c) => (c._id === id ? { ...c, qty: c.qty + 1 } : c)));
 };
@@ -152,7 +145,6 @@ const decreaseQty = (id) => {
   );
 };
 
-// Calculate Food Total
 const foodTotal = cart.reduce(
   (sum, item) => sum + item.foodPrice * item.qty,
   0,
@@ -185,13 +177,11 @@ const proceedPayment = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-6 relative">
-      {/* TIMER */}
       <div className="absolute top-3 right-3 bg-blue-600 text-white px-3 py-1 rounded text-sm shadow">
         ⏳ Payment Time left: {Math.floor(timeLeft / 60)}:
         {String(timeLeft % 60).padStart(2, "0")}
       </div>
       <div className="min-h-screen">
-        {/* HEADER */}
         <div className="shadow p-4">
           <h2 className="text-lg font-semibold">{booking.movieTitle}</h2>
           <p className="text-sm text-white">
@@ -214,9 +204,7 @@ const proceedPayment = () => {
 
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6 px-3">
           {" "}
-          {/* FOOD SECTION */}
           <div className="lg:col-span-2">
-            {/* SEARCH */}
             <div className="bg-white p-3 rounded shadow mb-4">
               <input
                 type="text"
@@ -227,7 +215,6 @@ const proceedPayment = () => {
               />
             </div>
 
-            {/* CATEGORY */}
             <div className="flex flex-wrap gap-3 sm:gap-4 bg-white p-3 rounded shadow mb-4">
               {foodCategories.map((cat) => (
                 <button
@@ -244,7 +231,6 @@ const proceedPayment = () => {
               ))}
             </div>
 
-            {/* FOOD CARDS */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {" "}
               {filteredFoods.map((item) => {
@@ -300,14 +286,12 @@ const proceedPayment = () => {
           </div>
           <div className="bg-white rounded-xl shadow-lg p-4 sm:p-5 h-fit border border-gray-200">
             {" "}
-            {/* Ticket Price */}
             <div className="flex justify-between items-center border-b pb-3">
               <h3 className="font-semibold text-gray-700">Ticket Price</h3>
               <p className="text-lg font-semibold text-black">
                 ₹{booking.totalPrice}
               </p>
             </div>
-            {/* Cart Section */}
             {cart.length === 0 ? (
               <div className="text-center py-6">
                 <p className="text-gray-500 text-sm">
@@ -316,12 +300,10 @@ const proceedPayment = () => {
               </div>
             ) : (
               <>
-                {/* Cart Heading */}
                 <h3 className="font-semibold text-gray-800 mt-4 mb-3 border-b pb-2">
                   Your Cart
                 </h3>
 
-                {/* Food Items */}
                 <div className="space-y-2">
                   {cart.map((item, index) => (
                     <div
@@ -340,10 +322,8 @@ const proceedPayment = () => {
                   ))}
                 </div>
 
-                {/* Divider */}
                 <div className="border-t my-4"></div>
 
-                {/* Grand Total */}
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-semibold text-gray-800">
                     Grand Total
@@ -354,7 +334,6 @@ const proceedPayment = () => {
                   </span>
                 </div>
 
-                {/* Proceed Button */}
                 <button
                   className="w-full mt-4 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition"
                   onClick={proceedPayment}

@@ -12,7 +12,6 @@ const User = require("../models/User");
 const Movie = require("../models/Movie");
 const Gallery = require("../models/Gallery");
 const Contact = require("../models/Contact");
-const Notification = require("../models/Notification");
 const Review = require("../models/Review");
 const Banner = require("../models/Banner");
 const Language = require("../models/Language");
@@ -132,7 +131,7 @@ router.post("/signup", async (req, res) => {
     const newAdmin = new User({
       name,
       email: email.toLowerCase(),
-      password, // Auto-hashed by the User model
+      password,
       role: "USER",
     });
     await newAdmin.save();
@@ -194,35 +193,6 @@ router.post("/login", async (req, res) => {
     return res.status(500).json({
       message: "Internal Server Error",
     });
-  }
-});
-
-router.get("/notifications", jwtAuthMiddleware, async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const notifications = await Notification.find({ userId }).sort({
-      createdAt: -1,
-    });
-    res.json(notifications);
-  } catch (error) {
-    console.error("Error fetching notifications:", error);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-router.post("/notifications/mark-read", jwtAuthMiddleware, async (req, res) => {
-  try {
-    const userId = req.user.id;
-
-    await Notification.updateMany(
-      { userId, isRead: false },
-      { $set: { isRead: true } },
-    );
-
-    res.json({ message: "Notifications marked as read" });
-  } catch (error) {
-    console.error("Error marking notifications as read:", error);
-    res.status(500).json({ message: "Server error" });
   }
 });
 
@@ -437,7 +407,7 @@ router.get("/get-recommended-shows", async (req, res) => {
       isActive: true,
     })
       .sort({ createdAt: -1 })
-      .limit(5); //  only 5 shows
+      .limit(5);
 
     res.json({ data: shows });
   } catch (err) {
@@ -857,9 +827,6 @@ router.post("/confirm-booking", jwtAuthMiddleware, async (req, res) => {
 
     const booking = new Booking({
       ...req.body,
-      // seats: lock.seats.map((s) => ({
-      //   seatId: s,
-      // })),
       seats: req.body.seats,
       paymentStatus: "Success",
       bookingStatus: "Confirmed",
@@ -932,7 +899,6 @@ router.post("/cancel-booking", jwtAuthMiddleware, async (req, res) => {
     if (booking.foodItems && booking.foodItems.length > 0) {
       booking.foodItems = booking.foodItems.map((food) => {
         if (food.foodStatus === "Booked") {
-          // OPTIONAL: if you want refund for food
           remainingRefund += food.price * food.quantity;
 
           refundedFood.push({
@@ -958,7 +924,6 @@ router.post("/cancel-booking", jwtAuthMiddleware, async (req, res) => {
     let refundDoc = null;
 
     if (remainingRefund > 0) {
-      //  create refund record
       refundDoc = await RefundPayment.create({
         userId: booking.userId,
         bookingId: booking._id,
@@ -1009,10 +974,7 @@ router.post("/cancel-booking", jwtAuthMiddleware, async (req, res) => {
       error: err.message,
     });
   }
-  // catch (err) {
-  //   console.error(err);
-  //   res.status(500).json({ message: "Error cancelling booking" });
-  // }
+
 });
 
 // Partial Seat Cancel
@@ -1059,7 +1021,6 @@ router.post("/cancel-seats", jwtAuthMiddleware, async (req, res) => {
 
     await booking.save();
 
-    //  Create refund record
     const refundDoc = await RefundPayment.create({
       userId: booking.userId,
       bookingId: booking._id,
@@ -1070,7 +1031,6 @@ router.post("/cancel-seats", jwtAuthMiddleware, async (req, res) => {
       refundType: "Partial",
     });
 
-    //  Razorpay
     try {
       await razorpay.payments.refund(booking.paymentId, {
         amount: currentRefund * 100,
@@ -1085,11 +1045,6 @@ router.post("/cancel-seats", jwtAuthMiddleware, async (req, res) => {
 
     const user = await User.findById(booking.userId);
     const theater = await Theater.findById(booking.theaterId);
-
-    // const { formattedDate, formattedTime } = formatDateTime(
-    //   booking.showDate,
-    //   booking.showTime,
-    // );
 
     await sendCancelEmail({
       user,
@@ -1113,17 +1068,12 @@ router.post("/cancel-seats", jwtAuthMiddleware, async (req, res) => {
       error: err.message,
     });
   }
-  // catch (err) {
-  //   console.error(err);
-  //   res.status(500).json({ message: "Error cancelling seats" });
-  // }
 });
 
 //Food Cancel
 router.post("/cancel-food", jwtAuthMiddleware, async (req, res) => {
   try {
     const { bookingId, foodIds } = req.body;
-    // foods = { foodId: qtyToCancel }
 
     const booking = await Booking.findById(bookingId);
 
@@ -1173,7 +1123,6 @@ router.post("/cancel-food", jwtAuthMiddleware, async (req, res) => {
           remainingQty: remainingQty,
           cancelledTotal: (food.cancelledTotal || 0) + cancelAmount,
 
-          //  STATUS
           foodStatus: remainingQty === 0 ? "Cancelled" : "Partially Cancelled",
         };
       }
@@ -1321,7 +1270,6 @@ const booking = new Booking({
     await booking.save();
    const user = await User.findById(req.user.id);
 
-   // Extract details from booking.details
    const details = booking.details;
 
    const fakeTheater = {

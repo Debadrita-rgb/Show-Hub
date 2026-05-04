@@ -1,4 +1,3 @@
-// components/TableComponent.jsx
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { FaEdit, FaTrash, FaEye, FaTicketAlt } from "react-icons/fa";
@@ -33,7 +32,6 @@ const totalPages = Math.ceil(data.length / itemsPerPage);
   return (
     <div className="bg-white p-5 rounded shadow-md w-full">
       <div className="flex items-center justify-between mb-4">
-        {/* Search */}
         {searchTerm !== undefined && setSearchTerm !== undefined && (
           <input
             type="text"
@@ -43,7 +41,6 @@ const totalPages = Math.ceil(data.length / itemsPerPage);
             className="border px-3 py-2 rounded-xl w-1/3 border-black text-black"
           />
         )}
-        {/* Add Button */}
         {showAddButton && (
           <button
             onClick={() => navigate(addPath)}
@@ -55,7 +52,6 @@ const totalPages = Math.ceil(data.length / itemsPerPage);
         )}
       </div>
 
-      {/* Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full border border-gray-200 ">
           <thead className="text-white" style={{ backgroundColor: "#1b4c6d" }}>
@@ -103,8 +99,6 @@ const totalPages = Math.ceil(data.length / itemsPerPage);
                     </td>
                   )}
 
-                  {/* Recommended Column */}
-
                   {showRecommendedeColumn && (
                     <td className="px-4 py-2 text-center border border-gray-200">
                       <input
@@ -118,11 +112,9 @@ const totalPages = Math.ceil(data.length / itemsPerPage);
                     </td>
                   )}
 
-                  {/* Action column (last column) */}
                   {showActionColumn && (
                     <td className="px-4 py-2 border text-center border-gray-200">
                       <div className="flex items-center justify-center gap-2">
-                        {/* View */}
                         {row.viewPath && (
                           <Link
                             to={row.viewPath}
@@ -133,7 +125,6 @@ const totalPages = Math.ceil(data.length / itemsPerPage);
                           </Link>
                         )}
 
-                        {/* Booking */}
                         {row.bookingPath && (
                           <Link
                             to={row.bookingPath}
@@ -144,7 +135,6 @@ const totalPages = Math.ceil(data.length / itemsPerPage);
                           </Link>
                         )}
 
-                        {/* Edit */}
                         {row.editPath && (
                           <Link
                             to={row.editPath}
@@ -155,7 +145,6 @@ const totalPages = Math.ceil(data.length / itemsPerPage);
                           </Link>
                         )}
 
-                        {/* Delete */}
                         {showDeleteButton && handleDelete && (
                           <button
                             onClick={() => handleDelete(row.id)}
@@ -187,7 +176,6 @@ const totalPages = Math.ceil(data.length / itemsPerPage);
           </tbody>
         </table>
         <div className="flex justify-between items-center mt-4">
-          {/* Items per page */}
           <div>
             <span className="ml-2 text-black">Items per page</span>
 
@@ -217,9 +205,7 @@ const totalPages = Math.ceil(data.length / itemsPerPage);
             </select>
           </div>
 
-          {/* Pagination Buttons */}
           <div className="flex items-center gap-2">
-            {/* << */}
             <button
               onClick={() => setCurrentPage(1)}
               disabled={currentPage === 1}
@@ -228,7 +214,6 @@ const totalPages = Math.ceil(data.length / itemsPerPage);
               {"<<"}
             </button>
 
-            {/* < */}
             <button
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
@@ -237,7 +222,6 @@ const totalPages = Math.ceil(data.length / itemsPerPage);
               {"<"}
             </button>
 
-            {/* Numbers with ... */}
             {(() => {
               const pages = [];
 
@@ -270,7 +254,6 @@ const totalPages = Math.ceil(data.length / itemsPerPage);
               return pages;
             })()}
 
-            {/* > */}
             <button
               onClick={() =>
                 setCurrentPage((prev) => Math.min(prev + 1, totalPages))
@@ -281,7 +264,6 @@ const totalPages = Math.ceil(data.length / itemsPerPage);
               {">"}
             </button>
 
-            {/* >> */}
             <button
               onClick={() => setCurrentPage(totalPages)}
               disabled={currentPage === totalPages}
@@ -291,7 +273,6 @@ const totalPages = Math.ceil(data.length / itemsPerPage);
             </button>
           </div>
 
-          {/* Info */}
           <div>
             {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, data.length)} of{" "}
             {data.length}

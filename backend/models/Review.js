@@ -17,7 +17,6 @@ const reviewSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      // enum: ["Movie", "Show"],
       required: true,
     },
     rating: {

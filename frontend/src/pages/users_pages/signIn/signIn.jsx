@@ -75,13 +75,12 @@ export default function SignIn() {
 
       const res = await axios.post(`${BASE_URL}/user/send-otp`, {
         email: userData.email,
-        name: userData.name, // ✅ send name
-        password: "google_user", // optional
+        name: userData.name, 
+        password: "google_user", 
       });
 
       toast.success("OTP sent to your email!");
 
-      // navigate to OTP page
       navigate("/verify-otp", { state: { email } });
     } catch (err) {
       toast.error("Failed to send OTP");
@@ -101,8 +100,6 @@ export default function SignIn() {
               <GoogleLogin
                 onSuccess={(credentialResponse) => {
                   const decoded = jwtDecode(credentialResponse.credential);
-                  // console.log(decoded); // contains email, name, picture
-
                   handleGoogleLogin(decoded);
                 }}
                 onError={() => {

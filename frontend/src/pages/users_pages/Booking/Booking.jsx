@@ -59,8 +59,6 @@ const Booking = () => {
       navigate("/signin");
       return;
     }
-
-    // setSelectedBooking(booking);
     setRatingBooking(booking);
 
     setShowRateModal(true);
@@ -104,7 +102,6 @@ const Booking = () => {
         throw new Error(data.error || "Something went wrong");
       }
 
-      // SUCCESS
       toast.success("Review submitted successfully 🎉");
 
       setShowRateModal(false);
@@ -144,7 +141,6 @@ const Booking = () => {
     if (booking.type === "Movie") {
       title = booking.movieTitle;
 
-      // Extract only YYYY-MM-DD
       const datePart = booking.showDate.split("T")[0];
 
       const start = new Date(`${datePart}T${booking.showTime}`);
@@ -216,7 +212,6 @@ const Booking = () => {
       toast.success("Booking cancelled ✅");
       setShowCancelModal(false);
 
-      // refresh bookings
       setBookings((prev) =>
         prev.map((b) =>
           b._id === booking._id
@@ -404,23 +399,18 @@ const Booking = () => {
   const getActiveMedia = (media = []) => {
     if (!media || media.length === 0) return null;
 
-    // 1. Active Image (priority)
     const activeImage = media.find(
       (item) => item.type === "image" && item.isActive,
     );
 
     if (activeImage) return activeImage.url;
 
-    // 2. Active YouTube (fallback)
     const activeVideo = media.find(
       (item) => item.type === "youtube" && item.isActive,
     );
 
     if (activeVideo) {
       return `https://img.youtube.com/vi/${activeVideo.url}/hqdefault.jpg`;
-
-      // type: "youtube",
-      // url: activeVideo.url,
     }
 
     return null;
@@ -441,7 +431,6 @@ const Booking = () => {
       <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-10 text-white">
         My Booking
       </h2>
-      {/* FILTER BUTTONS */}
       <div className="flex flex-wrap gap-4 bg-white p-3 rounded shadow mb-6 text-sm font-medium justify-center sm:justify-start">
         <button
           onClick={() => setFilterType("All")}
@@ -487,16 +476,13 @@ const Booking = () => {
         </button>
       </div>
 
-      {/* BOOKING CARDS */}
       <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
         {filteredBookings.map((booking) => (
           <div
             key={booking._id}
             className="relative rounded-xl p-4 sm:p-6 pb-12 flex flex-col sm:flex-row sm:justify-between gap-4 bg-white/10 backdrop-blur-md border border-purple-800 shadow-lg"
           >
-            {/* LEFT SECTION */}
             <div className="flex gap-4 sm:gap-6">
-              {/* POSTER */}
               <div
                 onClick={() => handleNavigate(booking)}
                 className="w-20 h-28 sm:w-28 sm:h-40 bg-gray-200 rounded flex items-center justify-center overflow-hidden cursor-pointer"
@@ -516,7 +502,6 @@ const Booking = () => {
                 })()}
               </div>
 
-              {/* DETAILS */}
               <div className="flex-1">
                 <h2
                   onClick={() => handleNavigate(booking)}
@@ -548,10 +533,8 @@ const Booking = () => {
                   </div>
                 )}
 
-                {/* SEATS */}
                 {booking.type === "Movie" && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 sm:gap-x-10 mt-2 border-t pt-2 text-xs sm:text-sm text-gray-400">
-                    {/* SEATS SECTION */}
                     <div>
                       <p className="font-medium text-white mb-1">Seats</p>
 
@@ -587,7 +570,6 @@ const Booking = () => {
                       })}
                     </div>
 
-                    {/* FOOD SECTION */}
                     {booking.foodItems?.length > 0 && (
                       <div className="sm:pl-6">
                         <p className="font-medium text-white mb-3">
@@ -624,21 +606,16 @@ const Booking = () => {
                                         : ""
                                     }`}
                                   >
-                                    {/* Food Name */}
                                     <td className="p-2 ">{food.name}</td>
 
-                                    {/* Quantity */}
                                     <td className="p-2 ">{displayQty}</td>
 
-                                    {/* Cancelled Qty */}
                                     <td className="p-2  text-red-400">
                                       {cancelledQty || 0}
                                     </td>
 
-                                    {/* Per item price */}
                                     <td className="p-2 ">₹{food.price}</td>
 
-                                    {/* Total cost after cancellation */}
                                     <td className="p-2  font-medium">
                                       ₹{remainingQty * food.price}
                                     </td>
@@ -652,12 +629,10 @@ const Booking = () => {
                     )}
                   </div>
                 )}
-                {/* PRICE */}
                 <p className="text-sm mt-3 font-medium text-white">
                   Amount Paid: ₹{Number(booking.totalAmount).toFixed(2)}
                 </p>
 
-                {/* PAYMENT STATUS */}
                 <p
                   className={`text-xs sm:text-sm mt-1 ${
                     booking.paymentStatus === "Success"
@@ -687,7 +662,6 @@ const Booking = () => {
               </div>
             </div>
 
-            {/* BUTTON */}
             <div className="flex flex-wrap sm:flex-col justify-end sm:justify-start gap-2 sm:gap-0">
               {" "}
               <button
@@ -712,7 +686,6 @@ const Booking = () => {
                   Give Rating
                 </button>
               )}
-              {/* Cancel booking  */}
               {!canRateBooking(booking) &&
                 booking.bookingStatus !== "Cancelled" && (
                   <div className="relative group w-full sm:w-auto">
@@ -733,7 +706,6 @@ const Booking = () => {
                       Cancel Booking
                     </button>
 
-                    {/* TOOLTIP */}
                     <div className="absolute right-0 bottom-full mb-2 hidden group-hover:block bg-black text-white text-xs px-2 py-1 rounded whitespace-nowrap">
                       {booking.type === "Show"
                         ? "Cancellation not available for live show"
@@ -745,7 +717,6 @@ const Booking = () => {
           </div>
         ))}
       </div>
-      {/* booking and seat cancellation */}
 
       {showCancelModal && cancelBookingData && (
         <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50">
@@ -764,7 +735,6 @@ const Booking = () => {
               Cancel Booking
             </h2>
 
-            {/* FULL CANCEL */}
             <button
               onClick={() => handleCancelClick(cancelBookingData)}
               className="w-full bg-red-600 text-white py-2 rounded mb-3"
@@ -772,7 +742,6 @@ const Booking = () => {
               Cancel Full Booking
             </button>
 
-            {/* PARTIAL CANCEL (SEATS) */}
             {cancelBookingData.seats.filter((s) => s.status === "Booked")
               .length > 1 && (
               <>
@@ -806,7 +775,6 @@ const Booking = () => {
               </>
             )}
 
-            {/* FOOD CANCEL SECTION */}
             {cancelBookingData.foodItems?.filter(
               (f) => f.foodStatus !== "Cancelled",
             ).length > 0 && (
@@ -870,11 +838,9 @@ const Booking = () => {
         </div>
       )}
 
-      {/* show booking details */}
       {selectedBooking && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-50 px-4 text-black">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto relative">
-            {/* CLOSE BUTTON */}
             <button
               className="absolute top-4 right-4 text-gray-500 hover:text-red-500 text-xl"
               onClick={() => setSelectedBooking(null)}
@@ -882,7 +848,6 @@ const Booking = () => {
               ✖
             </button>
 
-            {/* HEADER */}
             <div className="border-b p-5">
               <h2 className="text-xl font-bold text-gray-900">
                 {selectedBooking.type === "Movie"
@@ -903,7 +868,6 @@ const Booking = () => {
               </p>
             </div>
 
-            {/* MOVIE SEATS */}
             {selectedBooking.type === "Movie" && (
               <div className="p-5 border-b">
                 <h3 className="font-semibold text-gray-800 mb-2">🎟 Seats</h3>
@@ -947,7 +911,6 @@ const Booking = () => {
               </div>
             )}
 
-            {/* SHOW TICKETS */}
             {selectedBooking.type === "Show" && (
               <div className="p-5 border-b text-sm">
                 <h3 className="font-semibold text-gray-800 mb-2">
@@ -977,7 +940,6 @@ const Booking = () => {
               </div>
             )}
 
-            {/* FOOD (Movie Only) */}
             {selectedBooking.foodItems?.length > 0 && (
               <div className="p-5 border-b">
                 <h3 className="font-semibold text-gray-800 mb-2">
@@ -1012,7 +974,6 @@ const Booking = () => {
               </div>
             )}
 
-            {/* PRICE BREAKDOWN */}
             <div className="p-5 border-b text-sm space-y-2">
               {selectedBooking.type === "Movie" && (
                 <div className="flex justify-between">
@@ -1043,7 +1004,6 @@ const Booking = () => {
                 </span>
               </div>
 
-              {/* REFUND DETAILS */}
               {selectedBooking.refundAmount > 0 && (
                 <div className="p-5 border-b text-sm space-y-2">
                   <h3 className="font-semibold text-gray-800 mb-2">
@@ -1076,7 +1036,6 @@ const Booking = () => {
               )}
             </div>
 
-            {/* QR CODE */}
             {selectedBooking.bookingStatus !== "Cancelled" && (
               <div className="flex flex-col items-center p-6">
                 <QRCode
@@ -1092,12 +1051,11 @@ const Booking = () => {
           </div>
         </div>
       )}
-      {/* Rating Modal  */}
+      
       {showRateModal && (
         <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50">
           <div className="bg-white w-[90%] max-w-[400px] p-6 rounded-xl relative">
             {" "}
-            {/* Close Button */}
             <button
               onClick={() => setShowRateModal(false)}
               className="absolute top-3 right-4 text-gray-500 hover:text-black text-xl"
@@ -1107,7 +1065,6 @@ const Booking = () => {
             <h2 className="text-xl font-bold mb-4 text-black">
               Rate this {ratingBooking?.type}{" "}
             </h2>
-            {/* ⭐ Rating */}
             <div className="flex gap-2 mb-4">
               {[1, 2, 3, 4, 5].map((star) => (
                 <span

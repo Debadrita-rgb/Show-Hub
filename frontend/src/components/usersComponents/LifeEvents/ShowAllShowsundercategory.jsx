@@ -48,7 +48,6 @@ const showsPerPage = 5;
     setCurrentPage(1);
   }, [selectedFilters, shows]);
 
-  // FILTER LOGIC
   const filteredShows = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -108,7 +107,6 @@ const showsPerPage = 5;
         ⚙️ Filters
       </button>
       <div className="flex flex-col lg:flex-row gap-10">
-        {/* Sidebar */}
         <div className="hidden lg:block lg:w-1/4">
           <FilterSidebar
             filters={{ genres: subCategories }}
@@ -118,15 +116,12 @@ const showsPerPage = 5;
         </div>
         {showFilters && (
           <div className="fixed inset-0 z-50 flex">
-            {/* Overlay */}
             <div
               className="absolute inset-0 bg-black/50"
               onClick={() => setShowFilters(false)}
             ></div>
 
-            {/* Drawer */}
             <div className="relative w-3/4 max-w-sm bg-white h-full p-4 overflow-y-auto shadow-lg">
-              {/* Header */}
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold">Filters</h2>
                 <button
@@ -146,7 +141,6 @@ const showsPerPage = 5;
           </div>
         )}
 
-        {/* Shows */}
         <div className="lg:w-3/4">
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
             {" "}
@@ -161,7 +155,6 @@ const showsPerPage = 5;
 
           {totalPages > 1 && (
             <div className="flex justify-center mt-10 gap-2 flex-wrap">
-              {/* Prev */}
               <button
                 onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
@@ -170,7 +163,6 @@ const showsPerPage = 5;
                 Prev
               </button>
 
-              {/* Page Numbers */}
               {[...Array(totalPages)].map((_, index) => (
                 <button
                   key={index}
@@ -185,7 +177,6 @@ const showsPerPage = 5;
                 </button>
               ))}
 
-              {/* Next */}
               <button
                 onClick={() =>
                   setCurrentPage((prev) => Math.min(prev + 1, totalPages))

@@ -135,7 +135,6 @@ const AdminNavbar = ({ toggleSidebar, isSidebarOpen }) => {
       className="fixed top-0 left-0 w-full bg-gradient-to-r from-black/80 via-purple-900/70 to-black/80 backdrop-blur-md 
  text-white p-4 shadow-md flex items-center justify-between z-50 "
     >
-      {/* Left Section: Hamburger & Logo */}
       <div className="flex items-center space-x-4">
         <button className=" text-white" onClick={toggleSidebar}>
           {isSidebarOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
@@ -147,12 +146,10 @@ const AdminNavbar = ({ toggleSidebar, isSidebarOpen }) => {
         />
       </div>
 
-      {/* Center Section: Dynamic Page Title (Visible on all screens) */}
       <h4 className="text-lg font-semibold text-center md:text-left text-white justify-between items-center">
         {getPageTitle()}
       </h4>
 
-      {/* Right Section: Profile Dropdown */}
       <div className="relative dropdown">
         <button
           className="flex items-center space-x-2 focus:outline-none"
@@ -166,11 +163,6 @@ const AdminNavbar = ({ toggleSidebar, isSidebarOpen }) => {
             className="rounded-full w-10 h-10 border-2 border-white object-cover"
             alt="admin"
           />
-          {/* <img
-            src="https://cdn.pixabay.com/photo/2015/04/13/12/07/business-720429_1280.jpg"
-            className="rounded-full w-10 h-10 border-2 border-white"
-            alt="User"
-          /> */}
           <div className="flex flex-col text-left">
             <p className="font-semibold text-white">{admin.name}</p>
             <p className="text-sm text-white">Admin</p>
@@ -180,12 +172,6 @@ const AdminNavbar = ({ toggleSidebar, isSidebarOpen }) => {
 
         {dropdownOpen && (
           <div className="absolute right-4 w-56 bg-gray-200 text-black shadow-xl rounded-md py-2 top-16 p-4 z-50">
-            {/* <Link
-              to="/admin/profile"
-              className="block px-4 py-2 hover:bg-gray-300 mt-2 text-sm p-2 rounded-lg cursor-pointer"
-            >
-              My Profile
-            </Link> */}
             <button
               onClick={handleLogout}
               className="block w-full text-left px-4 py-2 hover:bg-gray-300 cursor-pointer"

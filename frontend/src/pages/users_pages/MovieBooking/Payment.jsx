@@ -46,7 +46,6 @@ const Payment = () => {
         const lockStatus = data?.lockStatus;
 
         if (lockStatus === "InActive") {
-          // clear localStorage
           localStorage.removeItem("lockId");
           localStorage.removeItem("lockExpiry");
 
@@ -163,7 +162,7 @@ const Payment = () => {
             },
             body: JSON.stringify({
               ...booking,
-              lockId: booking.lockId, // IMPORTANT
+              lockId: booking.lockId,  
               paymentId: response.razorpay_payment_id,
               paymentStatus: "Success",
               totalAmount: Number((finalAmount || 0).toFixed(2)),
@@ -198,8 +197,6 @@ const Payment = () => {
 
   const finalAmount = baseAmount + totalcgstsgst;
 
-  // console.log("Final Amount:", finalAmount);
-
   return (
     <div className="rounded shadow p-5 relative">
       <button className="absolute top-3 right-3 bg-blue-600 text-white px-3 py-1 rounded text-sm shadow">
@@ -207,7 +204,6 @@ const Payment = () => {
         {String(timeLeft % 60).padStart(2, "0")}
       </button>
       <div className="max-w-7xl mx-auto p-6 grid grid-cols-1 md:grid-cols-3 gap-6 text-black">
-        {/* PAYMENT OPTIONS */}
         <div className="md:col-span-2 bg-white rounded shadow p-5">
           <h2 className="text-lg font-semibold mb-4">Payment Options</h2>
 
@@ -226,12 +222,8 @@ const Payment = () => {
           </div>
         </div>
 
-        {/* ORDER SUMMARY */}
         <div className="bg-white rounded shadow p-5 relative">
-          {/* <p className="absolute top-2 right-3 text-red-500 text-sm">
-          Time left: {Math.floor(timeLeft / 60)}:
-          {String(timeLeft % 60).padStart(2, "0")}
-        </p> */}
+
           <h3 className="font-semibold text-lg mb-3">{booking.movieTitle}</h3>
 
           <p className="text-sm text-gray-500">
@@ -242,13 +234,11 @@ const Payment = () => {
           <p className="text-sm text-gray-500 mb-3">{booking.theaterName}</p>
 
           <div className="border-t pt-3">
-            {/* Ticket price */}
             <div className="flex justify-between mb-2">
               <span>Ticket(s) price</span>
               <span>₹{ticketPrice}</span>
             </div>
 
-            {/* Convenience fee */}
             <div
               className="flex justify-between cursor-pointer"
               onClick={() => setShowFeeDetails(!showFeeDetails)}
@@ -275,7 +265,6 @@ const Payment = () => {
               </div>
             )}
 
-            {/* Food section */}
             {booking.foodItems?.length > 0 && (
               <div className="mt-3">
                 <h4 className="font-medium text-sm mb-1">Food & Beverage</h4>
@@ -292,7 +281,6 @@ const Payment = () => {
               </div>
             )}
 
-            {/* Total */}
             <div className="border-t mt-3 pt-3 flex justify-between font-bold text-lg">
               <span>Amount Payable</span>
 

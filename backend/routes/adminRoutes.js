@@ -21,39 +21,6 @@ const shouldBeActive = require("../utils/shouldBeActive");
 
 const { calculateEndTime } = require("../utils/timeHelper");
 
-// router.post("/signup", async (req, res) => {
-//   try {
-//     const { name, email, password } = req.body;
-//     let existingUser = await User.findOne({ email: email.toLowerCase() });
-//     if (existingUser) {
-//       return res
-//         .status(400)
-//         .json({ success: false, message: "Account already exists" });
-//     }
-//     const newAdmin = new User({
-//       name,
-//       email: email.toLowerCase(), 
-//       password, // Auto-hashed by the User model
-//       role: "ADMIN",
-//     });
-//     await newAdmin.save();
-
-//     res.status(201).json({
-//       success: true,
-//       message: "Signup successful",
-//       adminId: newAdmin._id,
-//     });
-//   } catch (err) {
-//     console.error("Error in signup:", err);
-//     res
-//       .status(500)
-//       .json({ success: false, message: "Server error", error: err.message });
-//   }
-// });
-//  "success": true,
-//     "message": "Signup successful",
-//     "adminId": "681a5d674de33640dbf04bf4"
-
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -479,7 +446,6 @@ const generateCRUDRoutes = (path, Model) => {
   router.post(`/add-${path}`, jwtAuthMiddleware, async (req, res) => {
     try {
       const item = new Model(req.body);
-      // console.log(item);
       await item.save();
       res.json({ message: `${path} added`, item });
     } catch (error) {
@@ -936,22 +902,19 @@ router.post("/add-show", async (req, res) => {
     } = req.body;
     
      if (isMultipleLocation) {
-       // Multiple location → keep dates inside locations
        startDate = null;
        endDate = null;
 
        locations = locations.map((loc) => ({
          ...loc,
-         date: loc.date, // keep
+         date: loc.date, 
        }));
      } else {
-       // Single location → remove location date
        locations = locations.map((loc) => ({
          ...loc,
-         date: null, // ❌ remove date
+         date: null, 
        }));
 
-       // Optional validation
        if (!startDate || !endDate) {
          return res.status(400).json({
            success: false,
@@ -975,8 +938,8 @@ media,
       startDate,
       endDate,
     });
-    console.log(show);
-    // await show.save();
+    // console.log(show);
+    await show.save();
 
     res.status(201).json({
       success: true,

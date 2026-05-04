@@ -23,7 +23,6 @@ const AddCategory = () => {
       [name]: value,
     }));
 
-    // Reset subcategories if Movie selected
     if (name === "type" && value === "Movie") {
       setSubCategories([{ title: "" }]);
     }
@@ -88,7 +87,6 @@ const AddCategory = () => {
       >
         <h2 className="text-2xl font-semibold mb-6">Add Category</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Category Name */}
           <div>
             <label className="block mb-1">Category Name</label>
             <input
@@ -101,7 +99,6 @@ const AddCategory = () => {
             />
           </div>
 
-          {/* Image */}
           <div>
             <label className="block mb-1">Image Link</label>
             <input
@@ -113,7 +110,6 @@ const AddCategory = () => {
             />
           </div>
 
-          {/* Type */}
           <div>
             <label className="block mb-1">Type</label>
             <select
@@ -129,7 +125,6 @@ const AddCategory = () => {
             </select>
           </div>
         </div>
-        {/* Subcategories */}
         {formData.type === "Show" && (
           <div className="mb-6 mt-6">
             <h3 className="text-lg font-semibold mb-3">Sub Categories</h3>
@@ -166,7 +161,6 @@ const AddCategory = () => {
           </div>
         )}
 
-        {/* Submit */}
         <button
           type="submit"
           className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 mt-6"

@@ -238,7 +238,6 @@ const handleSubmit = async (e) => {
             />
             Multiple Halls
           </label>
-          {/* Pre Meal */}
           <label className="flex items-center gap-2 text-gray-700 font-medium">
             <input
               type="checkbox"
@@ -287,7 +286,6 @@ const handleSubmit = async (e) => {
             Wheel Chair Facility{" "}
           </label>
         </div>
-        {/* Seat Arrangement Section */}
         <div className="mt-8 bg-white p-6 rounded-xl shadow">
           <h2 className="text-lg font-semibold mb-4 text-gray-700">
             {isMultiple ? "Add Multiple Halls" : "Single Hall Seat Arrangement"}
@@ -297,7 +295,6 @@ const handleSubmit = async (e) => {
             .slice(0, isMultiple ? halls.length : 1)
             .map((hall, hallIndex) => (
               <div key={hallIndex} className="border p-5 mb-6 rounded-lg">
-                {/* Hall Name only if multiple */}
                 {isMultiple && (
                   <input
                     type="text"
@@ -310,13 +307,11 @@ const handleSubmit = async (e) => {
                   />
                 )}
 
-                {/* Seat Categories */}
                 {hall.seatCategories.map((seat, seatIndex) => (
                   <div
                     key={seatIndex}
                     className="grid md:grid-cols-4 gap-4 mb-4"
                   >
-                    {/* ✅ Seat Name Dropdown */}
                     <select
                       value={seat.seat_name}
                       onChange={(e) =>
@@ -443,7 +438,6 @@ const handleSubmit = async (e) => {
                   key={index}
                   className="grid grid-cols-12 gap-3 items-center mb-3"
                 >
-                  {/* Food categories  */}
                   <select
                     value={food.foodCategory || ""}
                     onChange={(e) =>
@@ -460,7 +454,6 @@ const handleSubmit = async (e) => {
                     ))}
                   </select>
 
-                  {/* Food Title */}
                   <input
                     type="text"
                     placeholder="Food Title"
@@ -471,7 +464,6 @@ const handleSubmit = async (e) => {
                     className="col-span-3 border p-2 rounded text-black"
                   />
 
-                  {/* Image URL */}
                   <input
                     type="text"
                     placeholder="Image URL"
@@ -482,7 +474,6 @@ const handleSubmit = async (e) => {
                     className="col-span-3 border p-2 rounded text-black"
                   />
 
-                  {/* Price */}
                   <input
                     type="number"
                     placeholder="Price"
@@ -493,9 +484,7 @@ const handleSubmit = async (e) => {
                     className="col-span-1 border p-2 rounded text-black"
                   />
 
-                  {/* Buttons */}
                   <div className="col-span-1 flex gap-2">
-                    {/* Add */}
                     <button
                       type="button"
                       onClick={addFoodItem}
@@ -504,7 +493,6 @@ const handleSubmit = async (e) => {
                       +
                     </button>
 
-                    {/* Remove */}
                     {foodItems.length > 1 && (
                       <button
                         type="button"

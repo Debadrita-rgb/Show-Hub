@@ -4,16 +4,15 @@ const generateInvoice = require("../utils/invoiceService");
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-// Retry function
 const sendWithRetry = async (msg, retries = 3) => {
   try {
     await sgMail.send(msg);
-    // console.log("✅ Email sent successfully");
+    console.log("✅ Email sent successfully");
   } catch (error) {
     console.error(`❌ Email failed. Retries left: ${retries}`, error.message);
 
     if (retries > 0) {
-      await new Promise((res) => setTimeout(res, 5000)); // wait 5 sec
+      await new Promise((res) => setTimeout(res, 5000));
       return sendWithRetry(msg, retries - 1);
     } else {
       console.error("🚨 Email permanently failed");
@@ -21,7 +20,6 @@ const sendWithRetry = async (msg, retries = 3) => {
   }
 };
 
-// Main background function
 const sendBookingEmail = async (booking, user, theater, movie, type) => {
   try {
     const msg = buildEmailTemplate(booking, user, theater, movie, type);

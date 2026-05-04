@@ -40,11 +40,9 @@ const AddFeedback = () => {
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Background
     ctx.fillStyle = "#f3f3f3";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Add distortion and noise
     for (let i = 0; i < text.length; i++) {
       const fontSize = 28 + Math.floor(Math.random() * 4);
       const x = 10 + i * 20;
@@ -60,7 +58,6 @@ const AddFeedback = () => {
       ctx.restore();
     }
 
-    // Add lines for extra distortion
     for (let i = 0; i < 3; i++) {
       ctx.strokeStyle = "rgba(0,0,0,0.2)";
       ctx.beginPath();
@@ -121,7 +118,6 @@ const AddFeedback = () => {
     <section className="relative px-6 md:px-16 py-16 overflow-hidden">
       <ToastContainer position="top-right" autoClose={2000} />
 
-      {/* Blurred Background */}
       <div className="absolute inset-0 -z-10">
         <img
           src="https://media.cnn.com/api/v1/images/stellar/prod/221129103455-06-body-cruise-critic-editors-picks-2022-norwegian-prima.jpg?q=w_1110,c_fill"
@@ -131,7 +127,6 @@ const AddFeedback = () => {
         <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-cyan-900/60" />
       </div>
 
-      {/* Main Content */}
       <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-10 backdrop-blur-md bg-white/10 border border-white/30 rounded-3xl p-8 md:p-12 shadow-[0_10px_40px_rgba(0,255,255,0.2)]">
         <div>
           <motion.div

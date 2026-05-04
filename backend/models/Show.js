@@ -12,7 +12,7 @@ const locationSchema = new mongoose.Schema({
   startTime: String,
   date: {
     type: String,
-    default: null, // important
+    default: null,  
   },
   duration: String,
   price: Number,
@@ -31,7 +31,6 @@ const showSchema = new mongoose.Schema(
         isActive: { type: Boolean, default: true },
       },
     ],
-    // showVideoEmbedURL: String,
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",

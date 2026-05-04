@@ -186,14 +186,12 @@ const SingleMovie = () => {
     <div className="overflow-x-hidden">
       {" "}
       <ToastContainer position="top-right" />
-      {/*  HERO SECTION */}
       <div
         className="relative min-h-screen w-full overflow-hidden bg-cover bg-center bg-no-repeat flex items-center"
         style={{ backgroundImage: `url(${movie.backgroundUrl})` }}
       >
         <div className="absolute inset-0 bg-black/70"></div>
 
-        {/* Share Button */}
         <button
           onClick={() => setShowShareModal(true)}
           className="absolute top-4 right-4 sm:top-6 sm:right-10 z-20 bg-black/60 backdrop-blur-md px-4 py-2 rounded-lg"
@@ -203,7 +201,6 @@ const SingleMovie = () => {
 
         <div className="relative z-10 flex flex-col md:flex-row items-center gap-6 md:gap-10 px-4 sm:px-6 md:px-10 lg:px-16">
           {" "}
-          {/* Poster */}
           <div className="relative group">
             <img
               src={movie.movieimage}
@@ -211,11 +208,9 @@ const SingleMovie = () => {
               className="w-40 sm:w-52 md:w-60 max-w-full rounded-xl shadow-2xl"
             />
 
-            {/* Show only if trailer exists */}
             {movie.trailerlink && (
               <Link
                 to={`/movie/${createSlug(movie.title)}/${movie._id}/videos`}
-                // to={`/movie/${createSlug(movie.title)}/${movie._id}/user-reviews`}
                 className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition rounded-xl cursor-pointer"
               >
                 <div className="text-white text-4xl">▶</div>
@@ -223,7 +218,6 @@ const SingleMovie = () => {
               </Link>
             )}
           </div>
-          {/* Movie Info */}
           <div className="max-w-full">
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">
               {movie.title}
@@ -259,7 +253,6 @@ const SingleMovie = () => {
           </div>
         </div>
       </div>
-      {/* 🔥 ABOUT SECTION */}
       <div className="px-4 sm:px-6 md:px-10 lg:px-16 py-8 sm:py-10">
         {" "}
         <h2 className="text-2xl font-bold mb-4">About the movie</h2>
@@ -268,7 +261,6 @@ const SingleMovie = () => {
           dangerouslySetInnerHTML={{ __html: movie.movieDescription }}
         ></div>
       </div>
-      {/* 🔥 CAST SECTION */}
       {movie.casting?.length > 0 && (
         <div className="px-4 sm:px-6 md:px-10 lg:px-16 py-8 sm:py-10">
           <h2 className="text-2xl font-bold mb-6">Cast</h2>
@@ -293,7 +285,6 @@ const SingleMovie = () => {
           </div>
         </div>
       )}
-      {/* 🔥 CREW SECTION */}
       {movie.crew?.length > 0 && (
         <div className="px-4 sm:px-6 md:px-10 lg:px-16 py-8 sm:py-10">
           <h2 className="text-2xl font-bold mb-6">Crew</h2>
@@ -315,14 +306,12 @@ const SingleMovie = () => {
           </div>
         </div>
       )}
-      {/* Review Section  */}
       {reviews?.length > 0 && (
         <div
           id="reviews-section"
           className="px-4 sm:px-6 md:px-10 lg:px-16 py-10 sm:py-14 text-white"
         >
           {" "}
-          {/*  Header */}
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-3xl font-bold">Top reviews</h2>
 
@@ -337,12 +326,10 @@ const SingleMovie = () => {
           <p className="text-white mb-6">
             Summary of {formatVotes(ratingSummary.totalVotes)} reviews.
           </p>
-          {/*  Review Slider */}
           <Slider {...settings}>
             {reviews.map((review) => (
               <div key={review._id} className="px-3">
                 <div className="bg-purple-300 hover:bg-purple-400 rounded-xl p-5 shadow-md h-[250px] flex flex-col justify-between">
-                  {/* Top */}
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-3">
                       <img
@@ -357,7 +344,6 @@ const SingleMovie = () => {
                             ? `${review.userId?.name.slice(0, 10)}${review.userId?.name.length > 10 ? "..." : ""}`
                             : "User"}
 
-                          {/* {review.userId?.name || "User"} */}
                         </p>
                       </div>
                     </div>
@@ -367,7 +353,6 @@ const SingleMovie = () => {
                     </div>
                   </div>
 
-                  {/* Review */}
                   <Link
                     to={`/Movie/${createSlug(movie.title)}/${movie._id}/user-reviews`}
                   >
@@ -376,7 +361,6 @@ const SingleMovie = () => {
                     </p>
                   </Link>
 
-                  {/* Time */}
                   <div className="flex justify-end mt-4 text-gray-500 text-sm">
                     <p className="text-black">{getTimeAgo(review.createdAt)}</p>
                   </div>
@@ -386,14 +370,12 @@ const SingleMovie = () => {
           </Slider>
         </div>
       )}
-      {/* Share Modal  */}
       {showShareModal && (
         <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50">
           <div className="bg-white w-[90%] max-w-[350px] rounded-xl p-4 relative">
             {" "}
             <div className="flex justify-between mb-4">
               <h2 className="text-xl font-semibold mb-4 text-black">Share</h2>
-              {/* Close Button */}
               <button
                 onClick={() => setShowShareModal(false)}
                 className="absolute top-3 right-4 text-gray-500 hover:text-black text-xl"

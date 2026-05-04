@@ -109,16 +109,11 @@ import UserFeedback from "./pages/users_pages/Feedback/Feedback.jsx";
 import LoginPage from "./pages/LoginPage/LoginPage";
 
 const App = () => {
-  // const { role } = useAuth();
-  // const role = localStorage.getItem("role");
-  // const isAuthenticated = !!role;
   const { loading, isAuthenticated, role } = useAuth();
   if (loading) return <div>Loading...</div>;
 
-  // console.log("Auth check:", isAuthenticated, "Role:", role);
   return (
     <div className="min-h-screen bg-transparent">
-      {/* <ToastContainer position="top-right" autoClose={2000} /> */}
 
       <BrowserRouter>
         <AuthHandler>
@@ -138,10 +133,6 @@ const App = () => {
                 path="movie/:slug/:id/book-movie"
                 element={<MyBookingMovies />}
               />
-              {/* <Route
-              path="services/facilities/movies/book-movie/:movieId"
-              element={<BookMovieForm />}
-            /> */}
               <Route
                 path="/movie/:slug/:id/book-movie/seat-arrangement"
                 element={<SeatArrangementPage />}
@@ -174,7 +165,6 @@ const App = () => {
             {isAuthenticated && role === "admin" && (
               <Route path="/admin" element={<AdminLayout />}>
                 <Route path="dashboard" element={<AdminDashboard />} />
-                {/* <Route path="facilities" element={<Facilities />} /> */}
                 {/*  Movie  */}
                 <Route path="viewMovie" element={<ViewMovie />} />
                 <Route path="addMovie" element={<AdminaddMovie />} />

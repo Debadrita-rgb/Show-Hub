@@ -13,7 +13,6 @@ const VerifyOtp = () => {
   const location = useLocation();
   const { login } = useAuth();
 
-  // email passed from previous page
   const email = location.state?.email;
 
   const handleVerify = async (e) => {
@@ -29,7 +28,6 @@ const VerifyOtp = () => {
         const role = res.data.user.role || "USER";
         const userRole = role.toLowerCase();
 
-        // Store in localStorage
         localStorage.setItem("token", res.data.token);
         localStorage.setItem("userName", res.data.user.name);
         localStorage.setItem("role", userRole);

@@ -16,12 +16,10 @@ const EditMovie = () => {
   const [categories, setCategories] = useState([]);
   const [languages, setLanguages] = useState([]);
 
-  // const [formats, setFormats] = useState([]);
   const [crew, setCrew] = useState([
     { name: "", dpimageUrl: "", designation: "" },
   ]);
 
-  // const [serviceslot, setServiceSlot] = useState([]);
   const [casting, setCasting] = useState([
     { castname: "", castimageURL: "", inmoviecastname: "" },
   ]);
@@ -96,7 +94,7 @@ const EditMovie = () => {
           format: data.format || [],
           trailerlink: data.trailerlink
             ? `https://www.youtube.com/watch?v=${data.trailerlink}`
-            : "", // isRecommended: data.isRecommended ?? false,
+            : "", 
         });
         setCasting(
           data.casting || [
@@ -233,12 +231,6 @@ const EditMovie = () => {
       options: categories.map((cat) => cat.name),
     },
     { name: "backgroundUrl", label: "Background Url", type: "text" },
-    // {
-    //   name: "isRecommended",
-    //   label: "Recommended",
-    //   type: "checkbox",
-    //   value: true,
-    // },
     {
       name: "trailerlink",
       label: "Trailer Link (YouTube only)",
@@ -256,7 +248,6 @@ const EditMovie = () => {
       <ToastContainer position="top-right" autoClose={2000} />
 
       <h2 className="text-xl font-bold mb-4">Edit Movie</h2>
-      {/* Casting Management  */}
       <div className="mb-6 bg-white p-6 border rounded-xl shadow w-full">
         <h2 className="text-sm font-semibold mb-4 text-gray-700">
           Casting Members
@@ -311,9 +302,8 @@ const EditMovie = () => {
           </div>
         ))}
       </div>
-      {/* end casting management  */}
 
-      {/* Crew management  */}
+
       <div className="mb-6 bg-white p-6 border rounded-xl shadow w-full">
         <h2 className="text-sm font-semibold mb-4 text-gray-700">
           Crew Members Management
@@ -366,9 +356,7 @@ const EditMovie = () => {
           </div>
         ))}
       </div>
-      {/* end crew management  */}
 
-      {/* Dynamic Form */}
       {initialData ? (
         <DynamicForm
           key={movieId}

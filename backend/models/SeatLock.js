@@ -30,7 +30,4 @@ const seatLockSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-// TTL index
-// seatLockSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
-
 module.exports = mongoose.model("SeatLock", seatLockSchema);

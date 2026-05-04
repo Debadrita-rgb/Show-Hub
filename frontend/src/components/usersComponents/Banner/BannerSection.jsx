@@ -22,7 +22,6 @@ const BannerSection = () => {
         return res.json();
       })
       .then((result) => {
-        // result.data is array of banners
         const allImages = result.data.flatMap((banner) =>
           banner.page_banner_image.map((img) => img.imageURL),
         );

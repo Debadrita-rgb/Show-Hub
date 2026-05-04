@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-// import CustomInput from "../../components/adminComponents/forms/CustomInput";
 import { FaEnvelope, FaLock } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
 import { useNavigate, Link } from "react-router-dom";
@@ -39,12 +38,10 @@ const AdminLogin = () => {
 
       const data = await response.json();
 
-      // Check if request is successful
       if (!response.ok) {
         throw new Error(data.message || "Login failed");
       }
 
-      // Only runs if login is successful
       toast.success("🎉 Login successful!", {
         autoClose: 3000,
         pauseOnFocusLoss: false,
@@ -57,7 +54,6 @@ const AdminLogin = () => {
         if (userRole === "admin") navigate("/admin/dashboard");
       }, 1000);
     } catch (error) {
-      // Show backend error message
       const errorMessage = error.message || "Login failed";
       toast.error(errorMessage);
       setErrors({ server: errorMessage });
@@ -75,14 +71,11 @@ const AdminLogin = () => {
       />
       <section className="min-h-screen flex items-center justify-center  border-red-500 ">
         <div className="bg-white p-5 rounded-2xl shadow-lg max-w-5xl w-full flex flex-col">
-          {/* Centered Logo at the Top */}
           <div className="flex justify-center mb-4">
             <img src={logo} alt="Company Logo" className="h-30 rounded-4xl" />
           </div>
 
-          {/* Two-column layout: Form & Image */}
           <div className="flex flex-col md:flex-row w-full">
-            {/* Form Section */}
             <div className="md:w-1/2 px-5">
               <h2 className="text-2xl font-bold text-[#03033D] text-center">
                 Admin Login
@@ -135,7 +128,6 @@ const AdminLogin = () => {
               </form>
             </div>
 
-            {/* Image Section */}
             <div className="md:w-1/2 flex items-center justify-center mt-6 md:mt-0">
               <img
                 src={admin_image}

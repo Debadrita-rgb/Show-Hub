@@ -31,8 +31,6 @@ const sendCancelEmail = async ({
       year: "numeric",
     });
 
-    // FOOD
-    // FOOD (only show cancelled items)
     const cancelledFoodItems =
       booking.foodItems?.filter((item) => item.cancelledQty > 0) || [];
 

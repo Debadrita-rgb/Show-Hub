@@ -7,7 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState('');
   const [role, setRole] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true); // Add loading state
+  const [loading, setLoading] = useState(true); 
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
@@ -18,7 +18,7 @@ export const AuthProvider = ({ children }) => {
       setRole(storedRole || "");
       setIsAuthenticated(true);
     }
-    setLoading(false); // Remove loading state after data is fetched
+    setLoading(false); 
   }, []);
 
 
@@ -38,7 +38,6 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("userName");
     localStorage.removeItem("token");
     localStorage.removeItem("role");
-    // navigate("/admin/LoginAdmin");
   };
 
   return (

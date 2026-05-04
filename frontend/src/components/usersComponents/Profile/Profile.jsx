@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import BASE_URL from "../../../../config";
 
 const ProfilePage = () => {
-//   const [user, setUser] = useState({});
 const [user, setUser] = useState({
   gender: "",
   married: "",
@@ -46,22 +45,17 @@ const handleSave = async () => {
   return (
     <div className="min-h-screen  py-10 px-6 md:px-20 text-white">
       <div className=" rounded-lg shadow-lg p-8">
-        {/* PROFILE HEADER */}
         <div className="flex items-center gap-6 mb-8">
           <div className="flex items-center justify-center">
-            {/* <span className="text-4xl text-gray-500"> */}
               <img src="https://cdn.pixabay.com/photo/2018/04/18/18/56/user-3331256_1280.png" className="rounded-full h-21 w-23"/>
-            {/* </span> */}
           </div>
 
           <h1 className="text-3xl font-semibold">{user.name}</h1>
         </div>
 
-        {/* ACCOUNT DETAILS */}
         <h2 className="text-xl font-semibold mb-4">Account Details</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          {/* MOBILE */}
           <div>
             <label className="text-sm text-gray-150">Mobile Number</label>
             <input
@@ -73,7 +67,6 @@ const handleSave = async () => {
             />
           </div>
 
-          {/* EMAIL */}
           <div>
             <label className="text-sm text-gray-150">Email Address</label>
             <input
@@ -85,11 +78,9 @@ const handleSave = async () => {
           </div>
         </div>
 
-        {/* PERSONAL DETAILS */}
         <h2 className="text-xl font-semibold mb-4">Personal Details</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* FIRST NAME */}
           <div>
             <label className="text-sm text-gray-150">Name</label>
             <input
@@ -100,7 +91,6 @@ const handleSave = async () => {
             />
           </div>
 
-          {/* BIRTHDAY */}
           <div>
             <label className="text-sm text-gray-150">Birthday</label>
             <input
@@ -111,7 +101,6 @@ const handleSave = async () => {
             />
           </div>
 
-          {/* GENDER */}
           <div>
             <label className="text-sm text-gray-150">Identity</label>
 
@@ -140,7 +129,6 @@ const handleSave = async () => {
             </div>
           </div>
 
-          {/* MARRIED */}
           <div>
             <label className="text-sm text-gray-150">Married?</label>
 
@@ -169,7 +157,6 @@ const handleSave = async () => {
             </div>
           </div>
 
-          {/* ANNIVERSARY */}
           <div>
             <label className="text-sm text-gray-150">Anniversary</label>
             <input
@@ -183,7 +170,6 @@ const handleSave = async () => {
           </div>
         </div>
 
-        {/* SAVE BUTTON */}
         <div className="mt-8">
           <button
             onClick={handleSave}

@@ -124,7 +124,6 @@ const EditCategory = () => {
         <h2 className="text-2xl font-semibold mb-6">Edit Category</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Category Name */}
           <div>
             <label className="block mb-1">Category Name</label>
             <input
@@ -137,7 +136,6 @@ const EditCategory = () => {
             />
           </div>
 
-          {/* Image */}
           <div>
             <label className="block mb-1">Image Link</label>
             <input
@@ -149,7 +147,6 @@ const EditCategory = () => {
             />
           </div>
 
-          {/* Type */}
           <div>
             <label className="block mb-1">Type</label>
             <select
@@ -166,7 +163,6 @@ const EditCategory = () => {
           </div>
         </div>
 
-        {/* Subcategories */}
         {formData.type === "Show" && (
           <div className="mb-6 mt-6">
             <h3 className="text-lg font-semibold mb-3">Sub Categories</h3>

@@ -12,7 +12,7 @@ const buildEmailTemplate = (booking, user, theater, movie, type) => {
   const template = handlebars.compile(source);
 
   let data = {};
-  // FORMAT DATE TIME
+
   const d = new Date(booking.showDate);
   const formattedDate = d.toLocaleDateString("en-IN", {
     day: "numeric",
@@ -20,7 +20,6 @@ const buildEmailTemplate = (booking, user, theater, movie, type) => {
     year: "numeric",
   });
 
-  // SEATS HTML
   const seatsHTML = booking.seats
     ?.map(
       (seat) => `
@@ -32,7 +31,6 @@ const buildEmailTemplate = (booking, user, theater, movie, type) => {
     )
     .join("");
 
-  // FOOD
   const foodTotal =
     booking.foodItems?.reduce((sum, item) => sum + item.total, 0) || 0;
 
@@ -105,16 +103,12 @@ const buildEmailTemplate = (booking, user, theater, movie, type) => {
     };
   }
 
-  // PASS DATA
   const html = template({
     name: user.name,
     bookingId: booking.bookingId || booking._id,
     ...data,
     totalAmount: booking.totalAmount,
     convenienceFee: booking.convenienceFee,
-    // seatsHTML,
-    // foodHTML,
-    // foodTotal,
   });
 
   return {

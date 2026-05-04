@@ -10,11 +10,5 @@ const LanguageSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
-  // rating: {
-  //   type: String,
-  // },
-  // trailerlink: {
-  //   type: String,
-  // },
 });
 module.exports = mongoose.model("Language", LanguageSchema);

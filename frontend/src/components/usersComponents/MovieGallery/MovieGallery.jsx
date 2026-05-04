@@ -12,11 +12,6 @@ const MovieGallery = () => {
   const { city } = useLocationcity();
   const [error, setError] = useState();
 
-
-// useEffect(() => {
-//   console.log("Detected city:", city);
-// }, [city]);
-
    useEffect(() => {
      const fetchMovies = async () => {
        try {
@@ -28,19 +23,18 @@ const MovieGallery = () => {
          const res = await fetch(url); 
 
          if (!res.ok) {
-           // If response is not ok (404, 500, etc.)
-           const errData = await res.json(); // get error message
-           setMovies([]); // clear previous movies
+           const errData = await res.json(); 
+           setMovies([]); 
            setError(errData.message || "No movies found");
-           return; // stop execution
+           return; 
          }
 
          const data = await res.json();
          setMovies(data.data);
-         setError(""); // clear error if successful
+         setError(""); 
        } catch (err) {
-         setMovies([]); // clear previous movies
-         setError("Something went wrong"); // network or other error
+         setMovies([]);
+         setError("Something went wrong"); 
        }
      };
 
@@ -89,19 +83,15 @@ const MovieGallery = () => {
             <div key={movie._id} className="px-3">
               <Link to={`/movie/${createSlug(movie.title)}/${movie._id}`}>
                 <div className="rounded-xl overflow-hidden">
-                  {/* Movie Image */}
                   <img
                     src={movie.movieimage}
                     alt={movie.title}
                     className="h-100 w-full object-cover rounded-xl hover:scale-105 transition duration-300 cursor-pointer"
                   />
 
-                  {/* Movie Details */}
                   <div className="mt-3 text-white">
-                    {/* Movie Name */}
                     <h3 className="font-bold text-lg">{movie.title}</h3>
 
-                    {/* Category */}
                     <p className="text-sm text-white">
                       {movie.category?.join(" / ")}
                     </p>

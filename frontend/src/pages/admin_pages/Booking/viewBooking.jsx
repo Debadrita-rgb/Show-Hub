@@ -72,7 +72,6 @@ const ViewBooking = () => {
       <div className="flex justify-center mb-6">
         <div className="relative flex bg-gray-800 rounded-full p-1 w-full max-w-xs sm:max-w-sm">
           {" "}
-          {/* Sliding Background */}
           <div
             className={`absolute top-1 bottom-1 w-1/2 rounded-full transition-all duration-300 ${
               activeTab === "Movie"
@@ -108,7 +107,6 @@ const ViewBooking = () => {
                     {" "}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                       {" "}
-                      {/* LEFT */}
                       <div className="space-y-2">
                         {" "}
                         <h2 className="text-base sm:text-lg font-semibold text-[#1b4c6d] break-words">
@@ -131,7 +129,6 @@ const ViewBooking = () => {
                           📧 {order.userId?.email}
                         </p>
                       </div>
-                      {/* RIGHT */}
                       <div className="space-y-3">
                         {" "}
                         <div className="flex flex-col sm:flex-row sm:justify-between text-sm gap-1">
@@ -157,7 +154,6 @@ const ViewBooking = () => {
                               : `${order.theaterName}, ${order.locationName}`
                             : `${order.details?.theaterName}, ${order.details?.locationName}`}
                         </p>
-                        {/* PRICE BOX */}
                         <div className="max-w-4xl mx-auto">
                           <div className="bg-gray-100 p-3 rounded-lg text-sm space-y-1">
                             {" "}
@@ -193,7 +189,6 @@ const ViewBooking = () => {
                             )}
                           </div>
                         </div>
-                        {/* SEATS (chips style) */}
                         {order.type === "Movie" && (
                           <div className="mt-3">
                             <p className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1">
@@ -237,9 +232,7 @@ const ViewBooking = () => {
                             </div>
                           </div>
                         )}
-                        {/* STATUS BADGE */}
                         <div className="flex flex-wrap gap-2 mt-2">
-                          {/* Payment Status */}
                           <span
                             className={`px-3 py-1 text-xs rounded-full font-semibold ${
                               order.paymentStatus === "Success"
@@ -250,7 +243,6 @@ const ViewBooking = () => {
                             💳 Payment Status: {order.paymentStatus}
                           </span>
 
-                          {/* Booking Status */}
                           <span
                             className={`px-3 py-1 text-xs rounded-full font-semibold ${
                               order.bookingStatus === "CONFIRMED"
@@ -265,7 +257,6 @@ const ViewBooking = () => {
                         </div>
                       </div>
                     </div>
-                    {/* ICON */}
                     {hasFood && order.type === "Movie" && (
                       <FaChevronUp
                         className={`${open ? "rotate-180 transform" : ""} w-5 h-5 transition`}
@@ -298,20 +289,17 @@ const ViewBooking = () => {
                                 key={idx}
                                 className="bg-white p-2 rounded-lg shadow-sm text-sm text-black"
                               >
-                                {/* FOOD NAME + AMOUNT */}
                                 <div className="flex justify-between font-medium">
                                   <span>{item.name}</span>
                                   <span>₹{displayAmount}</span>
                                 </div>
 
-                                {/* BOOKED */}
                                 {item.foodStatus === "Booked" && (
                                   <div className="text-green-600 text-xs mt-1">
                                     Qty: {item.quantity}
                                   </div>
                                 )}
 
-                                {/* PARTIAL CANCEL */}
                                 {item.foodStatus === "Partially Cancelled" && (
                                   <div className="text-xs mt-1">
                                     <p className="text-green-600">
@@ -332,7 +320,6 @@ const ViewBooking = () => {
                                   </div>
                                 )}
 
-                                {/* FULL CANCEL */}
                                 {item.foodStatus === "Cancelled" && (
                                   <div className="text-red-600 text-xs mt-1">
                                     Fully Cancelled ({item.cancelledQty}) - ₹
