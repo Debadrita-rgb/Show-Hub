@@ -219,7 +219,14 @@ const Booking = () => {
       // refresh bookings
       setBookings((prev) =>
         prev.map((b) =>
-          b._id === booking._id ? { ...b, bookingStatus: "Cancelled" } : b,
+          b._id === booking._id
+            ? {
+                ...b,
+                bookingStatus: "Cancelled",
+                refundAmount: data.refundAmount || b.totalAmount,
+                refundStatus: "Fully Refunded",
+              }
+            : b,
         ),
       );
       closeCancelModal();
@@ -282,6 +289,13 @@ const Booking = () => {
               ).length === 0
                 ? "Cancelled"
                 : "Partially Cancelled",
+
+            refundAmount: data.refundAmount || booking.refundAmount || 0,
+            refundStatus:
+              data.refundStatus ||
+              (booking.bookingStatus === "Cancelled"
+                ? "Fully Refunded"
+                : "Partially Refunded"),
 
             seats: booking.seats.map((seat) =>
               selectedSeats.includes(seat.seatId)
@@ -348,6 +362,8 @@ const Booking = () => {
               return {
                 ...food,
                 cancelledQty: newCancelledQty,
+                refundAmount: data.refundAmount || booking.refundAmount || 0,
+                refundStatus: "Partially Refunded",
               };
             }
 

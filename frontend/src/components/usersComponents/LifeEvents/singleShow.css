@@ -1,0 +1,17 @@
+.react-datepicker__day--selected {
+  background-color: #ef4444 !important;
+  color: white !important;
+}
+
+.react-datepicker__day--disabled {
+  color: #ccc !important;
+  cursor: not-allowed;
+}
+.available-date {
+  background-color: #fee2e2;
+  border-radius: 50%;
+}
+
+.react-datepicker{
+    margin-top: 20px;
+}

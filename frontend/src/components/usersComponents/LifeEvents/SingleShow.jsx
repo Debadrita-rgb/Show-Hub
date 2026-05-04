@@ -6,12 +6,16 @@ import "slick-carousel/slick/slick-theme.css";
 import { Link } from "react-router-dom";
 import BASE_URL from "../../../../config";
 import YouTubePlayer from "./youTubePlayerComponent";
+// import generateCalendar from "../../../helper/generateCalendar";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import "./singleShow.css";
 
 const SingleShow = () => {
   const { id } = useParams();
   const [openVenueModal, setOpenVenueModal] = useState(false);
   const [showDateSelector, setShowDateSelector] = useState(false);
-  const [showAllDates, setShowAllDates] = useState(false);
+  // const [showAllDates, setShowAllDates] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [visibleCount, setVisibleCount] = useState(10);
   const [show, setShow] = useState(null);
@@ -22,6 +26,12 @@ const SingleShow = () => {
     averageRating: 0,
     totalVotes: 0,
   });
+
+{/* <DatePicker
+  selected={selectedDate}
+  onChange={(date) => setSelectedDate(date)}
+  inline
+/>; */}
   const [reviews, setReviews] = useState([]);
   
   const getDateRange = (start, end) => {
@@ -173,6 +183,25 @@ if (show?.media?.length > 0) {
     return `${diffInDays} day${diffInDays > 1 ? "s" : ""} ago`;
   };
 
+  
+  const isSingleDayShow = () => {
+    if (!show?.startDate || !show?.endDate) return false;
+
+    const start = new Date(show.startDate);
+    const end = new Date(show.endDate);
+
+    start.setHours(0, 0, 0, 0);
+    end.setHours(0, 0, 0, 0);
+
+    return start.getTime() === end.getTime();
+  };
+
+  useEffect(() => {
+  if (show && isSingleDayShow()) {
+    setSelectedDate(new Date(show.startDate));
+  }
+  }, [show]);
+
   const createSlug = (title) => {
     return title
       .toLowerCase()
@@ -273,8 +302,9 @@ if (show?.media?.length > 0) {
     return html.replace(/<[^>]*>?/gm, "");
   };
 
-  const basePrice = show.locations[0].price || 0;
+const basePrice = show?.locations?.[0]?.price || 0;
   const totalPrice = basePrice * seatCount;
+
 
   return (
     <div className=" min-h-screen overflow-x-hidden">
@@ -321,7 +351,10 @@ if (show?.media?.length > 0) {
             {show?.startDate && (
               <p className="mb-3">
                 📅 {new Date(show.startDate).toDateString()}
-                {show.endDate && ` - ${new Date(show.endDate).toDateString()}`}
+                {show.endDate &&
+                  new Date(show.startDate).toDateString() !==
+                    new Date(show.endDate).toDateString() &&
+                  ` - ${new Date(show.endDate).toDateString()}`}
               </p>
             )}
           </>
@@ -375,7 +408,7 @@ if (show?.media?.length > 0) {
                     </div>
                   </span>
 
-                  {canBookShow(show) && (
+                  {canBookShow(show) && !isSingleDayShow() && (
                     <button
                       onClick={() => setShowDateSelector(true)}
                       className="bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 rounded-md text-sm"
@@ -390,81 +423,23 @@ if (show?.media?.length > 0) {
                 show?.startDate &&
                 show?.endDate &&
                 (() => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const allDates = getDateRange(show.startDate, show.endDate).filter((date) => {
-    const d = new Date(date);
-    d.setHours(0, 0, 0, 0);
-    return d >= today;
-  });
-                    // const visibleDates = showAllDates
-                    // ? allDates
-                    // : allDates.slice(0, 10);
-
-                    const visibleDates = allDates.slice(0, visibleCount);
                   return (
-                    <div className="mt-3 flex flex-wrap gap-2 items-center">
-                      {visibleDates.map((date, index) => {
-                        const isDisabled = !isBookingAvailable(date);
-
-                        return (
-                          <button
-                            key={index}
-                            disabled={isDisabled}
-                            onClick={() => setSelectedDate(date)}
-                            className={`px-3 py-1 rounded-md text-sm border transition-colors duration-200
-  ${
-    selectedDate?.toDateString() === date.toDateString()
-      ? "bg-red-500 text-white"
-      : "bg-white text-black hover:bg-red-600 hover:text-white"
-  }
-  ${
-    isDisabled
-      ? "opacity-50 cursor-not-allowed hover:bg-white hover:text-black"
-      : ""
-  }
-`}
-                          >
-                            {date.toLocaleDateString("en-IN", {
-                              day: "numeric",
-                              month: "short",
-                            })}
-                          </button>
-                        );
-                      })}
-
-                      {/* Show More / Less Button */}
-                      {/* {allDates.length > 10 && (
-                        <button
-                          onClick={() => setShowAllDates(!showAllDates)}
-                          className="px-3 py-1 text-sm text-blue-600 underline"
-                        >
-                          {showAllDates ? "Show Less" : "Show More"}
-                        </button>
-                      )} */}
-                      {visibleCount < allDates.length && (
-                        <button
-                          onClick={() => setVisibleCount((prev) => prev + 10)}
-                          className="px-3 py-1 text-sm text-blue-600 underline"
-                        >
-                          Show More
-                        </button>
-                      )}
-
-                      {visibleCount > 10 && (
-                        <button
-                          onClick={() => setVisibleCount(10)}
-                          className="px-3 py-1 text-sm text-gray-500 underline"
-                        >
-                          Show Less
-                        </button>
-                      )}
-                    </div>
+                    <DatePicker
+                      selected={selectedDate}
+                      onChange={(date) => setSelectedDate(date)}
+                      inline
+                      minDate={new Date()}
+                      maxDate={new Date(show.endDate)}
+                      filterDate={(date) => {
+                        const d = new Date(date);
+                        d.setHours(0, 0, 0, 0);
+                        return isBookingAvailable(d);
+                      }}
+                    />
                   );
                 })()}
 
-              {selectedDate && (
+              {(selectedDate || isSingleDayShow()) && (
                 <div className="mt-3">
                   <p className="mb-2 font-medium">Select Seats Count</p>
 
@@ -616,7 +591,7 @@ if (show?.media?.length > 0) {
                     <button
                       onClick={() => {
                         setSelectedLocation(loc);
-                        setSeatCount(1); 
+                        setSeatCount(1);
                       }}
                       disabled={!isBookingAvailable(loc.date)}
                       className={`px-5 py-2 rounded-md text-sm font-semibold transition

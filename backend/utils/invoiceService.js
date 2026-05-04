@@ -134,7 +134,7 @@ const generateInvoice = (booking, user, theater) => {
     };
 
     // HEADER ROW
-    drawRow(y, "Item Description", "Qty", "Ticket Price", "Total");
+    drawRow(y, "Item Description", "Qty", "Price", "Total");
     y += 25;
 
     // MAIN ITEM
