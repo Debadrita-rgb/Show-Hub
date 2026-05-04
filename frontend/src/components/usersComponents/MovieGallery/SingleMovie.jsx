@@ -277,7 +277,7 @@ const SingleMovie = () => {
 
                   <h3 className="mt-2 font-semibold">{cast.castname}</h3>
                   <p className="text-sm text-white">
-                    as {cast.inmoviecastname}
+                    {cast.inmoviecastname}
                   </p>
                 </div>
               ))}

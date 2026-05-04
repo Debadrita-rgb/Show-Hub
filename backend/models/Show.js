@@ -31,6 +31,13 @@ const showSchema = new mongoose.Schema(
         isActive: { type: Boolean, default: true },
       },
     ],
+    gallery: [
+      {
+        gallerytype: { type: String, required: true },
+        galleryurl: { type: String, required: true },
+        isActive: { type: Boolean, default: true },
+      },
+    ],
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",

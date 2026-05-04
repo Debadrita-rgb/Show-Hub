@@ -191,37 +191,81 @@ const ShowAllMovieWithFilter = () => {
 
           {totalPages > 1 && (
             <div className="flex justify-center mt-10 gap-2 flex-wrap">
-              <button
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-                className="px-4 py-2 bg-purple-900 hover:bg-purple-800 text-white rounded disabled:opacity-50"
-              >
-                Prev
-              </button>
-
-              {[...Array(totalPages)].map((_, index) => (
+              <div className="flex items-center gap-2">
                 <button
-                  key={index}
-                  onClick={() => setCurrentPage(index + 1)}
-                  className={`px-4 py-2 rounded ${
-                    currentPage === index + 1
-                      ? "bg-blue-600 text-white"
-                      : "bg-purple-900 hover:bg-purple-800 text-white"
-                  }`}
+                  onClick={() => setCurrentPage(1)}
+                  disabled={currentPage === 1}
+                  className="px-4 py-2 bg-purple-900 hover:bg-purple-800 text-white rounded disabled:opacity-50"
                 >
-                  {index + 1}
+                  {"<<"}
                 </button>
-              ))}
 
-              <button
-                onClick={() =>
-                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                }
-                disabled={currentPage === totalPages}
-                className="px-4 py-2 bg-purple-900 hover:bg-purple-800 text-white rounded disabled:opacity-50"
-              >
-                Next
-              </button>
+                <button
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
+                  disabled={currentPage === 1}
+                  className="px-4 py-2 bg-purple-900 hover:bg-purple-800 text-white rounded disabled:opacity-50"
+                >
+                  {"<"}
+                </button>
+
+                {(() => {
+                  const pages = [];
+
+                  for (let i = 1; i <= totalPages; i++) {
+                    if (
+                      i === 1 ||
+                      i === totalPages ||
+                      (i >= currentPage - 1 && i <= currentPage + 1)
+                    ) {
+                      pages.push(
+                        <button
+                          key={i}
+                          onClick={() => setCurrentPage(i)}
+                          className={`px-4 py-2 rounded ${
+                            currentPage === i
+                              ? "bg-blue-600 text-white"
+                              : "bg-purple-900 hover:bg-purple-800 text-white"
+                          }`}
+
+                          // className={`px-4 py-2 bg-purple-900 hover:bg-purple-800 text-white rounded disabled:opacity-50 ${
+                          //   currentPage === i ? "bg-blue-500 text-white" : ""
+                          // }`}
+                        >
+                          {i}
+                        </button>,
+                      );
+                    } else if (i === currentPage - 2 || i === currentPage + 2) {
+                      pages.push(
+                        <span key={i} className="px-2 text-white">
+                          ...
+                        </span>,
+                      );
+                    }
+                  }
+
+                  return pages;
+                })()}
+
+                <button
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
+                  disabled={currentPage === totalPages}
+                  className="px-4 py-2 bg-purple-900 hover:bg-purple-800 text-white rounded disabled:opacity-50"
+                >
+                  {">"}
+                </button>
+
+                <button
+                  onClick={() => setCurrentPage(totalPages)}
+                  disabled={currentPage === totalPages}
+                  className="px-4 py-2 bg-purple-900 hover:bg-purple-800 text-white rounded disabled:opacity-50"
+                >
+                  {">>"}
+                </button>
+              </div>
             </div>
           )}
         </div>

@@ -57,8 +57,8 @@ const EditLocationWiseMovie = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
-const activeTheaters = res.data.filter((t) => t.isActive);
-setAllTheaters(activeTheaters);
+        const activeTheaters = res.data.filter((t) => t.isActive);
+        setAllTheaters(activeTheaters);
         const uniqueLocations = [
           ...new Set(activeTheaters.map((t) => t.location_name)),
         ];
@@ -99,8 +99,9 @@ setAllTheaters(activeTheaters);
         );
         setTheaters(filtered);
 
-        const selected = filtered.find((t) => t._id === data.theater);
-
+        const selected = filtered.find(
+          (t) => t._id === (data.theater?._id || data.theater),
+        );
         if (selected?.isMultiple) {
           setIsMultipleHall(true);
           setHalls(selected.halls || []);
@@ -187,7 +188,7 @@ setAllTheaters(activeTheaters);
     setFormData((prev) => ({
       ...prev,
       location,
-      theater: isValidTheater ? prev.theater : "", 
+      theater: isValidTheater ? prev.theater : "",
       hall_name: "",
     }));
 
@@ -212,7 +213,7 @@ setAllTheaters(activeTheaters);
   const handleTheaterChange = (e) => {
     const theaterId = e.target.value;
 
-    const selected = theaters.find((t) => t._id === theaterId); 
+    const selected = theaters.find((t) => t._id === theaterId);
 
     setFormData((prev) => ({
       ...prev,
@@ -374,7 +375,9 @@ setAllTheaters(activeTheaters);
               >
                 <option value="">Select Hall</option>
                 {halls.map((h, i) => (
-                  <option key={i}>{h.hall_name}</option>
+                  <option key={i} value={h.hall_name}>
+                    {h.hall_name}
+                  </option>
                 ))}
               </select>
             </div>
@@ -455,9 +458,7 @@ setAllTheaters(activeTheaters);
         </div>
         <br />
 
-        <button className="bg-blue-600 text-white px-6 py-3">
-          Update
-        </button>
+        <button className="bg-blue-600 text-white px-6 py-3">Update</button>
       </form>
     </div>
   );

@@ -12,6 +12,8 @@ const AddShow = () => {
   const [languages, setLanguages] = useState([]);
   const [selectedSubCategories, setSelectedSubCategories] = useState([]);
   const [media, setMedia] = useState([{ type: "image", url: "" }]);
+
+  const [gallery, setGallery] = useState([]);
   const [locations, setLocations] = useState([
     {
       locationName: "",
@@ -57,6 +59,42 @@ const AddShow = () => {
     updated.splice(index, 1);
     setMedia(updated);
   };
+
+
+    const addGallery = () => {
+      setGallery([...gallery, { gallerytype: "image", galleryurl: "" }]);
+    };
+
+    const handleGalleryChange = (index, field, value) => {
+      const updated = [...gallery];
+      updated[index][field] = value;
+
+      if (field === "galleryurl") {
+        const gallerytype = updated[index].gallerytype;
+
+        if (gallerytype === "youtube") {
+          const id = getYouTubeVideoId(value);
+          if (!id && value !== "") {
+            toast.warn("Enter valid YouTube link");
+          }
+        }
+
+        if (gallerytype === "image") {
+          const isYT = getYouTubeVideoId(value);
+          if (isYT) {
+            toast.warn("This looks like YouTube link, change type");
+          }
+        }
+      }
+
+      setGallery(updated);
+    };
+
+    const removeGallery = (index) => {
+      const updated = [...gallery];
+      updated.splice(index, 1);
+      setGallery(updated);
+    };
 
   const [artists, setArtists] = useState([
     { artist_name: "", designation: "", artist_image: "" },
@@ -126,7 +164,7 @@ const AddShow = () => {
       [name]: type === "checkbox" ? checked : value,
     });
 
-    //  CATEGORY CHANGE LOGIC
+    //  CATEGORY CHANGE LOGIC 
     if (name === "category") {
       const selectedCategory = categories.find((cat) => cat._id === value);
 
@@ -253,6 +291,23 @@ const AddShow = () => {
         return item;
       });
 
+      const formattedGallery = gallery
+        .filter((item) => item.galleryurl && item.galleryurl.trim() !== "")
+        .map((item, index) => {
+          if (item.gallerytype === "youtube") {
+            const videoId = getYouTubeVideoId(item.galleryurl);
+
+            if (!videoId) {
+              toast.error(`Gallery ${index + 1}: Invalid YouTube URL`);
+              throw new Error("Invalid YouTube");
+            }
+
+            return { gallerytype: "youtube", galleryurl: videoId };
+          }
+
+          return item;
+        });
+
       const filteredArtists = artists.filter(
         (a) =>
           a.artist_name.trim() !== "" ||
@@ -266,6 +321,7 @@ const AddShow = () => {
         subCategory: selectedSubCategories,
         artists: filteredArtists.length > 0 ? filteredArtists : [],
         media: formattedMedia,
+        gallery: formattedGallery,
       };
 
       if (formData.isMultipleLocation) {
@@ -368,7 +424,7 @@ const AddShow = () => {
         </div>
 
         <div className="mt-8">
-          <label className="font-semibold">Images / YouTube Links</label>
+          <label className="font-semibold">Banner Images / YouTube Links</label>
 
           {media.map((item, index) => (
             <div key={index} className="flex gap-2 mb-2">
@@ -663,6 +719,53 @@ const AddShow = () => {
               )}
             </div>
           ))}
+        </div>
+
+        <div className="mt-8">
+          <label className="font-semibold">Gallery Images / YouTube Links</label>
+
+          {gallery.map((item, index) => (
+            <div key={index} className="flex gap-2 mb-2">
+              <select
+                value={item.gallerytype}
+                onChange={(e) =>
+                  handleGalleryChange(index, "gallerytype", e.target.value)
+                }
+                className="border p-2 rounded"
+              >
+                <option value="image">Image</option>
+                <option value="youtube">YouTube</option>
+              </select>
+
+              <input
+                type="text"
+                placeholder="Enter Gallery URL"
+                value={item.galleryurl}
+                onChange={(e) =>
+                  handleGalleryChange(index, "galleryurl", e.target.value)
+                }
+                className="flex-1 border p-2 rounded"
+              />
+
+              {gallery.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => removeGallery(index)}
+                  className="bg-red-500 text-white px-3 rounded"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+          ))}
+
+          <button
+            type="button"
+            onClick={addGallery}
+            className="bg-green-600 text-white px-4 py-2 mt-2 rounded"
+          >
+            + Add Gallery
+          </button>
         </div>
 
         <div className="mt-6">

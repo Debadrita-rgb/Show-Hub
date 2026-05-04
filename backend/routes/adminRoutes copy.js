@@ -730,12 +730,6 @@ router.post(`/add-locationwise-movie`, jwtAuthMiddleware, async (req, res) => {
     const existingShows = await LocationWiseMovie.find({
       theater,
       hall_name,
-      $or: [
-        {
-          startDate: { $lte: endDate },
-          endDate: { $gte: startDate },
-        },
-      ],
     });
 
     for (let newShow of shows) {
@@ -746,8 +740,6 @@ router.post(`/add-locationwise-movie`, jwtAuthMiddleware, async (req, res) => {
         newEnd = newEnd.add(1, "day");
       }
 
-      const BUFFER_MINUTES = 30;
-
       for (let movie of existingShows) {
         for (let show of movie.shows) {
           const start = dayjs(`1970-01-01T${show.startTime}`);
@@ -757,22 +749,10 @@ router.post(`/add-locationwise-movie`, jwtAuthMiddleware, async (req, res) => {
             end = end.add(1, "day");
           }
 
-          const allowedStart = end.add(BUFFER_MINUTES, "minute");
-
           if (newStart.isBefore(end) && newEnd.isAfter(start)) {
             return res.status(400).json({
               success: false,
               message: `Hall already has a show between ${show.startTime} - ${show.endTime}`,
-            });
-          }
-
-          if (
-            newStart.isBefore(allowedStart) &&
-            newStart.isAfter(end.subtract(1, "minute"))
-          ) {
-            return res.status(400).json({
-              success: false,
-              message: `Next show must start at least ${BUFFER_MINUTES} minutes after ${show.endTime}`,
             });
           }
         }

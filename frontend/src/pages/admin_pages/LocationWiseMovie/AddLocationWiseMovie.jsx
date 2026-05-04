@@ -128,7 +128,7 @@ const AddLocationWiseMovie = () => {
       if (prevShow.endTime) {
         let prevEnd = dayjs(`1970-01-01T${prevShow.endTime}`);
 
-        const allowedStart = prevEnd.add(20, "minute");
+        const allowedStart = prevEnd.add(30, "minute");
 
         if (newStart.isBefore(allowedStart)) {
           toast.error(
