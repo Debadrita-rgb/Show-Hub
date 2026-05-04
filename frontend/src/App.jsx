@@ -23,7 +23,6 @@ import UserHomePage from "./pages/users_pages/Index/Index";
 import SignUp from "./pages/users_pages/signUp/signUp";
 import VerifyOtp from "./pages/users_pages/signUp/VerifyOtp.jsx";
 import SignIn from "./pages/users_pages/signIn/signIn";
-import About from "./pages/users_pages/about/about";
 import Contact from "./pages/users_pages/contact/contact";
 import SeatArrangementPage from "./components/usersComponents/booking/Movie/SeatArrangementPage.jsx";
 import SingleMovie from "./components/usersComponents/MovieGallery/SingleMovie";
@@ -124,7 +123,6 @@ const App = () => {
               <Route path="/signup" element={<SignUp />} />
               <Route path="/verify-otp" element={<VerifyOtp />} />
               <Route path="/signin" element={<SignIn />} />
-              <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/feedback" element={<UserFeedback />} />
               <Route path="/faq" element={<Faq />} />
