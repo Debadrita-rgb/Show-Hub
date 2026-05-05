@@ -535,7 +535,7 @@ router.get("/get-categorized-show/:categoryId", async (req, res) => {
 router.get("/get-maincategory/:categoryId", async (req, res) => {
   try {
     const { categoryId } = req.params;
-    
+
     const category = await Category.findById(categoryId);
     if (!category) {
       return res.status(404).json({ message: "Category not found" });
@@ -831,7 +831,7 @@ router.post("/confirm-booking", jwtAuthMiddleware, async (req, res) => {
       paymentStatus: "Success",
       bookingStatus: "Confirmed",
     });
-// console.log(booking);
+    // console.log(booking);
     await booking.save();
 
     await SeatLock.updateOne(
@@ -850,7 +850,7 @@ router.post("/confirm-booking", jwtAuthMiddleware, async (req, res) => {
     if (!user || !theater || !movie) {
       return res.status(404).json({ message: "Data not found" });
     }
-const type="Movie";
+    const type = "Movie";
 
     setImmediate(() => {
       sendBookingEmail(booking, user, theater, movie, type);
@@ -974,7 +974,6 @@ router.post("/cancel-booking", jwtAuthMiddleware, async (req, res) => {
       error: err.message,
     });
   }
-
 });
 
 // Partial Seat Cancel
@@ -1261,41 +1260,40 @@ router.post("/verify-ticket", async (req, res) => {
 
 router.post("/confirm-show-booking", jwtAuthMiddleware, async (req, res) => {
   try {
-const booking = new Booking({
-  ...req.body,
-  paymentStatus: "Success",
-  bookingStatus: "Confirmed",
-});
-// console.log(booking);
+    const booking = new Booking({
+      ...req.body,
+      paymentStatus: "Success",
+      bookingStatus: "Confirmed",
+    });
+    // console.log(booking);
     await booking.save();
-   const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user.id);
 
-   const details = booking.details;
+    const details = booking.details;
 
-   const fakeTheater = {
-     theater_name: details.theaterName,
-     location_name: details.locationName,
-   };
+    const fakeTheater = {
+      theater_name: details.theaterName,
+      location_name: details.locationName,
+    };
 
-   const fakeMovie = {
-     movieimage: "https://via.placeholder.com/300x450",
-   };
+    const fakeMovie = {
+      movieimage: "https://via.placeholder.com/300x450",
+    };
 
-   const normalizedBooking = {
-     ...booking.toObject(),
-     movieTitle: details.showTitle,
-     showDate: details.date,
-     showTime: details.startTime,
-     ticketPrice: details.ticketPrice,
-     seatCount: details.seatCount,
-   };
+    const normalizedBooking = {
+      ...booking.toObject(),
+      movieTitle: details.showTitle,
+      showDate: details.date,
+      showTime: details.startTime,
+      ticketPrice: details.ticketPrice,
+      seatCount: details.seatCount,
+    };
 
-   const type = "Show";
+    const type = "Show";
 
-   setImmediate(() => {
-     sendBookingEmail(normalizedBooking, user, fakeTheater, fakeMovie, type);
-   });
-
+    setImmediate(() => {
+      sendBookingEmail(normalizedBooking, user, fakeTheater, fakeMovie, type);
+    });
 
     res.json({
       message: "Booking saved successfully",
@@ -1303,6 +1301,52 @@ const booking = new Booking({
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+});
+
+router.get("/similar-shows/:id", async (req, res) => {
+  try {
+    const currentShow = await Show.findById(req.params.id);
+
+    if (!currentShow) {
+      return res.status(404).json({ message: "Show not found" });
+    }
+
+    const similarShows = await Show.find({
+      _id: { $ne: currentShow._id },
+      subCategory: { $in: currentShow.subCategory },
+      isActive: true,
+    })
+      .limit(10)
+      .sort({ createdAt: -1 });
+
+    res.json(similarShows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error fetching similar shows" });
+  }
+});
+
+router.get("/similar-movies/:id", async (req, res) => {
+  try {
+    const currentMovie = await Movie.findById(req.params.id);
+
+    if (!currentMovie) {
+      return res.status(404).json({ message: "Show not found" });
+    }
+
+    const similarMovies = await Movie.find({
+      _id: { $ne: currentMovie  ._id },
+      category: { $in: currentMovie.category },
+      isActive: true,
+    })
+      .limit(10)
+      .sort({ createdAt: -1 });
+
+    res.json(similarMovies);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error fetching similar movies" });
   }
 });
 

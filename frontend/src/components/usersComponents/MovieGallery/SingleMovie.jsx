@@ -14,12 +14,13 @@ const SingleMovie = () => {
   const [movie, setMovie] = useState(null);
   const navigate = useNavigate();
   const [showShareModal, setShowShareModal] = useState(false);
+  const [similarMovies, setSimilarMovies] = useState([]);
   const [ratingSummary, setRatingSummary] = useState({
     averageRating: 0,
     totalVotes: 0,
   });
-  const [reviews, setReviews] = useState([]); 
-  
+  const [reviews, setReviews] = useState([]);
+
   const settings = {
     dots: false,
     infinite: reviews?.length > 5,
@@ -73,6 +74,15 @@ const SingleMovie = () => {
       .then((data) => setRatingSummary(data));
   }, [id]);
 
+      useEffect(() => {
+        if (!id) return;
+
+        fetch(`${BASE_URL}/user/similar-movies/${id}`)
+          .then((res) => res.json())
+          .then((data) => setSimilarMovies(data))
+          .catch((err) => console.log(err));
+      }, [id]);
+    
   //Fetch Reviews
   const fetchReviews = () => {
     fetch(`${BASE_URL}/user/reviews/Movie/${id}`)
@@ -137,7 +147,7 @@ const SingleMovie = () => {
 
     return words.slice(0, wordLimit).join(" ") + "...";
   };
-// console.log(movie);
+  // console.log(movie);
   const settings_cast = {
     dots: false,
     infinite: movie?.casting?.length > 5,
@@ -182,6 +192,43 @@ const SingleMovie = () => {
       },
     ],
   };
+
+  const limitText = (text, maxLength = 40) => {
+    if (!text) return "";
+    return text.length > maxLength
+      ? text.substring(0, maxLength) + "..."
+      : text;
+  };
+
+  const similarSettings = {
+    dots: false,
+    infinite: similarMovies.length > 5,
+    speed: 500,
+    slidesToShow: 5,
+    slidesToScroll: 1,
+    arrows: true,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 3,
+        },
+      },
+      {
+        breakpoint: 768,
+        settings: {
+          slidesToShow: 2,
+        },
+      },
+      {
+        breakpoint: 480,
+        settings: {
+          slidesToShow: 1,
+        },
+      },
+    ],
+  };
+
   return (
     <div className="overflow-x-hidden">
       {" "}
@@ -276,9 +323,7 @@ const SingleMovie = () => {
                   />
 
                   <h3 className="mt-2 font-semibold">{cast.castname}</h3>
-                  <p className="text-sm text-white">
-                    {cast.inmoviecastname}
-                  </p>
+                  <p className="text-sm text-white">{cast.inmoviecastname}</p>
                 </div>
               ))}
             </Slider>
@@ -343,7 +388,6 @@ const SingleMovie = () => {
                           {review.userId?.name
                             ? `${review.userId?.name.slice(0, 10)}${review.userId?.name.length > 10 ? "..." : ""}`
                             : "User"}
-
                         </p>
                       </div>
                     </div>
@@ -419,6 +463,39 @@ const SingleMovie = () => {
               </button>
             </div>
           </div>
+        </div>
+      )}
+      {similarMovies?.length > 0 && (
+        <div className="px-4 sm:px-6 md:px-10 lg:px-16 py-8 sm:py-10">
+          <h2 className="text-2xl font-bold mb-6">You May Also Like</h2>
+
+          <Slider {...similarSettings}>
+            {similarMovies.map((item) => (
+              <div key={item._id} className="px-2">
+                <div
+                  onClick={() =>
+                    navigate(`/movie/${createSlug(item.title)}/${item._id}`)
+                  }
+                  className="cursor-pointer bg-white rounded-lg overflow-hidden shadow hover:scale-105 transition"
+                >
+                  <img
+                    src={item.movieimage}
+                    alt={item.title}
+                    className="w-full h-85 object-cover"
+                  />
+
+                  <div className="p-3">
+                    <p className="text-sm font-semibold text-black">
+                      {limitWords(item.title, 5)}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {limitText(item.category?.join(", "), 40)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </Slider>
         </div>
       )}
     </div>
