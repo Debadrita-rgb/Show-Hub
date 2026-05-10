@@ -105,8 +105,8 @@ const viewBookingDetails = () => {
                           🏢{" "}
                           {order.type === "Movie"
                             ? order.hallName
-                              ? `${order.hallName} (${order.theaterName}, ${order.locationName})`
-                              : `${order.theaterName}, ${order.locationName}`
+                              ? `${order.hallName} (${order.theaterId?.theater_name}, ${order.theaterId?.location_name})`
+                              : `${order.theaterId?.theater_name}, ${order.theaterId?.location_name}`
                             : `${order.details?.theaterName}, ${order.details?.locationName}`}
                         </p>
                         <div className="max-w-4xl mx-auto">

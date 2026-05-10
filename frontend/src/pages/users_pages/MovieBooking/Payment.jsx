@@ -10,7 +10,7 @@ const Payment = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
   const booking = location.state;
-  console.log("Booking Data:", booking);
+  // console.log("Booking Data:", booking);
   const [showFeeDetails, setShowFeeDetails] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
 

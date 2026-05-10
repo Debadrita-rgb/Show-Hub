@@ -518,6 +518,15 @@ const Booking = () => {
                     : `${new Date(booking.details?.date).toDateString()} | ${booking.details?.startTime}`}
                 </p>
 
+                <p className="text-xs sm:text-sm text-gray-400 mt-1">
+                  🏢{" "}
+                  {booking.type === "Movie"
+                    ? booking.hallName
+                      ? `${booking.hallName} (${booking.theater?.theater_name}, ${booking.theater?.location_name})`
+                      : `${booking.theater?.theater_name}, ${booking.theater?.location_name}`
+                    : `${booking.details?.theaterName}, ${booking.details?.locationName}`}
+                </p>
+
                 {booking.type === "Show" && (
                   <div>
                     {" "}
@@ -636,7 +645,7 @@ const Booking = () => {
                 <p
                   className={`text-xs sm:text-sm mt-1 ${
                     booking.paymentStatus === "Success"
-                      ? "text-green-600"
+                      ? "text-green-600 font-bold"
                       : "text-red-500"
                   }`}
                 >
@@ -670,7 +679,7 @@ const Booking = () => {
               >
                 View Booking Info
               </button>
-              {booking.bookingStatus !== "Cancelled" && (
+              {booking.bookingStatus !== "Cancelled" && !canRateBooking(booking) && (
                 <button
                   onClick={() => openGoogleCalender(booking)}
                   className="border border-purple-600 px-3 sm:px-4 py-2 rounded text-sm hover:bg-purple-200 hover:text-black sm:mb-2"
@@ -930,12 +939,10 @@ const Booking = () => {
                   {selectedBooking.details?.ticketPrice}
                 </p>
                 <p>
-                  <b>Seat Count:</b> ₹
-                  {selectedBooking.details?.seatCount}
+                  <b>Seat Count:</b> ₹{selectedBooking.details?.seatCount}
                 </p>
                 <p>
-                  <b>Total:</b> ₹
-                  {selectedBooking.details?.seatAmount}
+                  <b>Total:</b> ₹{selectedBooking.details?.seatAmount}
                 </p>
               </div>
             )}
@@ -1051,7 +1058,7 @@ const Booking = () => {
           </div>
         </div>
       )}
-      
+
       {showRateModal && (
         <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50">
           <div className="bg-white w-[90%] max-w-[400px] p-6 rounded-xl relative">
