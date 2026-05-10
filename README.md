@@ -224,13 +224,16 @@ SENDGRID_API_KEY=your_sendgrid_key
 ![Home](./readme_image/home.png)
 
 ## Movie Details
-![Movie Details](./screenshots/movie-details.png)
+![Movie Details](./readme_image/movie-details.png)
 
 ## Seat Booking
-![Seat Booking](./screenshots/booking.png)
+![Seat Booking](./readme_image/seat-booking.png)
 
 ## Admin Dashboard
-![Admin Dashboard](./screenshots/admin.png)
+![Admin Dashboard](./readme_image/admin_dashboard.png)
+
+## Booking Details
+![Booking](./readme_image/booking.png)
 
 ---
 
