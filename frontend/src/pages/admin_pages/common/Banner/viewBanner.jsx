@@ -62,7 +62,7 @@ const ViewBanner = () => {
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
           showActiveColumn={false}
-          showAddButton={true}
+          showAddButton={false}
           addPath="/admin/add-banner"
           showRecommendedeColumn={false}
         />
