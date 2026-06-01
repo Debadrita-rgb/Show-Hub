@@ -8,15 +8,14 @@ import BASE_URL from "../../../../config";
 import { useAuth } from "../../../context/AuthContext";
 
 const VerifyOtp = () => {
-  const email = location.state?.email;
-  const generatedOtp = location.state?.otp;
-
   const [otp, setOtp] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
 
   const email = location.state?.email;
+  const generatedOtp = location.state?.otp;
+
 
   const handleVerify = async (e) => {
     e.preventDefault();
