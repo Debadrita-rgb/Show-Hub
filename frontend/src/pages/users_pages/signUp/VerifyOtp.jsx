@@ -8,6 +8,9 @@ import BASE_URL from "../../../../config";
 import { useAuth } from "../../../context/AuthContext";
 
 const VerifyOtp = () => {
+  const email = location.state?.email;
+  const generatedOtp = location.state?.otp;
+
   const [otp, setOtp] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
@@ -65,7 +68,7 @@ const VerifyOtp = () => {
           <p className="text-center text-sm mb-6 text-gray-300">
             OTP sent to <span className="font-semibold">{email}</span>
           </p>
-          <p>OTP is : {otp}</p>
+          <p>OTP is : {generatedOtp}</p>
           <form onSubmit={handleVerify} className="space-y-6">
             <input
               type="text"

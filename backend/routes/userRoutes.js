@@ -54,7 +54,7 @@ router.post("/send-otp", async (req, res) => {
 
     // await sgMail.send(msg);
 
-    res.json({ success: true });
+    res.json({ success: true, otp });
   } catch (error) {
     console.error("SendGrid error:", error.response?.body || error.message);
   }

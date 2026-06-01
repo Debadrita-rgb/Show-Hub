@@ -81,7 +81,7 @@ export default function SignIn() {
 
       toast.success("OTP sent to your email!");
 
-      navigate("/verify-otp", { state: { email } });
+      navigate("/verify-otp", { state: { email, otp: res.data.otp } });
     } catch (err) {
       toast.error("Failed to send OTP");
     }
