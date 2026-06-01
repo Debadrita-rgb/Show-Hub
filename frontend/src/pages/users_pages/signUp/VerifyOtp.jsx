@@ -65,7 +65,7 @@ const VerifyOtp = () => {
           <p className="text-center text-sm mb-6 text-gray-300">
             OTP sent to <span className="font-semibold">{email}</span>
           </p>
-
+          <p>OTP is : {otp}</p>
           <form onSubmit={handleVerify} className="space-y-6">
             <input
               type="text"
