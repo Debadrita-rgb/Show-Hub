@@ -64,10 +64,20 @@ const VerifyOtp = () => {
         <div className="bg-white/10 backdrop-blur-md p-8 rounded-2xl shadow-lg w-full max-w-md border border-white/20">
           <h2 className="text-2xl font-bold text-center mb-4">Verify OTP</h2>
 
-          <p className="text-center text-sm mb-6 text-gray-300">
-            OTP sent to <span className="font-semibold">{email}</span>
+          <p className="text-center text-sm mb-4 text-gray-300">
+            OTP sent to: <span className="font-semibold">{email}</span>
           </p>
-          <p>OTP is : {generatedOtp}</p>
+
+          <div
+            onClick={() => setOtp(generatedOtp)}
+            className="cursor-pointer bg-indigo-500/20 border border-indigo-400/30 rounded-lg p-3 text-center mb-6 hover:bg-indigo-500/30 transition"
+          >
+            <p className="text-xs text-gray-300">Click to auto-fill OTP</p>
+            <p className="text-2xl font-bold text-yellow-300 tracking-[0.3em]">
+              {generatedOtp}
+            </p>
+          </div>
+
           <form onSubmit={handleVerify} className="space-y-6">
             <input
               type="text"
